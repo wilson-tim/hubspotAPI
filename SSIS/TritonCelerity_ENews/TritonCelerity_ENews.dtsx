@@ -1,0 +1,2356 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="2/22/2016 10:17:30 AM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="SHG-LT-006267"
+  DTS:CreatorName="NEXUS\DHolmes"
+  DTS:DTSID="{B33E544D-A274-4152-9A25-CF3A05B7C6A7}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="12.0.5000.0"
+  DTS:LocaleID="2057"
+  DTS:ObjectName="TritonCelerity_ENews"
+  DTS:PackageType="5"
+  DTS:VersionBuild="7"
+  DTS:VersionGUID="{BCB9F928-870A-4709-8868-52B6EF97142E}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[CelerityMarine_Stage]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{3BC8C6A6-876E-4E43-8B6E-41D7C0B4701A}"
+      DTS:ObjectName="CelerityMarine_Stage">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=V-AWD-SQL-11;Initial Catalog=CelerityMarine_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[Live.TRITON_Stage]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{5A711365-63D0-499B-BCB5-B07A0F9508AC}"
+      DTS:ObjectName="Live.TRITON_Stage">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=V-AWD-SQL-09;Initial Catalog=TRITON_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Load Sunsail EFMST"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{B18EEC78-3FC0-4146-8714-BE49B498D33E}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Sunsail EFMST"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load Sunsail EFMST\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[TRT_Sunsail_ST_EFMST]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Sunsail EFMST\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[CelerityMarine_Stage]"
+                  connectionManagerRefId="Package.ConnectionManagers[CelerityMarine_Stage]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFNUMB]"
+                      cachedDataType="wstr"
+                      cachedLength="40"
+                      cachedName="EFNUMB"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFNUMB]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFNUMB]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFNAM]"
+                      cachedDataType="wstr"
+                      cachedLength="40"
+                      cachedName="EFFNAM"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFNAM]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFNAM]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFLNAM]"
+                      cachedDataType="wstr"
+                      cachedLength="56"
+                      cachedName="EFLNAM"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLNAM]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLNAM]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFMAIL]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="EFMAIL"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMAIL]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMAIL]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFWPID]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFWPID"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFWPID]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFWPID]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCTCD]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFCTCD"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTCD]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTCD]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFLGID]"
+                      cachedDataType="wstr"
+                      cachedLength="1"
+                      cachedName="EFLGID"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLGID]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLGID]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSITE]"
+                      cachedDataType="wstr"
+                      cachedLength="1"
+                      cachedName="EFSITE"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSITE]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSITE]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFEMYN]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFEMYN"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFEMYN]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFEMYN]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFETDT]"
+                      cachedDataType="i4"
+                      cachedName="EFETDT"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFETDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFETDT]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFUSER]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFUSER"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFUSER]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFUSER]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCHDT]"
+                      cachedDataType="i4"
+                      cachedName="EFCHDT"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHDT]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCHUS]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFCHUS"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHUS]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHUS]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCTDT]"
+                      cachedDataType="i4"
+                      cachedName="EFCTDT"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTDT]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFRPDT]"
+                      cachedDataType="i4"
+                      cachedName="EFRPDT"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPDT]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFRPCD]"
+                      cachedDataType="i4"
+                      cachedName="EFRPCD"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPCD]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPCD]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFMRCD]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFMRCD"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRCD]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRCD]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFMRC2]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFMRC2"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRC2]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRC2]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSPI1]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFSPI1"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI1]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI1]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSPI2]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFSPI2"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI2]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI2]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSPI3]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFSPI3"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI3]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI3]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFDTE1]"
+                      cachedDataType="i4"
+                      cachedName="EFDTE1"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE1]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE1]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFDTE2]"
+                      cachedDataType="i4"
+                      cachedName="EFDTE2"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE2]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE2]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFLG1]"
+                      cachedDataType="wstr"
+                      cachedLength="3"
+                      cachedName="EFFLG1"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG1]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG1]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFLG2]"
+                      cachedDataType="wstr"
+                      cachedLength="3"
+                      cachedName="EFFLG2"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG2]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG2]" />
+                    <inputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFLG3]"
+                      cachedDataType="wstr"
+                      cachedLength="1"
+                      cachedName="EFFLG3"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG3]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG3]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFNUMB]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFNUMB" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFNAM]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFFNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLNAM]"
+                      dataType="wstr"
+                      length="56"
+                      name="EFLNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMAIL]"
+                      dataType="wstr"
+                      length="50"
+                      name="EFMAIL" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFWPID]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFWPID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFCTCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLGID]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFLGID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSITE]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFSITE" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFEMYN]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFEMYN" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFETDT]"
+                      dataType="i4"
+                      name="EFETDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFUSER]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFUSER" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHDT]"
+                      dataType="i4"
+                      name="EFCHDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHUS]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFCHUS" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTDT]"
+                      dataType="i4"
+                      name="EFCTDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPDT]"
+                      dataType="i4"
+                      name="EFRPDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPCD]"
+                      dataType="i4"
+                      name="EFRPCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRC2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRC2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI1]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI3]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFSPI3" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE1]"
+                      dataType="i4"
+                      name="EFDTE1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE2]"
+                      dataType="i4"
+                      name="EFDTE2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG1]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG2]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG3]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFFLG3" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load Sunsail EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load Sunsail EFMST\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[SUNSAIL_ST_EFMST]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">0</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Sunsail EFMST\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[Live.TRITON_Stage]"
+                  connectionManagerRefId="Package.ConnectionManagers[Live.TRITON_Stage]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFNUMB]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFNUMB]"
+                      length="40"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFNUMB]"
+                      name="EFNUMB"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFNAM]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFNAM]"
+                      length="40"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFNAM]"
+                      name="EFFNAM"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLNAM]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLNAM]"
+                      length="56"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLNAM]"
+                      name="EFLNAM"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMAIL]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMAIL]"
+                      length="50"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMAIL]"
+                      name="EFMAIL"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFWPID]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFWPID]"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFWPID]"
+                      name="EFWPID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTCD]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTCD]"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTCD]"
+                      name="EFCTCD"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLGID]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLGID]"
+                      length="1"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLGID]"
+                      name="EFLGID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSITE]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSITE]"
+                      length="1"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSITE]"
+                      name="EFSITE"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFEMYN]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFEMYN]"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFEMYN]"
+                      name="EFEMYN"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFETDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFETDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFETDT]"
+                      name="EFETDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFUSER]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFUSER]"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFUSER]"
+                      name="EFUSER"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHDT]"
+                      name="EFCHDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHUS]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHUS]"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHUS]"
+                      name="EFCHUS"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTDT]"
+                      name="EFCTDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPDT]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPDT]"
+                      name="EFRPDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPCD]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPCD]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPCD]"
+                      name="EFRPCD"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRCD]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRCD]"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRCD]"
+                      name="EFMRCD"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRC2]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRC2]"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRC2]"
+                      name="EFMRC2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI1]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI1]"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI1]"
+                      name="EFSPI1"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI2]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI2]"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI2]"
+                      name="EFSPI2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI3]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI3]"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI3]"
+                      name="EFSPI3"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE1]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE1]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE1]"
+                      name="EFDTE1"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE2]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE2]"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE2]"
+                      name="EFDTE2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG1]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG1]"
+                      length="3"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG1]"
+                      name="EFFLG1"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG2]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG2]"
+                      length="3"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG2]"
+                      name="EFFLG2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG3]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG3]"
+                      length="1"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG3]"
+                      name="EFFLG3"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFNUMB]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFNUMB" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFNAM]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFFNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLNAM]"
+                      dataType="wstr"
+                      length="56"
+                      name="EFLNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMAIL]"
+                      dataType="wstr"
+                      length="50"
+                      name="EFMAIL" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFWPID]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFWPID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFCTCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLGID]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFLGID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSITE]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFSITE" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFEMYN]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFEMYN" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFETDT]"
+                      dataType="i4"
+                      name="EFETDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFUSER]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFUSER" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHDT]"
+                      dataType="i4"
+                      name="EFCHDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHUS]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFCHUS" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTDT]"
+                      dataType="i4"
+                      name="EFCTDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPDT]"
+                      dataType="i4"
+                      name="EFRPDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPCD]"
+                      dataType="i4"
+                      name="EFRPCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRC2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRC2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI1]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI3]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFSPI3" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE1]"
+                      dataType="i4"
+                      name="EFDTE1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE2]"
+                      dataType="i4"
+                      name="EFDTE2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG1]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG2]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG3]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFFLG3" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFNUMB]"
+                      dataType="wstr"
+                      length="40"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFNUMB]"
+                      name="EFNUMB" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFNAM]"
+                      dataType="wstr"
+                      length="40"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFNAM]"
+                      name="EFFNAM" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLNAM]"
+                      dataType="wstr"
+                      length="56"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLNAM]"
+                      name="EFLNAM" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMAIL]"
+                      dataType="wstr"
+                      length="50"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMAIL]"
+                      name="EFMAIL" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFWPID]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFWPID]"
+                      name="EFWPID" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTCD]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTCD]"
+                      name="EFCTCD" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLGID]"
+                      dataType="wstr"
+                      length="1"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLGID]"
+                      name="EFLGID" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSITE]"
+                      dataType="wstr"
+                      length="1"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSITE]"
+                      name="EFSITE" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFEMYN]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFEMYN]"
+                      name="EFEMYN" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFETDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFETDT]"
+                      name="EFETDT" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFUSER]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFUSER]"
+                      name="EFUSER" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHDT]"
+                      name="EFCHDT" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHUS]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHUS]"
+                      name="EFCHUS" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTDT]"
+                      name="EFCTDT" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPDT]"
+                      name="EFRPDT" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPCD]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPCD]"
+                      name="EFRPCD" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRCD]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRCD]"
+                      name="EFMRCD" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRC2]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRC2]"
+                      name="EFMRC2" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI1]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI1]"
+                      name="EFSPI1" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI2]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI2]"
+                      name="EFSPI2" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI3]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI3]"
+                      name="EFSPI3" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE1]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE1]"
+                      name="EFDTE1" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE2]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE2]"
+                      name="EFDTE2" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG1]"
+                      dataType="wstr"
+                      length="3"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG1]"
+                      name="EFFLG1" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG2]"
+                      dataType="wstr"
+                      length="3"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG2]"
+                      name="EFFLG2" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG3]"
+                      dataType="wstr"
+                      length="1"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG3]"
+                      name="EFFLG3" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load Sunsail EFMST.Paths[OLE DB Source Output]"
+              endId="Package\Load Sunsail EFMST\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load Sunsail EFMST\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Load Triton EFMST"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{6F68BDD1-FD5E-4E7F-B9AF-538AF25FDE34}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Triton EFMST"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load Triton EFMST\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[TRT_Triton_ST_EFMST]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Triton EFMST\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[CelerityMarine_Stage]"
+                  connectionManagerRefId="Package.ConnectionManagers[CelerityMarine_Stage]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFNUMB]"
+                      cachedDataType="wstr"
+                      cachedLength="40"
+                      cachedName="EFNUMB"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFNUMB]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFNUMB]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFNAM]"
+                      cachedDataType="wstr"
+                      cachedLength="40"
+                      cachedName="EFFNAM"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFNAM]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFNAM]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFLNAM]"
+                      cachedDataType="wstr"
+                      cachedLength="56"
+                      cachedName="EFLNAM"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLNAM]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLNAM]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFMAIL]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="EFMAIL"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMAIL]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMAIL]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFWPID]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFWPID"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFWPID]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFWPID]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCTCD]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFCTCD"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTCD]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTCD]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFLGID]"
+                      cachedDataType="wstr"
+                      cachedLength="1"
+                      cachedName="EFLGID"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLGID]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLGID]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSITE]"
+                      cachedDataType="wstr"
+                      cachedLength="1"
+                      cachedName="EFSITE"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSITE]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSITE]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFEMYN]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFEMYN"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFEMYN]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFEMYN]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFETDT]"
+                      cachedDataType="i4"
+                      cachedName="EFETDT"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFETDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFETDT]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFUSER]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFUSER"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFUSER]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFUSER]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCHDT]"
+                      cachedDataType="i4"
+                      cachedName="EFCHDT"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHDT]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCHUS]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFCHUS"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHUS]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHUS]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFCTDT]"
+                      cachedDataType="i4"
+                      cachedName="EFCTDT"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTDT]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFRPDT]"
+                      cachedDataType="i4"
+                      cachedName="EFRPDT"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPDT]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFRPCD]"
+                      cachedDataType="i4"
+                      cachedName="EFRPCD"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPCD]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPCD]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFMRCD]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFMRCD"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRCD]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRCD]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFMRC2]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFMRC2"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRC2]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRC2]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSPI1]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFSPI1"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI1]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI1]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSPI2]"
+                      cachedDataType="wstr"
+                      cachedLength="2"
+                      cachedName="EFSPI2"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI2]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI2]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFSPI3]"
+                      cachedDataType="wstr"
+                      cachedLength="10"
+                      cachedName="EFSPI3"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI3]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI3]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFDTE1]"
+                      cachedDataType="i4"
+                      cachedName="EFDTE1"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE1]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE1]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFDTE2]"
+                      cachedDataType="i4"
+                      cachedName="EFDTE2"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE2]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE2]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFLG1]"
+                      cachedDataType="wstr"
+                      cachedLength="3"
+                      cachedName="EFFLG1"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG1]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG1]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFLG2]"
+                      cachedDataType="wstr"
+                      cachedLength="3"
+                      cachedName="EFFLG2"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG2]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG2]" />
+                    <inputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EFFLG3]"
+                      cachedDataType="wstr"
+                      cachedLength="1"
+                      cachedName="EFFLG3"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG3]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG3]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFNUMB]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFNUMB" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFNAM]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFFNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLNAM]"
+                      dataType="wstr"
+                      length="56"
+                      name="EFLNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMAIL]"
+                      dataType="wstr"
+                      length="50"
+                      name="EFMAIL" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFWPID]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFWPID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFCTCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFLGID]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFLGID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSITE]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFSITE" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFEMYN]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFEMYN" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFETDT]"
+                      dataType="i4"
+                      name="EFETDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFUSER]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFUSER" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHDT]"
+                      dataType="i4"
+                      name="EFCHDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCHUS]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFCHUS" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFCTDT]"
+                      dataType="i4"
+                      name="EFCTDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPDT]"
+                      dataType="i4"
+                      name="EFRPDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFRPCD]"
+                      dataType="i4"
+                      name="EFRPCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFMRC2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRC2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI1]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFSPI3]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFSPI3" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE1]"
+                      dataType="i4"
+                      name="EFDTE1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFDTE2]"
+                      dataType="i4"
+                      name="EFDTE2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG1]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG2]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EFFLG3]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFFLG3" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load Triton EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load Triton EFMST\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[TRITON_ST_EFMST]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">0</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Triton EFMST\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[Live.TRITON_Stage]"
+                  connectionManagerRefId="Package.ConnectionManagers[Live.TRITON_Stage]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFNUMB]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFNUMB]"
+                      length="40"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFNUMB]"
+                      name="EFNUMB"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFNAM]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFNAM]"
+                      length="40"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFNAM]"
+                      name="EFFNAM"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLNAM]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLNAM]"
+                      length="56"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLNAM]"
+                      name="EFLNAM"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMAIL]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMAIL]"
+                      length="50"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMAIL]"
+                      name="EFMAIL"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFWPID]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFWPID]"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFWPID]"
+                      name="EFWPID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTCD]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTCD]"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTCD]"
+                      name="EFCTCD"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLGID]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLGID]"
+                      length="1"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFLGID]"
+                      name="EFLGID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSITE]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSITE]"
+                      length="1"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSITE]"
+                      name="EFSITE"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFEMYN]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFEMYN]"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFEMYN]"
+                      name="EFEMYN"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFETDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFETDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFETDT]"
+                      name="EFETDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFUSER]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFUSER]"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFUSER]"
+                      name="EFUSER"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHDT]"
+                      name="EFCHDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHUS]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHUS]"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCHUS]"
+                      name="EFCHUS"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFCTDT]"
+                      name="EFCTDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPDT]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPDT]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPDT]"
+                      name="EFRPDT"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPCD]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPCD]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFRPCD]"
+                      name="EFRPCD"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRCD]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRCD]"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRCD]"
+                      name="EFMRCD"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRC2]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRC2]"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFMRC2]"
+                      name="EFMRC2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI1]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI1]"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI1]"
+                      name="EFSPI1"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI2]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI2]"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI2]"
+                      name="EFSPI2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI3]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI3]"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFSPI3]"
+                      name="EFSPI3"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE1]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE1]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE1]"
+                      name="EFDTE1"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE2]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE2]"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFDTE2]"
+                      name="EFDTE2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG1]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG1]"
+                      length="3"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG1]"
+                      name="EFFLG1"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG2]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG2]"
+                      length="3"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG2]"
+                      name="EFFLG2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG3]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG3]"
+                      length="1"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].Columns[EFFLG3]"
+                      name="EFFLG3"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFNUMB]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFNUMB" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFNAM]"
+                      dataType="wstr"
+                      length="40"
+                      name="EFFNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLNAM]"
+                      dataType="wstr"
+                      length="56"
+                      name="EFLNAM" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMAIL]"
+                      dataType="wstr"
+                      length="50"
+                      name="EFMAIL" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFWPID]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFWPID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFCTCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFLGID]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFLGID" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSITE]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFSITE" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFEMYN]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFEMYN" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFETDT]"
+                      dataType="i4"
+                      name="EFETDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFUSER]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFUSER" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHDT]"
+                      dataType="i4"
+                      name="EFCHDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCHUS]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFCHUS" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFCTDT]"
+                      dataType="i4"
+                      name="EFCTDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPDT]"
+                      dataType="i4"
+                      name="EFRPDT" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFRPCD]"
+                      dataType="i4"
+                      name="EFRPCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRCD]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRCD" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFMRC2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFMRC2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI1]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI2]"
+                      dataType="wstr"
+                      length="2"
+                      name="EFSPI2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFSPI3]"
+                      dataType="wstr"
+                      length="10"
+                      name="EFSPI3" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE1]"
+                      dataType="i4"
+                      name="EFDTE1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFDTE2]"
+                      dataType="i4"
+                      name="EFDTE2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG1]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG1" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG2]"
+                      dataType="wstr"
+                      length="3"
+                      name="EFFLG2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EFFLG3]"
+                      dataType="wstr"
+                      length="1"
+                      name="EFFLG3" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFNUMB]"
+                      dataType="wstr"
+                      length="40"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFNUMB]"
+                      name="EFNUMB" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFNAM]"
+                      dataType="wstr"
+                      length="40"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFNAM]"
+                      name="EFFNAM" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLNAM]"
+                      dataType="wstr"
+                      length="56"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLNAM]"
+                      name="EFLNAM" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMAIL]"
+                      dataType="wstr"
+                      length="50"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMAIL]"
+                      name="EFMAIL" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFWPID]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFWPID]"
+                      name="EFWPID" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTCD]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTCD]"
+                      name="EFCTCD" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLGID]"
+                      dataType="wstr"
+                      length="1"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFLGID]"
+                      name="EFLGID" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSITE]"
+                      dataType="wstr"
+                      length="1"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSITE]"
+                      name="EFSITE" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFEMYN]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFEMYN]"
+                      name="EFEMYN" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFETDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFETDT]"
+                      name="EFETDT" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFUSER]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFUSER]"
+                      name="EFUSER" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHDT]"
+                      name="EFCHDT" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHUS]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCHUS]"
+                      name="EFCHUS" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFCTDT]"
+                      name="EFCTDT" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPDT]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPDT]"
+                      name="EFRPDT" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPCD]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFRPCD]"
+                      name="EFRPCD" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRCD]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRCD]"
+                      name="EFMRCD" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRC2]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFMRC2]"
+                      name="EFMRC2" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI1]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI1]"
+                      name="EFSPI1" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI2]"
+                      dataType="wstr"
+                      length="2"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI2]"
+                      name="EFSPI2" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI3]"
+                      dataType="wstr"
+                      length="10"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFSPI3]"
+                      name="EFSPI3" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE1]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE1]"
+                      name="EFDTE1" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE2]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFDTE2]"
+                      name="EFDTE2" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG1]"
+                      dataType="wstr"
+                      length="3"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG1]"
+                      name="EFFLG1" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG2]"
+                      dataType="wstr"
+                      length="3"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG2]"
+                      name="EFFLG2" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG3]"
+                      dataType="wstr"
+                      length="1"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EFFLG3]"
+                      name="EFFLG3" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load Triton EFMST.Paths[OLE DB Source Output]"
+              endId="Package\Load Triton EFMST\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load Triton EFMST\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\TRUNCATE TABLES"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{087F83D9-2841-432D-97EF-55941EAC381A}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="TRUNCATE TABLES"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2014; © 2014 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{3BC8C6A6-876E-4E43-8B6E-41D7C0B4701A}"
+          SQLTask:SqlStatementSource="TRUNCATE TABLE TRT_Sunsail_ST_EFMST&#xA;TRUNCATE TABLE TRT_Triton_ST_EFMST&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{BCAAEDB0-B360-4DD1-9B5D-E49274D79CBA}"
+      DTS:From="Package\TRUNCATE TABLES"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Load Sunsail EFMST" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{1968A822-CCE7-4BFC-BCBC-ED1AE0217191}"
+      DTS:From="Package\Load Sunsail EFMST"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\Load Triton EFMST" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="sql12">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="173,42"
+          Id="Package\Load Sunsail EFMST"
+          TopLeft="184,214" />
+        <NodeLayout
+          Size="170,42"
+          Id="Package\Load Triton EFMST"
+          TopLeft="186.5,339" />
+        <NodeLayout
+          Size="172,42"
+          Id="Package\TRUNCATE TABLES"
+          TopLeft="185.5,101" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="271,143">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,71"
+              Start="0,0"
+              End="0,63.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,63.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="271,256">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,83"
+              Start="0,0"
+              End="0,75.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,75.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\Load Sunsail EFMST">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="173,42"
+          Id="Package\Load Sunsail EFMST\OLE DB Destination"
+          TopLeft="186,245" />
+        <NodeLayout
+          Size="152,42"
+          Id="Package\Load Sunsail EFMST\OLE DB Source"
+          TopLeft="195,104" />
+        <EdgeLayout
+          Id="Package\Load Sunsail EFMST.Paths[OLE DB Source Output]"
+          TopLeft="271.75,146">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,99"
+              Start="0,0"
+              End="0,91.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,91.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Load Sunsail EFMST\OLE DB Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Load Sunsail EFMST\OLE DB Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <TaskHost
+    design-time-name="Package\Load Triton EFMST">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="173,42"
+          Id="Package\Load Triton EFMST\OLE DB Destination"
+          TopLeft="193,266" />
+        <NodeLayout
+          Size="152,42"
+          Id="Package\Load Triton EFMST\OLE DB Source"
+          TopLeft="208,126" />
+        <EdgeLayout
+          Id="Package\Load Triton EFMST.Paths[OLE DB Source Output]"
+          TopLeft="281.75,168">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,98"
+              Start="0,0"
+              End="0,90.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,90.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Load Triton EFMST\OLE DB Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Load Triton EFMST\OLE DB Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

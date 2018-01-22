@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<DTSConfiguration>
+  <DTSConfigurationHeading>
+    <DTSConfigurationFileInfo GeneratedBy="NEXUS\DHolmes" GeneratedFromPackageName="NeptuneCRM" GeneratedFromPackageID="{732593F8-F91C-44DC-ABF8-C2554327F8CB}" GeneratedDate="02/09/2016 11:12:25"/>
+  </DTSConfigurationHeading>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::AMIGalaxy_ConnString].Properties[Value]" ValueType="String">
+    <ConfiguredValue>Data Source=v-awd-sql-11;User ID=;Initial Catalog=AMI_Galaxy;Integrated Security=SSPI;Auto Translate=False;Provider=SQLNCLI11.1;</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::FTPServerName].Properties[Value]" ValueType="String">
+    <ConfiguredValue>10.84.244.10</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::FTPServerPassword].Properties[Value]" ValueType="String">
+    <ConfiguredValue>dbc0ns</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::FTPServerPort].Properties[Value]" ValueType="Int32">
+    <ConfiguredValue>21</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::FTPServerUserName].Properties[Value]" ValueType="String">
+    <ConfiguredValue>dataw</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::localpath].Properties[Value]" ValueType="String">
+    <ConfiguredValue>G:\Marine\NeptuneCRM\data\FullLoad\</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::NeptuneStage_ConnString].Properties[Value]" ValueType="String">
+    <ConfiguredValue>Data Source=V-AWD-SQL-11;User ID=;Initial Catalog=NEPTUNE_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::remotepath].Properties[Value]" ValueType="String">
+    <ConfiguredValue>/data/reports/</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::UnzipExecutable].Properties[Value]" ValueType="String">
+    <ConfiguredValue>C:\Program Files\7-Zip\7z.exe</ConfiguredValue>
+  </Configuration>
+</DTSConfiguration>

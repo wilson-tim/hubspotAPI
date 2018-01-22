@@ -1,0 +1,18 @@
+<?xml version="1.0" ?> 
+<DTSConfiguration>
+<DTSConfigurationHeading>
+<DTSConfigurationFileInfo GeneratedBy="NEXUS\SFrate" GeneratedFromPackageName="NeptuneDataExtract" GeneratedFromPackageID="{B5073B05-A671-4DF5-84D4-EC6FF16314A3}" GeneratedDate="19/05/2014 18:03:57" /> 
+</DTSConfigurationHeading>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[AMI_Galaxy].Properties[InitialCatalog]" ValueType="String">
+<ConfiguredValue>AMI_Galaxy</ConfiguredValue> 
+</Configuration>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[AMI_Galaxy].Properties[ServerName]" ValueType="String">
+<ConfiguredValue>V-AWD-SQL-11</ConfiguredValue> 
+</Configuration>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[FTP Folder].Properties[ConnectionString]" ValueType="String">
+<ConfiguredValue>G:\Marine\Neptune\data\FullLoad</ConfiguredValue> 
+</Configuration>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[FTP Connection Manager].Properties[ServerPassword]" ValueType="String">
+<ConfiguredValue>dbc0ns</ConfiguredValue>
+</Configuration>
+</DTSConfiguration>
