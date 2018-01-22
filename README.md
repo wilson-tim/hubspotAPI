@@ -1,4 +1,4 @@
-Repository for HubSpot API code.
+**Repository for HubSpot API code.**
 
 This repository has a separate subdirectory for each component of the solution as follows:
 
@@ -15,5 +15,3 @@ This repository has a separate subdirectory for each component of the solution a
   - NeptuneCRM
   - TritonCelerity
   - TritonCelerity_ENews
-
-
