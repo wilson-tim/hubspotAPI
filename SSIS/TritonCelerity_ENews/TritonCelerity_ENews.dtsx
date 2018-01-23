@@ -6,13 +6,14 @@
   DTS:CreatorComputerName="SHG-LT-006267"
   DTS:CreatorName="NEXUS\DHolmes"
   DTS:DTSID="{B33E544D-A274-4152-9A25-CF3A05B7C6A7}"
+  DTS:EnableConfig="True"
   DTS:ExecutableType="Microsoft.Package"
   DTS:LastModifiedProductVersion="12.0.5000.0"
   DTS:LocaleID="2057"
   DTS:ObjectName="TritonCelerity_ENews"
   DTS:PackageType="5"
-  DTS:VersionBuild="7"
-  DTS:VersionGUID="{BCB9F928-870A-4709-8868-52B6EF97142E}">
+  DTS:VersionBuild="8"
+  DTS:VersionGUID="{02BE36E8-7673-445D-B55E-7270A9E91AD2}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -37,6 +38,14 @@
       </DTS:ObjectData>
     </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
+  <DTS:Configurations>
+    <DTS:Configuration
+      DTS:ConfigurationString="G:\SSIS_Configs\Marine\TritonCelerity_ENews.dtsConfig"
+      DTS:ConfigurationType="1"
+      DTS:CreationName=""
+      DTS:DTSID="{A1505579-B627-4153-A9CD-155D01D10B84}"
+      DTS:ObjectName="Configuration 1" />
+  </DTS:Configurations>
   <DTS:Variables />
   <DTS:Executables>
     <DTS:Executable
