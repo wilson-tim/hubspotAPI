@@ -11,7 +11,47 @@ This repository has a separate subdirectory for each component of the solution a
 \MSSQL (MSSQL scripts to build the HUBSPOT database, including data for static tables)
   
 \SSIS (SSIS packages and supporting files that generate the data for the HubSpot upload)
-  - Neptune
-  - NeptuneCRM
-  - TritonCelerity
-  - TritonCelerity_ENews
+  Neptune
+  NeptuneCRM
+  TritonCelerity
+  TritonCelerity_ENews
+
+
+The G: drive folder structure supporting the SSIS packages has been revised and simplified as follows:
+
+G:\
+|
+|--Marine
+   |
+   |--Neptune
+   |  |
+   |  |--data
+   |     |
+   |     |--Archive
+   |     |
+   |     |--FullLoad
+   |
+   |--NeptuneCRM
+   |  |
+   |  |--data
+   |     |
+   |     |--Archive
+   |     |
+   |     |--FullLoad
+   |
+   |--MarineCRM 
+   |  |
+   |  |--HUBSPOT
+   |
+   |--Triton
+      |
+      |--data
+      |  |
+      |  |--Archive
+      |  |
+      |  |--FullLoad
+      |  
+      |--Batch_files
+
+
+*
