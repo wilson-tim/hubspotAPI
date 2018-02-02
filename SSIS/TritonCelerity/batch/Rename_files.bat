@@ -1,9 +1,7 @@
 REM 21/12/2017  TW  Edited batch file for DWYT-18 Marine / Hubspot testing
 
-REM for /f %%a IN ('powershell get-date -format "{yyyyMMdd}"') do set today=%%a
-REM set today=%today%%
-
-SET TODAY=20180117
+for /f %%a IN ('powershell get-date -format "{yyyyMMdd}"') do set today=%%a
+set today=%today%%
 
 G:
 CD G:\Marine\Triton\data\FullLoad\

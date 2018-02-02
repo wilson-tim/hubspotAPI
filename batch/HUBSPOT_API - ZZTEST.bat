@@ -57,24 +57,4 @@ echo ***********************************************************
   HubSpot_API.exe ZZTEST SSBOOKINGS >> HUBSPOT_API_%TODAY%.log
 echo ***********************************************************
 
-echo ***********************************************************
-  echo ZLBTEST LBENEWS Process Started At %TIME:~0,2%:%TIME:~3,2% >> HUBSPOT_API_%TODAY%.log
-  HubSpot_API.exe ZLBTEST ENEWS >> HUBSPOT_API_%TODAY%.log
-echo ***********************************************************
-
-echo ***********************************************************
-  echo ZLBTEST LBBROCREQ Process Started At %TIME:~0,2%:%TIME:~3,2% >> HUBSPOT_API_%TODAY%.log
-  HubSpot_API.exe ZLBTEST BROCREQ >> HUBSPOT_API_%TODAY%.log
-echo ***********************************************************
-
-echo ***********************************************************
-  echo ZLBTEST LBQUOTES Process Started At %TIME:~0,2%:%TIME:~3,2% >> HUBSPOT_API_%TODAY%.log
-  HubSpot_API.exe ZLBTEST QUOTES >> HUBSPOT_API_%TODAY%.log
-echo ***********************************************************
-
-echo ***********************************************************
-  echo ZLBTEST LBBOOKINGS Process Started At %TIME:~0,2%:%TIME:~3,2% >> HUBSPOT_API_%TODAY%.log
-  HubSpot_API.exe ZLBTEST BOOKINGS >> HUBSPOT_API_%TODAY%.log
-echo ***********************************************************
-
 REM pause

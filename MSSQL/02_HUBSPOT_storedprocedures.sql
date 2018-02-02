@@ -10,7 +10,7 @@
 */
 USE [HUBSPOT]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -385,7 +385,7 @@ BEGIN
 		AND CLI.Lead='Yes'
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
 		--AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
 	) Result
 	WHERE 
@@ -395,7 +395,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -522,7 +522,7 @@ BEGIN
 		AND [ST_MARINE_CLIENTS].Lead='Yes'
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
 		--AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN '2017-08-03' AND '2017-09-10'
 		AND [ST_MARINE_BROCHURE_REQUEST].TYPE != 'LBE'
 	)Result
@@ -531,7 +531,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -662,7 +662,7 @@ BEGIN
 			)
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
 		--AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN '2017-08-03' and '2017-09-10'
 	)Result
 	Where RankResult=1
@@ -670,7 +670,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -998,7 +998,7 @@ BEGIN
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '%''%'
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '% %'
 		AND [ST_MARINE_REMBOOK].CompanyNo='5'
-		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
 		--AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATETIME,'2017-08-03') AND CONVERT(DATETIME,'2017-09-10')
 	)Result
 	WHERE 
@@ -1009,7 +1009,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1021,6 +1021,7 @@ BEGIN
          LifecycleStage
         ,BrandName
         ,ConfirmDate
+		,BookingSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
         ,ClientCode
@@ -1450,7 +1451,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1461,7 +1462,7 @@ BEGIN
     SELECT DISTINCT 
          LifecycleStage
         ,BrandName
-		,BookingSourcePrimary
+		,QuoteSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
         ,ClientCode
@@ -1526,7 +1527,7 @@ BEGIN
         SELECT
 			'opportunity' AS LifecycleStage,
 			'Footloose' AS BrandName,
-			COALESCE(RecentBookings.BookingSourcePrimary,'') AS BookingSourcePrimary,
+			COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS QuoteSourcePrimary,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation,'') AS BookingOfficeLocation,
 			COALESCE([SL_Simplified_Language].[LanguageSimplified],[CELERITY_ST_BOOKINGS].BookingLanguageFull,'') AS BookingLanguage,
 			CLI.ClientCode,
@@ -1626,8 +1627,8 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
             ) AS NumberOfBookings,
             CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateCreated))*60*60*1000) END AS TritonCreateDate,
-            COALESCE(RecentBookings.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            COALESCE(RecentBookings.BookingSourceTertiary,'') AS BookingSourceTertiary,
+            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
+            '' AS BookingSourceTertiary,
             COALESCE(RecentBookings.BookingSalesAgent,'') AS BookingSalesAgent,
             COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
             COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
@@ -2001,7 +2002,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2013,6 +2014,7 @@ BEGIN
          LifecycleStage
         ,BrandName
         ,ConfirmDate
+		,BookingSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
         ,ClientCode
@@ -2448,7 +2450,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2592,7 +2594,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2705,14 +2707,14 @@ BEGIN
 		WHERE
 		    TRT_SUNSAIL_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%(%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%)%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%''%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '% %'
-		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-360,112) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-8,112) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
 		--AND TRT_SUNSAIL_ST_EFMST.EFETDT >= 20170803 --AND TRT_SUNSAIL_ST_EFMST.EFETDT<= 20170203
 	)Result
 	Where RankResult=1
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2724,7 +2726,7 @@ BEGIN
          LifecycleStage
         ,BrandName
 --        ,ConfirmDate
-		,BookingSourcePrimary
+		,QuoteSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
         ,ClientCode
@@ -2796,7 +2798,7 @@ BEGIN
 			'opportunity' AS LifecycleStage,
 			'Sunsail' AS BrandName,
 			--CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS ConfirmDate,
-            COALESCE(RecentBookings.BookingSourcePrimary,'') AS BookingSourcePrimary,
+			COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS QuoteSourcePrimary,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation,'') AS BookingOfficeLocation,
 			COALESCE([SL_Simplified_Language].[LanguageSimplified],[CELERITY_ST_BOOKINGS].BookingLanguageFull,'') AS BookingLanguage,
 			CLI.ClientCode,
@@ -2904,8 +2906,8 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
             ) AS NumberOfBookings,
             CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateCreated))*60*60*1000) END AS TritonCreateDate,
-            COALESCE(RecentBookings.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            COALESCE(RecentBookings.BookingSourceTertiary,'') AS BookingSourceTertiary,
+            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
+            '' AS BookingSourceTertiary,
             COALESCE(RecentBookings.BookingSalesAgent,'') AS BookingSalesAgent,
             COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
             COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
@@ -3276,7 +3278,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3288,6 +3290,7 @@ BEGIN
          LifecycleStage
         ,BrandName
         ,ConfirmDate
+		,BookingSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
         ,ClientCode
@@ -3729,7 +3732,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3872,7 +3875,7 @@ BEGIN
 		BrochureDateRequested
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3985,14 +3988,14 @@ BEGIN
 		WHERE
 		    TRT_TRITON_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_TRITON_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%(%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%)%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%''%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '% %'
-		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-360,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-8,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
 		--AND TRT_TRITON_ST_EFMST.EFETDT >= 20170803 --AND TRT_TRITON_ST_EFMST.EFETDT<= 20170203
 	) Result
 	Where RankResult=1
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4004,7 +4007,7 @@ BEGIN
          LifecycleStage
         ,BrandName
 --        ,ConfirmDate
-		,BookingSourcePrimary
+		,QuoteSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
         ,ClientCode
@@ -4076,7 +4079,7 @@ BEGIN
 			'opportunity' AS LifecycleStage,
 			'Moorings' AS BrandName,
 			--CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS ConfirmDate,
-			COALESCE(RecentBookings.BookingSourcePrimary,'') AS BookingSourcePrimary,
+			COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS QuoteSourcePrimary,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation,'') AS BookingOfficeLocation,
 			COALESCE([SL_Simplified_Language].[LanguageSimplified],[CELERITY_ST_BOOKINGS].BookingLanguageFull,'') AS BookingLanguage,
 			CLI.ClientCode,
@@ -4184,8 +4187,8 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
             ) AS NumberOfBookings,
             CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateCreated))*60*60*1000) END AS TritonCreateDate,
-            COALESCE(RecentBookings.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            COALESCE(RecentBookings.BookingSourceTertiary,'') AS BookingSourceTertiary,
+            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
+            '' AS BookingSourceTertiary,
             COALESCE(RecentBookings.BookingSalesAgent,'') AS BookingSalesAgent,
             COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
             COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
@@ -4562,7 +4565,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4599,7 +4602,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 15/01/2018 13:40:01 ******/
+/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 01/02/2018 15:54:51 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

@@ -19,7 +19,7 @@ Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_H
 Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]" | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_TRITON_FL_BOOKINGS_" + $currdate + ".csv")
 Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]" | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_TRITON_FL_QUOTES_" + $currdate + ".csv")
 
-Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_BOOKINGS_" + $currdate + ".csv")
-Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_QUOTES_" + $currdate + ".csv")
-Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_" + $currdate + ".csv")
-Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_ENEWS_" + $currdate + ".csv")
+#Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_BOOKINGS_" + $currdate + ".csv")
+#Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_QUOTES_" + $currdate + ".csv")
+#Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_" + $currdate + ".csv")
+#Invoke-SQLcmd -ServerInstance V-AZD-SQL-11 -Query "exec [HUBSPOT].[dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]" -QueryTimeout 0 | Export-Csv -NoTypeInformation $($expLocation + "HUBSPOT_NEPTUNE_ENEWS_" + $currdate + ".csv")
