@@ -1,20 +1,23 @@
-/*    ==Scripting Parameters==
-
-    Source Server Version : SQL Server 2014 (12.0.5557)
-    Source Database Engine Edition : Microsoft SQL Server Enterprise Edition
-    Source Database Engine Type : Standalone SQL Server
-
-    Target Server Version : SQL Server 2017
-    Target Database Engine Edition : Microsoft SQL Server Standard Edition
-    Target Database Engine Type : Standalone SQL Server
-*/
 USE [HUBSPOT]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 01-Dec-2017      BUILD_HUBSPOT_NEPTUNE_BOOKINGS - Selects Neptune booking records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 01-Dec-2017      1.0         Tim Wilson         Original Version    
+-- 04-Jan-2018      1.1         Tim Wilson         First Charter selection now ge 01/01/2010
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]
 AS
 BEGIN
@@ -385,8 +388,9 @@ BEGIN
 		AND CLI.Lead='Yes'
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
-		--AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+--		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	) Result
 	WHERE 
 		RankResult=1
@@ -394,12 +398,26 @@ BEGIN
 		ConfirmDate 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 30-Nov-2017      BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS - Selects Neptune brochure request records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]
 AS
 BEGIN
@@ -522,20 +540,40 @@ BEGIN
 		AND [ST_MARINE_CLIENTS].Lead='Yes'
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
-		--AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN '2017-08-03' AND '2017-09-10'
-		AND [ST_MARINE_BROCHURE_REQUEST].TYPE != 'LBE'
+--		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+--		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+		AND NOT
+		(
+			[ST_MARINE_BROCHURE_REQUEST].BrochureName IN ('LeBoat Enews NL-EN-EUR','LeBoat Enews SE-FR-EUR','LeBoat Enews UK-EN-GBP','LeBoat Enews SE-ES-EUR','LeBoat Enews NE-EN-EUR','LeBoat Enews IE-EN-EUR','LeBoat Enews US-ES-USD','LeBoat Enews US-EN-USD','LBE','LeBoat Enews SE-EN-EUR','LeBoat Enews SE-IT-EUR','LeBoat Enews SW-SW-KRO','LeBoat Enews CA-FR-CAD','LeBoat Enews AU-EN-AUD','LeBoat Enews SW-EN-KRO','LeBoat Enews NOR-EN-EUR','LeBoat Enews NL-NL-EUR','LeBoat Enews SA-EN-RAN','LeBoat Enews NE-DE-EUR','LeBoat Enews US-FR-USD','LeBoat Enews US-AM-USD')
+			OR
+			[ST_MARINE_BROCHURE_REQUEST].TYPE = 'LBE'
+		)
 	)Result
 	Where RankResult=1
 	ORDER BY BrochureDateRequested 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 30-Nov-2017      BUILD_HUBSPOT_NEPTUNE_ENEWS - Selects Neptune enews records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]
 AS
 BEGIN
@@ -662,19 +700,35 @@ BEGIN
 			)
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
-		--AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN '2017-08-03' and '2017-09-10'
+--		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+--		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	Where RankResult=1
 	ORDER BY EnewsDateRequested
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 30-Nov-2017      BUILD_HUBSPOT_NEPTUNE_QUOTES - Selects Neptune quote records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
+-- 10-Jan-2018      1.1         Tim Wilson         Added new column QuoteSalesAgent
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]
 AS
 BEGIN
@@ -998,8 +1052,9 @@ BEGIN
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '%''%'
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '% %'
 		AND [ST_MARINE_REMBOOK].CompanyNo='5'
-		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
-		--AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATETIME,'2017-08-03') AND CONVERT(DATETIME,'2017-09-10')
+--		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+--		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	WHERE 
 		RankResult=1 
@@ -1008,12 +1063,25 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 30-Nov-2017      BUILD_HUBSPOT_TRITON_FL_BOOKINGS - Selects Triton Footloose booking records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]
 AS
 BEGIN
@@ -1441,8 +1509,9 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-        --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentBooking=1
@@ -1450,12 +1519,27 @@ BEGIN
 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 30-Nov-2017      BUILD_HUBSPOT_TRITON_FL_QUOTES - Selects Triton Footloose quote records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 10-Jan-2018      1.1         Tim Wilson         Added JOIN for most recent booking data
+--                                                 Added new column QuoteSalesAgent
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]
 AS
 BEGIN
@@ -1992,8 +2076,9 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-        --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentQuote=1
@@ -2001,12 +2086,25 @@ BEGIN
 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 29-Nov-2017      BUILD_HUBSPOT_TRITON_SS_BOOKINGS - Selects Triton Sunsail booking records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]
 AS
 BEGIN
@@ -2440,8 +2538,9 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-        --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentBooking=1
@@ -2449,12 +2548,26 @@ BEGIN
 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 29-Nov-2017      BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS - Selects Triton Sunsail brochure request records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]
 AS
 BEGIN
@@ -2582,8 +2695,9 @@ BEGIN
 			[CELERITY_ST_CLIENT].Deceased ='N'
 --		AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='S'
 		AND [TRT_CLIENT].Brand='S'
-		AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-		--AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN '2017-08-03' AND '2017-09-10'
+--		AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
 		AND [CELERITY_ST_CLIENT].Email1 not like '%[[]%' AND [CELERITY_ST_CLIENT].Email1 not like '%]%' AND [CELERITY_ST_CLIENT].Email1 not like '%(%' AND [CELERITY_ST_CLIENT].Email1 not like '%)%' AND [CELERITY_ST_CLIENT].Email1 not like '%''%' AND [CELERITY_ST_CLIENT].Email1 not like '% %'
 	)Result
@@ -2593,12 +2707,26 @@ BEGIN
 		BrochureDateRequested  DESC
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 29-Nov-2017      BUILD_HUBSPOT_TRITON_SS_ENEWS - Selects Triton Sunsail enews records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]
 AS
 BEGIN
@@ -2707,18 +2835,34 @@ BEGIN
 		WHERE
 		    TRT_SUNSAIL_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%(%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%)%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%''%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '% %'
-		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-8,112) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
-		--AND TRT_SUNSAIL_ST_EFMST.EFETDT >= 20170803 --AND TRT_SUNSAIL_ST_EFMST.EFETDT<= 20170203
+--		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-90,112) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+--		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
+		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	)Result
 	Where RankResult=1
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 29-Nov-2017      BUILD_HUBSPOT_TRITON_SS_QUOTES - Selects Triton Sunsail quotes records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 10-Jan-2018      1.1         Tim Wilson         Added JOIN for most recent booking data
+--                                                 Added new column QuoteSalesAgent
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]
 AS
 BEGIN
@@ -3268,8 +3412,9 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-        --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentQuote=1
@@ -3277,12 +3422,27 @@ BEGIN
 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 29-Nov-2017      BUILD_HUBSPOT_TRITON_TM_BOOKINGS - Selects Triton Moorings booking records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 24-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 27-Nov-2017      1.1         Tim Wilson         Continued development - removed column CancellationEmail
+--                                                 New left joins to provide First Charter and Most Recent Cancellation data
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]
 AS
 BEGIN
@@ -3722,8 +3882,9 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-        --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentBooking=1
@@ -3731,12 +3892,26 @@ BEGIN
 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 28-Nov-2017      BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS - Selects Triton Moorings brochure request records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 28-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]
 AS
 BEGIN
@@ -3864,8 +4039,9 @@ BEGIN
 			[CELERITY_ST_CLIENT].Deceased ='N'
 --		AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
 		AND [TRT_CLIENT].Brand='M'
-		AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-		--AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN '2017-08-03' AND '2017-09-10'
+--		AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
 		AND [CELERITY_ST_CLIENT].Email1 not like '%[[]%' AND [CELERITY_ST_CLIENT].Email1 not like '%]%' AND [CELERITY_ST_CLIENT].Email1 not like '%(%' AND [CELERITY_ST_CLIENT].Email1 not like '%)%' AND [CELERITY_ST_CLIENT].Email1 not like '%''%' AND [CELERITY_ST_CLIENT].Email1 not like '% %'
 	) Result
@@ -3874,12 +4050,26 @@ BEGIN
 	ORDER BY 
 		BrochureDateRequested
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 28-Nov-2017      BUILD_HUBSPOT_TRITON_TM_ENEWS - Selects Triton Moorings enews records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 28-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]
 AS
 BEGIN
@@ -3988,18 +4178,34 @@ BEGIN
 		WHERE
 		    TRT_TRITON_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_TRITON_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%(%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%)%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%''%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '% %'
-		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-8,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
-		--AND TRT_TRITON_ST_EFMST.EFETDT >= 20170803 --AND TRT_TRITON_ST_EFMST.EFETDT<= 20170203
+--		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-90,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+--		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
+		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	) Result
 	Where RankResult=1
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+--========================================================================================================================
+-- Procedure Date - Procedure Description
+-- 28-Nov-2017      BUILD_HUBSPOT_TRITON_TM_QUOTES - Selects Triton Moorings quotes records for HubSpot upload
+--
+--========================================================================================================================
+-- Change History===
+--========================================================================================================================
+-- Date             Version     Who                Comment
+-- 28-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 10-Jan-2018      1.1         Tim Wilson         Added JOIN for most recent booking data
+--                                                 Added new column QuoteSalesAgent
+--========================================================================================================================
+
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]
 AS
 BEGIN
@@ -4555,8 +4761,9 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-        --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentQuote=1
@@ -4564,8 +4771,9 @@ BEGIN
 
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4602,7 +4810,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 01/02/2018 15:54:51 ******/
+/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 07/02/2018 10:04:20 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
