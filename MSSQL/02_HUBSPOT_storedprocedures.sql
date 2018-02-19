@@ -16,6 +16,7 @@ GO
 -- Date             Version     Who                Comment
 -- 01-Dec-2017      1.0         Tim Wilson         Original Version    
 -- 04-Jan-2018      1.1         Tim Wilson         First Charter selection now ge 01/01/2010
+-- 19-Feb-2018      1.2         Tim Wilson         New selection criterion for [ST_MARINE_BOOKINGS].BookingSourcePrimary
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]
@@ -417,6 +418,8 @@ GO
 -- Date             Version     Who                Comment
 -- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
+-- 19-Feb-2018      1.2         Tim Wilson         Remove selection criterion for brochure type 'LBE'
+--                                                 This is covered by the INNER JOIN to SL_Simplified_BrochureName
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]
@@ -544,12 +547,6 @@ BEGIN
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
-		AND NOT
-		(
-			[ST_MARINE_BROCHURE_REQUEST].BrochureName IN ('LeBoat Enews NL-EN-EUR','LeBoat Enews SE-FR-EUR','LeBoat Enews UK-EN-GBP','LeBoat Enews SE-ES-EUR','LeBoat Enews NE-EN-EUR','LeBoat Enews IE-EN-EUR','LeBoat Enews US-ES-USD','LeBoat Enews US-EN-USD','LBE','LeBoat Enews SE-EN-EUR','LeBoat Enews SE-IT-EUR','LeBoat Enews SW-SW-KRO','LeBoat Enews CA-FR-CAD','LeBoat Enews AU-EN-AUD','LeBoat Enews SW-EN-KRO','LeBoat Enews NOR-EN-EUR','LeBoat Enews NL-NL-EUR','LeBoat Enews SA-EN-RAN','LeBoat Enews NE-DE-EUR','LeBoat Enews US-FR-USD','LeBoat Enews US-AM-USD')
-			OR
-			[ST_MARINE_BROCHURE_REQUEST].TYPE = 'LBE'
-		)
 	)Result
 	Where RankResult=1
 	ORDER BY BrochureDateRequested 
