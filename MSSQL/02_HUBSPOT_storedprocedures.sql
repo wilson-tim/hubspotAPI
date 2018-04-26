@@ -1,6 +1,6 @@
 USE [HUBSPOT]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,6 +17,7 @@ GO
 -- 01-Dec-2017      1.0         Tim Wilson         Original Version    
 -- 04-Jan-2018      1.1         Tim Wilson         First Charter selection now ge 01/01/2010
 -- 19-Feb-2018      1.2         Tim Wilson         New selection criterion for [ST_MARINE_BOOKINGS].BookingSourcePrimary
+-- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]
@@ -289,7 +290,6 @@ BEGIN
 					[ST_MARINE_BOOKINGS].BrandCode='LBT'
 				AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
 				AND [ST_MARINE_BOOKINGS].BookingType='Direct'
-				AND CLI.Deceased='N'
 				AND CLI.Lead='Yes'
 				AND CLI.Email1 LIKE '%_@%_.__%'
 				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
@@ -370,7 +370,6 @@ BEGIN
 				AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
 				AND [ST_MARINE_BOOKINGS].CancelledDate IS NOT NULL
 				AND [ST_MARINE_BOOKINGS].BookingType='Direct'
-				AND CLI.Deceased='N'
 				AND CLI.Lead='Yes'
 				AND CLI.Email1 LIKE '%_@%_.__%'
 				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
@@ -385,13 +384,12 @@ BEGIN
 			[ST_MARINE_BOOKINGS].BrandCode='LBT'
 		AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
 		AND [ST_MARINE_BOOKINGS].BookingType='Direct'
-		AND CLI.Deceased='N'
 		AND CLI.Lead='Yes'
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [ST_MARINE_BOOKINGS].BookingSourcePrimary NOT IN ('STHOL','OPS','STAFF','OWNER','OWNS')
 	) Result
 	WHERE 
@@ -401,8 +399,9 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -420,6 +419,8 @@ GO
 -- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
 -- 19-Feb-2018      1.2         Tim Wilson         Remove selection criterion for brochure type 'LBE'
 --                                                 This is covered by the INNER JOIN to SL_Simplified_BrochureName
+-- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
+-- 25-Apr-2018      1.4         Tim Wilson         Revised client link using URN
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]
@@ -500,13 +501,14 @@ BEGIN
 			[NEPTUNE_Stage].[dbo].[ST_MARINE_BROCHURE_REQUEST] WITH (NOLOCK)
 		INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_CLIENTS] WITH (NOLOCK)
 			ON [ST_MARINE_BROCHURE_REQUEST].ClientCode=[ST_MARINE_CLIENTS].ClientCode
+			AND [ST_MARINE_BROCHURE_REQUEST].F_CONTACT_URN = [ST_MARINE_CLIENTS].F_URN
 		INNER JOIN [HUBSPOT].[dbo].[SL_Simplified_BrochureName] WITH (NOLOCK)
 			ON [SL_Simplified_BrochureName].[BrochureNameActual]=[ST_MARINE_BROCHURE_REQUEST].[Type] AND [SL_Simplified_BrochureName].[BrandName]='LBT'
 		INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_MAIL_CONTACT] WITH (NOLOCK) 
 			ON [NEPTUNE_MAIL_CONTACT].F_mail_no = [ST_MARINE_CLIENTS].MailNo
-		INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
-            ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
-            AND [NEPTUNE_FAMILY].F_leader = 'true'
+		--INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
+        --    ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
+        --    AND [NEPTUNE_FAMILY].F_leader = 'true'
 		-- Most recent booking
 		LEFT JOIN
 		(
@@ -540,21 +542,20 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
 			ON [SL_Simplified_Title].[TitleActual]=[ST_MARINE_CLIENTS].Title
 		WHERE
-			[ST_MARINE_CLIENTS].Deceased='N'
-		AND [ST_MARINE_CLIENTS].Lead='Yes'
-		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
+			[ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
---		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	Where RankResult=1
 	ORDER BY BrochureDateRequested 
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -570,6 +571,9 @@ GO
 -- Date             Version     Who                Comment
 -- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
+-- 19-Feb-2018      1.2         Tim Wilson         Improved brochure type/name filtering
+-- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
+-- 25-Apr-2018      1.4         Tim Wilson         Revised client link using URN
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]
@@ -650,11 +654,12 @@ BEGIN
 			[NEPTUNE_Stage].[dbo].[ST_MARINE_BROCHURE_REQUEST] WITH (NOLOCK)
 		INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_CLIENTS] WITH (NOLOCK)
 			ON [ST_MARINE_BROCHURE_REQUEST].ClientCode=[ST_MARINE_CLIENTS].ClientCode
+			AND [ST_MARINE_BROCHURE_REQUEST].F_CONTACT_URN = [ST_MARINE_CLIENTS].F_URN
 		INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_MAIL_CONTACT] WITH (NOLOCK) 
 			ON [NEPTUNE_MAIL_CONTACT].F_mail_no = [ST_MARINE_CLIENTS].MailNo
-		INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
-            ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
-            AND [NEPTUNE_FAMILY].F_leader = 'true'
+		--INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
+        --    ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
+        --    AND [NEPTUNE_FAMILY].F_leader = 'true'
 		-- Most recent booking
 		LEFT JOIN
 		(
@@ -688,27 +693,25 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
 			ON [SL_Simplified_Title].[TitleActual]=[ST_MARINE_CLIENTS].Title
 		WHERE
-			[ST_MARINE_CLIENTS].Deceased='N'
-		AND [ST_MARINE_CLIENTS].Lead='Yes'
-		AND 
 			(
-				[ST_MARINE_BROCHURE_REQUEST].BrochureName IN ('LeBoat Enews NL-EN-EUR','LeBoat Enews SE-FR-EUR','LeBoat Enews UK-EN-GBP','LeBoat Enews SE-ES-EUR','LeBoat Enews NE-EN-EUR','LeBoat Enews IE-EN-EUR','LeBoat Enews US-ES-USD','LeBoat Enews US-EN-USD','LBE','LeBoat Enews SE-EN-EUR','LeBoat Enews SE-IT-EUR','LeBoat Enews SW-SW-KRO','LeBoat Enews CA-FR-CAD','LeBoat Enews AU-EN-AUD','LeBoat Enews SW-EN-KRO','LeBoat Enews NOR-EN-EUR','LeBoat Enews NL-NL-EUR','LeBoat Enews SA-EN-RAN','LeBoat Enews NE-DE-EUR','LeBoat Enews US-FR-USD','LeBoat Enews US-AM-USD')
-				OR
 				[ST_MARINE_BROCHURE_REQUEST].TYPE = 'LBE'
+				OR
+				[ST_MARINE_BROCHURE_REQUEST].BrochureName LIKE ('LeBoat Enews %')
 			)
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
---		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	Where RankResult=1
 	ORDER BY EnewsDateRequested
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -725,6 +728,9 @@ GO
 -- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 04-Jan-2018      1.1         Tim Wilson         Corrected joins for Most Recent Booking
 -- 10-Jan-2018      1.1         Tim Wilson         Added new column QuoteSalesAgent
+-- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
+-- 23-Apr-2018      1.4         Tim Wilson         Resolve conflict between QuoteDuration and
+--                                                 Bookings Duration
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]
@@ -760,7 +766,7 @@ BEGIN
 		,Phone1
 		,Phone2
 		,BusinessPhone
-		,Duration
+		,QuoteDuration
 		,QuoteBookRef
 		,[Status]
 		,CancelFromTelephone
@@ -785,6 +791,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
 		,BookingTotalPax
+		,Duration
 		,QuoteSalesAgent
 	FROM
 	(
@@ -818,7 +825,7 @@ BEGIN
 			COALESCE([ST_MARINE_REMBOOK].Phone1,'') AS Phone1,
 			COALESCE([ST_MARINE_REMBOOK].Phone2,'') AS Phone2,
 			COALESCE([ST_MARINE_REMBOOK].Phone3,'') AS BusinessPhone,
-			COALESCE([ST_MARINE_REMBOOK].Duration,'') AS Duration, 
+			COALESCE([ST_MARINE_REMBOOK].Duration,'') AS QuoteDuration, 
 			COALESCE([ST_MARINE_REMBOOK].BookRef,'') AS QuoteBookRef,
 			'Quote' AS Status,
 			DENSE_RANK() OVER(PARTITION BY REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@')
@@ -888,6 +895,7 @@ BEGIN
             [ST_MARINE_REMBOOK].MailNo AS CleanClientID,
             COALESCE(BKGS.BookRef,'') AS BookingCleanBookRef,
 			COALESCE(BKGS.TotalPax,0) AS BookingTotalPax,
+     		COALESCE(BKGS.Duration,'') AS Duration,
 			COALESCE([ST_MARINE_REMBOOK].AgencyKeyContactName,'') AS QuoteSalesAgent
 
 		FROM
@@ -936,7 +944,6 @@ BEGIN
 					AND [ST_MARINE_CLIENTS].Email1 NOT LIKE '%''%'
 					AND [ST_MARINE_CLIENTS].Email1 NOT LIKE '% %'
 					AND [ST_MARINE_CLIENTS].Lead = 'Yes'
-					AND [ST_MARINE_CLIENTS].Deceased = 'N'
 			) Client
 			ON REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@') = REPLACE(Client.Email1,'\@','@')
 			AND [ST_MARINE_REMBOOK].MailNo = Client.MailNo
@@ -950,6 +957,7 @@ BEGIN
 				,[ST_MARINE_BOOKINGS].TotalPax
 				--,[ST_MARINE_BOOKINGS].ConfirmDate
 				,[ST_MARINE_FBKG].Email
+     			,[ST_MARINE_BOOKINGS].[Duration] AS Duration
 				,ROW_NUMBER() OVER(PARTITION BY REPLACE([ST_MARINE_FBKG].Email,'\@','@')
 				ORDER BY [ST_MARINE_BOOKINGS].ConfirmDate DESC,
 					[ST_MARINE_BOOKINGS].BookRef DESC
@@ -1050,9 +1058,9 @@ BEGIN
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '%''%'
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '% %'
 		AND [ST_MARINE_REMBOOK].CompanyNo='5'
---		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-30) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	WHERE 
 		RankResult=1 
@@ -1062,8 +1070,9 @@ END
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1078,6 +1087,8 @@ GO
 --========================================================================================================================
 -- Date             Version     Who                Comment
 -- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 20-Mar-2018      1.1         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]
@@ -1117,6 +1128,7 @@ BEGIN
         ,BusinessPhone
         ,DateOfBirth
         ,NumberOfCharters
+		,Duration
         ,BookingBoat
         ,BookingBookRef
         ,CustomerLinkCode
@@ -1145,6 +1157,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
+		,BookingStatus
 --        ,RankResultMostRecentBooking
 --        ,RankResultFirstCharter
     FROM 
@@ -1183,6 +1196,7 @@ BEGIN
             COALESCE(CLI.[BusinessPhone],'') AS BusinessPhone,
             CASE WHEN CLI.DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateOfBirth))*60*60*1000) END AS DateOfBirth,
             COALESCE(CLI.NumberOfCharters,'') AS NumberOfCharters,
+            COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS Duration,
             COALESCE([CELERITY_ST_BOOKINGS].UserDefinable1,'') AS BookingBoat,
             COALESCE([CELERITY_ST_BOOKINGS].BookRef,'') AS BookingBookRef,
             COALESCE(CLI.CustomerLinkCode,'') AS CustomerLinkCode,
@@ -1225,6 +1239,7 @@ BEGIN
                     CLI.[BusinessPhone],
                     CLI.DateOfBirth,
                     CLI.NumberOfCharters,
+                    [CELERITY_ST_BOOKINGS].Duration,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.CustomerLinkCode,
                     CLI.[CustomerClass],
@@ -1261,7 +1276,8 @@ BEGIN
             COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS BookingSalesAgent,
             COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
             COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax
+            COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
+            COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -1269,6 +1285,7 @@ BEGIN
             ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
         INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
             ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND CLI.Brand = 'M'
         LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
             ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -1351,6 +1368,7 @@ BEGIN
                         CLI.[BusinessPhone] DESC,
                         CLI.DateOfBirth DESC,
                         CLI.NumberOfCharters DESC,
+                        [CELERITY_ST_BOOKINGS].Duration DESC,
                         [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
                         CLI.CustomerLinkCode DESC,
                         CLI.[CustomerClass] DESC,
@@ -1363,6 +1381,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -1388,7 +1407,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -1447,6 +1465,7 @@ BEGIN
                             CLI.[BusinessPhone] ASC,
                             CLI.DateOfBirth ASC,
                             CLI.NumberOfCharters ASC,
+		                    [CELERITY_ST_BOOKINGS].Duration ASC,
                             [CELERITY_ST_BOOKINGS].UserDefinable1 ASC,
                             CLI.CustomerLinkCode ASC,
                             CLI.[CustomerClass] ASC,
@@ -1459,6 +1478,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -1482,7 +1502,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -1501,15 +1520,14 @@ BEGIN
         AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
         AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
         AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-        AND CLI.Deceased ='N'
         AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
         AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentBooking=1
@@ -1518,8 +1536,9 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1536,6 +1555,10 @@ GO
 -- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 10-Jan-2018      1.1         Tim Wilson         Added JOIN for most recent booking data
 --                                                 Added new column QuoteSalesAgent
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
+--                                                 Bookings Duration
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]
@@ -1602,6 +1625,9 @@ BEGIN
         ,BookingCleanBookRef
         ,BookingTotalPax
 		,QuoteSalesAgent
+		,BookingStatus
+		,QuoteDuration
+		,Duration
 --        ,RankResultMostRecentQuote
 --        ,RankResultFirstCharter
     FROM 
@@ -1715,7 +1741,10 @@ BEGIN
             COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
             COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
             COALESCE(RecentBookings.BookingTotalPax,'') AS BookingTotalPax,
-            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent
+            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent,
+            COALESCE(RecentBookings.BookingStatus,'') AS BookingStatus,
+			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS QuoteDuration,
+            COALESCE(RecentBookings.BookingDuration,'') AS Duration
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -1723,6 +1752,7 @@ BEGIN
             ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
         INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
             ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND CLI.Brand = 'M'
         LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
             ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -1757,6 +1787,8 @@ BEGIN
 				BookingCleanClientID,
 				BookingCleanBookRef,
 				BookingTotalPax,
+				BookingStatus,
+				BookingDuration,
                 RankResultBooking
             FROM
             (
@@ -1772,6 +1804,8 @@ BEGIN
 		            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS BookingCleanClientID,
 				    COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
 					COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
+					COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus,
+					COALESCE([CELERITY_ST_BOOKINGS].[Duration],'') AS BookingDuration,
                     DENSE_RANK() OVER(PARTITION BY CLI.Email1 
 				ORDER BY 
 					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
@@ -1819,6 +1853,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -1842,7 +1877,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -1918,6 +1952,9 @@ BEGIN
                         CLI.[Phone2] DESC,
                         CLI.[BusinessPhone] DESC,
                         CLI.DateOfBirth DESC,
+                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
+                        CLI.NumberOfCharters DESC,
+                        [CELERITY_ST_BOOKINGS].Duration DESC,
                         [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
                         CLI.CustomerLinkCode DESC,
                         CLI.[CustomerClass] DESC,
@@ -1930,6 +1967,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -1955,7 +1993,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -2013,9 +2050,11 @@ BEGIN
                             CLI.[Phone2] ASC,
                             CLI.[BusinessPhone] ASC,
                             CLI.DateOfBirth ASC,
-                            CLI.NumberOfCharters ASC,
-                            [CELERITY_ST_BOOKINGS].UserDefinable1 ASC,
-                            CLI.CustomerLinkCode ASC,
+							[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
+							CLI.NumberOfCharters,
+							[CELERITY_ST_BOOKINGS].Duration,
+							[CELERITY_ST_BOOKINGS].UserDefinable1,
+							CLI.CustomerLinkCode,
                             CLI.[CustomerClass] ASC,
                             CLI.ClientSourceCode ASC,
                             [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] ASC
@@ -2026,6 +2065,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -2049,7 +2089,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -2064,19 +2103,18 @@ BEGIN
         ON CancelledBookings.CancellationClientCode = CLI.ClientCode
         WHERE 
             [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-        AND [CELERITY_ST_BOOKINGS].[Status] = 'Quote'
+        AND [CELERITY_ST_BOOKINGS].[Status] IN ('Quote', 'Hold', 'Option')
         AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
         AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
         AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-        AND CLI.Deceased ='N'
         AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
         AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentQuote=1
@@ -2085,8 +2123,9 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2101,6 +2140,8 @@ GO
 --========================================================================================================================
 -- Date             Version     Who                Comment
 -- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
+-- 20-Mar-2018      1.1         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]
@@ -2170,6 +2211,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
+		,BookingStatus
 --        ,RankResultMostRecentBooking
 --        ,RankResultFirstCharter
     FROM 
@@ -2292,7 +2334,8 @@ BEGIN
             COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS BookingSalesAgent,
             COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
             COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax
+            COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
+            COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -2300,6 +2343,7 @@ BEGIN
             ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
         INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
             ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND CLI.Brand = 'S'
         LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
             ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -2394,6 +2438,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'S'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -2417,7 +2462,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -2490,6 +2534,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'S'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -2511,7 +2556,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -2530,15 +2574,14 @@ BEGIN
         AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
         AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
         AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-        AND CLI.Deceased ='N'
         AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
         AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentBooking=1
@@ -2547,8 +2590,9 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2564,6 +2608,8 @@ GO
 -- Date             Version     Who                Comment
 -- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]
@@ -2651,14 +2697,14 @@ BEGIN
             COALESCE(BKGS.AgentCode,'') AS BookingSalesAgent,
             COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_CLIENT].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
             COALESCE(REPLACE(REPLACE(REPLACE(BKGS.BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            CASE WHEN BKGS.[TotalPax] IS NULL THEN '' ELSE CAST(BKGS.[TotalPax] AS varchar(10)) END AS BookingTotalPax
+            CASE WHEN BKGS.[TotalPax] IS NULL THEN '' ELSE CAST(BKGS.[TotalPax] AS varchar(10)) END AS BookingTotalPax,
+            COALESCE(BKGS.[Status],'') AS BookingStatus
 
 		FROM
 			[CelerityMarine_Stage].[dbo].[CELERITY_ST_BROCHUREREQUEST] WITH (NOLOCK)
 		INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BROCHUREREQUEST].ClientCode
-  		INNER JOIN [CelerityMarine_Stage].[dbo].[TRT_CLIENT] WITH (NOLOCK)
-			ON [TRT_CLIENT].ClientCode=[CELERITY_ST_BROCHUREREQUEST].ClientCode
+			AND [CELERITY_ST_CLIENT].Brand = 'S'
 		INNER JOIN [HUBSPOT].[dbo].[SL_Simplified_BrochureName] WITH (NOLOCK)
 			ON [SL_Simplified_BrochureName].[BrochureNameActual]=[CELERITY_ST_BROCHUREREQUEST].[BrochureName] AND [SL_Simplified_BrochureName].[BrandName]='SUN'
 		LEFT JOIN
@@ -2669,12 +2715,16 @@ BEGIN
 				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
 				,[CELERITY_ST_BOOKINGS].[AgentCode]
 				,[CELERITY_ST_BOOKINGS].[TotalPax]
+				,[CELERITY_ST_BOOKINGS].[Status]
 				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
 			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
 			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
 			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
+	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
+            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND [CELERITY_ST_CLIENT].Brand = 'S'
 			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
 		) BKGS
 		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
@@ -2690,12 +2740,9 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
 			ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=[CELERITY_ST_CLIENT].BookingOffice
 		WHERE
-			[CELERITY_ST_CLIENT].Deceased ='N'
---		AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='S'
-		AND [TRT_CLIENT].Brand='S'
---		AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
 		AND [CELERITY_ST_CLIENT].Email1 not like '%[[]%' AND [CELERITY_ST_CLIENT].Email1 not like '%]%' AND [CELERITY_ST_CLIENT].Email1 not like '%(%' AND [CELERITY_ST_CLIENT].Email1 not like '%)%' AND [CELERITY_ST_CLIENT].Email1 not like '%''%' AND [CELERITY_ST_CLIENT].Email1 not like '% %'
 	)Result
@@ -2706,8 +2753,9 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2723,6 +2771,8 @@ GO
 -- Date             Version     Who                Comment
 -- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]
@@ -2741,7 +2791,7 @@ BEGIN
 			COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],[SL_ISO_SalesOffice].[CountryOfResidence],'') AS Country,
 			TRT_SUNSAIL_ST_EFMST.EFMAIL AS Email,
 			COALESCE([SL_EFSITE_PRODUCT_INTEREST].[ProductInterest],TRT_SUNSAIL_ST_EFMST.EFSITE) AS EnewsProductName,
-			CASE WHEN TRT_SUNSAIL_ST_EFMST.EFETDT IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', SUBSTRING(CAST(TRT_SUNSAIL_ST_EFMST.EFETDT AS VARCHAR(10)),5,2) + '/' + RIGHT(TRT_SUNSAIL_ST_EFMST.EFETDT,2) + '/' + LEFT(TRT_SUNSAIL_ST_EFMST.EFETDT,4)))*60*60*1000) END AS EnewsDateRequested,
+			CASE WHEN TRT_SUNSAIL_ST_EFMST.EFETDT IS NULL OR TRT_SUNSAIL_ST_EFMST.EFETDT = 0 THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_SUNSAIL_ST_EFMST.EFETDT), 112)))*60*60*1000) END AS EnewsDateRequested,
 			COALESCE([CELERITY_ST_CLIENT].[Add1],'') AS Address1,
 			COALESCE([CELERITY_ST_CLIENT].[Add2],'') AS Address2,
 			COALESCE([CELERITY_ST_CLIENT].[Add3],'') AS Address3,
@@ -2758,7 +2808,7 @@ BEGIN
 			COALESCE([SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified],'') AS ClientBookingOffice,
 			DENSE_RANK() OVER(PARTITION BY TRT_SUNSAIL_ST_EFMST.EFMAIL 
 				ORDER BY 
-				CAST(CASE ISNULL(TRT_SUNSAIL_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE SUBSTRING(CAST(TRT_SUNSAIL_ST_EFMST.EFETDT AS VARCHAR(10)),5,2) + '/' + RIGHT(TRT_SUNSAIL_ST_EFMST.EFETDT,2) + '/' + LEFT(TRT_SUNSAIL_ST_EFMST.EFETDT,4) END AS Datetime) DESC,
+				CAST(CASE ISNULL(TRT_SUNSAIL_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_SUNSAIL_ST_EFMST.EFETDT), 112) END AS Datetime) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				[SL_ISO_SalesOffice].[SalesOffice],
 				[SL_ISO_SalesOffice].[Language],
@@ -2792,14 +2842,16 @@ BEGIN
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
-			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode
+			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode,
+            COALESCE(BKGS.[Status],'') AS BookingStatus
 			
 		FROM 
 			[CelerityMarine_Stage].[dbo].[TRT_SUNSAIL_ST_EFMST] WITH (NOLOCK)
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK) 
 			ON REPLACE([CELERITY_ST_CLIENT].Email1,'\@','@') = REPLACE(TRT_SUNSAIL_ST_EFMST.EFMAIL,'\@','@')
-			AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
+--			AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
 			AND [CELERITY_ST_CLIENT].Email1 != ''
+			AND [CELERITY_ST_CLIENT].Brand = 'S'
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode=[CELERITY_ST_CLIENT].ClientCode
 		LEFT JOIN
@@ -2810,12 +2862,16 @@ BEGIN
 				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
 				,[CELERITY_ST_BOOKINGS].[AgentCode]
 				,[CELERITY_ST_BOOKINGS].[TotalPax]
+				,[CELERITY_ST_BOOKINGS].[Status]
 				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
 			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
 			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
 			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
+	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
+            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND [CELERITY_ST_CLIENT].Brand = 'S'
 			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
 		) BKGS
 		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
@@ -2833,16 +2889,18 @@ BEGIN
 		WHERE
 		    TRT_SUNSAIL_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%(%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%)%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%''%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '% %'
---		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-90,112) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+		AND TRT_SUNSAIL_ST_EFMST.EFETDT != 0
+		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-109,112)) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-1,112))
 --		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
-		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
+--		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	)Result
 	Where RankResult=1
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2859,6 +2917,10 @@ GO
 -- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 10-Jan-2018      1.1         Tim Wilson         Added JOIN for most recent booking data
 --                                                 Added new column QuoteSalesAgent
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
+--                                                 Bookings Duration
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]
@@ -2899,7 +2961,7 @@ BEGIN
         ,DateOfBirth
         ,QuoteExecutiveReportingRegion
 --        ,NumberOfCharters  -- Ignore for now
-        ,Duration
+        ,QuoteDuration
 --		  ,CleanBaseName
 --		  ,CleanBoatName
         ,QuoteBoat
@@ -2931,7 +2993,9 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
+		,Duration
 		,QuoteSalesAgent
+		,BookingStatus
 --        ,RankResultMostRecentQuote
 --        ,RankResultFirstCharter
     FROM 
@@ -2971,7 +3035,7 @@ BEGIN
 			CASE WHEN CLI.DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateOfBirth))*60*60*1000) END AS DateOfBirth,
 			COALESCE([CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,'') AS QuoteExecutiveReportingRegion,
 			--COALESCE(CLI.NumberOfCharters,'') AS NumberOfCharters, -- Ignore for now
-			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS Duration,
+			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS QuoteDuration,
 			--COALESCE([CELERITY_ST_BOOKINGS].CleanBaseName,'') AS CleanBaseName,--Ignore for now
 			--COALESCE([CELERITY_ST_BOOKINGS].CleanBoatName,'') AS CleanBoatName,--Ignore for now
 			COALESCE([CELERITY_ST_BOOKINGS].UserDefinable1,'') AS QuoteBoat,
@@ -3054,7 +3118,9 @@ BEGIN
             COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
             COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
             COALESCE(RecentBookings.BookingTotalPax,'') AS BookingTotalPax,
-            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent
+            COALESCE(RecentBookings.BookingDuration,'') AS Duration,
+            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent,
+            COALESCE(RecentBookings.BookingStatus,'') AS BookingStatus
 
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -3062,6 +3128,7 @@ BEGIN
             ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
         INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
             ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND CLI.Brand = 'S'
         LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
             ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3094,6 +3161,8 @@ BEGIN
 				BookingCleanClientID,
 				BookingCleanBookRef,
 				BookingTotalPax,
+				BookingStatus,
+				BookingDuration,
                 RankResultBooking
             FROM
             (
@@ -3109,6 +3178,8 @@ BEGIN
 		            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS BookingCleanClientID,
 				    COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
 					COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
+					COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus,
+					COALESCE([CELERITY_ST_BOOKINGS].[Duration],'') AS BookingDuration,
                     DENSE_RANK() OVER(PARTITION BY CLI.Email1 
 				ORDER BY 
 					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
@@ -3156,6 +3227,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'S'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3179,7 +3251,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -3269,6 +3340,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'S'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3292,7 +3364,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -3364,6 +3435,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'S'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3385,7 +3457,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -3400,29 +3471,28 @@ BEGIN
         ON CancelledBookings.CancellationClientCode = CLI.ClientCode
         WHERE 
             [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-        AND [CELERITY_ST_BOOKINGS].[Status] = 'Quote'
+        AND [CELERITY_ST_BOOKINGS].[Status] IN ('Quote', 'Hold', 'Option')
         AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
         AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
         AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-        AND CLI.Deceased ='N'
         AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
         AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentQuote=1
     ORDER BY QuoteDateRequested
-
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3439,6 +3509,8 @@ GO
 -- 24-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 27-Nov-2017      1.1         Tim Wilson         Continued development - removed column CancellationEmail
 --                                                 New left joins to provide First Charter and Most Recent Cancellation data
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]
@@ -3508,6 +3580,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
+		,BookingStatus
 --        ,RankResultMostRecentBooking
 --        ,RankResultFirstCharter
     FROM 
@@ -3630,7 +3703,8 @@ BEGIN
             COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS BookingSalesAgent,
             COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
             COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax
+            COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
+            COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -3638,6 +3712,7 @@ BEGIN
             ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
         INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
             ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND CLI.Brand = 'M'
         LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
             ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3734,6 +3809,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3759,7 +3835,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -3832,6 +3907,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -3855,7 +3931,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -3874,15 +3949,14 @@ BEGIN
         AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
         AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
         AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-        AND CLI.Deceased ='N'
         AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
         AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentBooking=1
@@ -3891,8 +3965,9 @@ BEGIN
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3908,6 +3983,8 @@ GO
 -- Date             Version     Who                Comment
 -- 28-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]
@@ -3995,14 +4072,14 @@ BEGIN
             COALESCE(BKGS.AgentCode,'') AS BookingSalesAgent,
             COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_CLIENT].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
             COALESCE(REPLACE(REPLACE(REPLACE(BKGS.BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            CASE WHEN BKGS.[TotalPax] IS NULL THEN '' ELSE CAST(BKGS.[TotalPax] AS varchar(10)) END AS BookingTotalPax
+            CASE WHEN BKGS.[TotalPax] IS NULL THEN '' ELSE CAST(BKGS.[TotalPax] AS varchar(10)) END AS BookingTotalPax,
+            COALESCE(BKGS.[Status],'') AS BookingStatus
 
 		FROM
 			[CelerityMarine_Stage].[dbo].[CELERITY_ST_BROCHUREREQUEST] WITH (NOLOCK)
 		INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BROCHUREREQUEST].ClientCode
-  		INNER JOIN [CelerityMarine_Stage].[dbo].[TRT_CLIENT] WITH (NOLOCK)
-			ON [TRT_CLIENT].ClientCode=[CELERITY_ST_BROCHUREREQUEST].ClientCode
+			AND [CELERITY_ST_CLIENT].Brand = 'M'
 		INNER JOIN [HUBSPOT].[dbo].[SL_Simplified_BrochureName] WITH (NOLOCK)
 			ON [SL_Simplified_BrochureName].[BrochureNameActual]=[CELERITY_ST_BROCHUREREQUEST].[BrochureName] AND [SL_Simplified_BrochureName].[BrandName]='MRG'
 		LEFT JOIN
@@ -4013,12 +4090,16 @@ BEGIN
 				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
 				,[CELERITY_ST_BOOKINGS].[AgentCode]
 				,[CELERITY_ST_BOOKINGS].[TotalPax]
+				,[CELERITY_ST_BOOKINGS].[Status]
 				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
 			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
 			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
 			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
+	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
+            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND [CELERITY_ST_CLIENT].Brand = 'M'
 			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
 		) BKGS
 		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
@@ -4034,12 +4115,9 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
 			ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=[CELERITY_ST_CLIENT].BookingOffice
 		WHERE
-			[CELERITY_ST_CLIENT].Deceased ='N'
---		AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
-		AND [TRT_CLIENT].Brand='M'
---		AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
---        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+--      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
+--        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
 		AND [CELERITY_ST_CLIENT].Email1 not like '%[[]%' AND [CELERITY_ST_CLIENT].Email1 not like '%]%' AND [CELERITY_ST_CLIENT].Email1 not like '%(%' AND [CELERITY_ST_CLIENT].Email1 not like '%)%' AND [CELERITY_ST_CLIENT].Email1 not like '%''%' AND [CELERITY_ST_CLIENT].Email1 not like '% %'
 	) Result
@@ -4049,8 +4127,9 @@ BEGIN
 		BrochureDateRequested
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4066,6 +4145,8 @@ GO
 -- Date             Version     Who                Comment
 -- 28-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]
@@ -4084,7 +4165,7 @@ BEGIN
 			COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],[SL_ISO_SalesOffice].[CountryOfResidence],'') AS Country,
 			TRT_TRITON_ST_EFMST.EFMAIL AS Email,
 			COALESCE([SL_EFSITE_PRODUCT_INTEREST].[ProductInterest],TRT_TRITON_ST_EFMST.EFSITE) AS EnewsProductName,
-			CASE WHEN TRT_TRITON_ST_EFMST.EFETDT IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', SUBSTRING(CAST(TRT_TRITON_ST_EFMST.EFETDT AS VARCHAR(10)),5,2) + '/' + RIGHT(TRT_TRITON_ST_EFMST.EFETDT,2) + '/' + LEFT(TRT_TRITON_ST_EFMST.EFETDT,4)))*60*60*1000) END AS EnewsDateRequested,
+			CASE WHEN TRT_TRITON_ST_EFMST.EFETDT IS NULL OR TRT_TRITON_ST_EFMST.EFETDT = 0 THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_TRITON_ST_EFMST.EFETDT), 112)))*60*60*1000) END AS EnewsDateRequested,
 			COALESCE([CELERITY_ST_CLIENT].[Add1],'') AS Address1,
 			COALESCE([CELERITY_ST_CLIENT].[Add2],'') AS Address2,
 			COALESCE([CELERITY_ST_CLIENT].[Add3],'') AS Address3,
@@ -4101,7 +4182,7 @@ BEGIN
 			COALESCE([SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified],'') AS ClientBookingOffice,
 			DENSE_RANK() OVER(PARTITION BY TRT_TRITON_ST_EFMST.EFMAIL 
 				ORDER BY 
-				CAST(CASE ISNULL(TRT_TRITON_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE SUBSTRING(CAST(TRT_TRITON_ST_EFMST.EFETDT AS VARCHAR(10)),5,2) + '/' + RIGHT(TRT_TRITON_ST_EFMST.EFETDT,2) + '/' + LEFT(TRT_TRITON_ST_EFMST.EFETDT,4) END AS Datetime) DESC,
+				CAST(CASE ISNULL(TRT_TRITON_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_TRITON_ST_EFMST.EFETDT), 112) END AS Datetime) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				[SL_ISO_SalesOffice].[SalesOffice],
 				[SL_ISO_SalesOffice].[Language],
@@ -4135,14 +4216,16 @@ BEGIN
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
-			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode
+			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode,
+            COALESCE(BKGS.[Status],'') AS BookingStatus
 			
 		FROM 
 			[CelerityMarine_Stage].[dbo].[TRT_Triton_ST_EFMST] WITH (NOLOCK)
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK) 
 			ON REPLACE([CELERITY_ST_CLIENT].Email1,'\@','@') = REPLACE(TRT_TRITON_ST_EFMST.EFMAIL,'\@','@')
-			AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
+--			AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
 			AND [CELERITY_ST_CLIENT].Email1 != ''
+			AND [CELERITY_ST_CLIENT].Brand = 'M'
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode=[CELERITY_ST_CLIENT].ClientCode
 		LEFT JOIN
@@ -4153,12 +4236,16 @@ BEGIN
 				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
 				,[CELERITY_ST_BOOKINGS].[AgentCode]
 				,[CELERITY_ST_BOOKINGS].[TotalPax]
+				,[CELERITY_ST_BOOKINGS].[Status]
 				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
 				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
 			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
 			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
 			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
+	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
+            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND [CELERITY_ST_CLIENT].Brand = 'M'
 			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
 		) BKGS
 		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
@@ -4176,16 +4263,18 @@ BEGIN
 		WHERE
 		    TRT_TRITON_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_TRITON_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%(%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%)%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%''%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '% %'
---		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-90,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+		AND TRT_TRITON_ST_EFMST.EFETDT != 0
+		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-109,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
 --		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
-		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
+--		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	) Result
 	Where RankResult=1
 END
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 07/02/2018 10:04:20 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4202,6 +4291,10 @@ GO
 -- 28-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 10-Jan-2018      1.1         Tim Wilson         Added JOIN for most recent booking data
 --                                                 Added new column QuoteSalesAgent
+-- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
+-- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
+--                                                 Bookings Duration
+-- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]
@@ -4242,7 +4335,7 @@ BEGIN
         ,DateOfBirth
         ,QuoteExecutiveReportingRegion
 --        ,NumberOfCharters  -- Ignore for now
-        ,Duration
+        ,QuoteDuration
 --		  ,CleanBaseName
 --		  ,CleanBoatName
         ,QuoteBoat
@@ -4274,7 +4367,9 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
+		,Duration
 		,QuoteSalesAgent
+		,BookingStatus
 --        ,RankResultMostRecentQuote
 --        ,RankResultFirstCharter
     FROM 
@@ -4314,7 +4409,7 @@ BEGIN
 			CASE WHEN CLI.DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateOfBirth))*60*60*1000) END AS DateOfBirth,
 			COALESCE([CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,'') AS QuoteExecutiveReportingRegion,
 			--COALESCE(CLI.NumberOfCharters,'') AS NumberOfCharters, -- Ignore for now
-			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS Duration,
+			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS QuoteDuration,
 			--COALESCE([CELERITY_ST_BOOKINGS].CleanBaseName,'') AS CleanBaseName,--Ignore for now
 			--COALESCE([CELERITY_ST_BOOKINGS].CleanBoatName,'') AS CleanBoatName,--Ignore for now
 			COALESCE([CELERITY_ST_BOOKINGS].UserDefinable1,'') AS QuoteBoat,
@@ -4397,7 +4492,9 @@ BEGIN
             COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
             COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
             COALESCE(RecentBookings.BookingTotalPax,'') AS BookingTotalPax,
-            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent
+            COALESCE(RecentBookings.BookingDuration,'') AS Duration,
+            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent,
+            COALESCE(RecentBookings.BookingStatus,'') AS BookingStatus
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -4405,6 +4502,7 @@ BEGIN
             ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
         INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
             ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+			AND CLI.Brand = 'M'
         LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
             ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -4439,6 +4537,8 @@ BEGIN
 				BookingCleanClientID,
 				BookingCleanBookRef,
 				BookingTotalPax,
+				BookingStatus,
+				BookingDuration,
                 RankResultBooking
             FROM
             (
@@ -4454,6 +4554,8 @@ BEGIN
 		            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS BookingCleanClientID,
 				    COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
 					COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
+					COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus,
+					COALESCE([CELERITY_ST_BOOKINGS].[Duration],'') AS BookingDuration,
                     DENSE_RANK() OVER(PARTITION BY CLI.Email1 
 				ORDER BY 
 					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
@@ -4501,6 +4603,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -4524,7 +4627,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -4614,6 +4716,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -4639,7 +4742,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -4711,6 +4813,7 @@ BEGIN
                     ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
                 INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
                     ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
+					AND CLI.Brand = 'M'
                 LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
                     ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
                 LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -4734,7 +4837,6 @@ BEGIN
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND CLI.Deceased ='N'
                 AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
                 AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
                 AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
@@ -4749,19 +4851,18 @@ BEGIN
         ON CancelledBookings.CancellationClientCode = CLI.ClientCode
         WHERE 
             [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-        AND [CELERITY_ST_BOOKINGS].[Status] = 'Quote'
+        AND [CELERITY_ST_BOOKINGS].[Status] IN ('Quote', 'Hold', 'Option')
         AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
         AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
         AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-        AND CLI.Deceased ='N'
         AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
         AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
---        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
 
     WHERE RankResultMostRecentQuote=1
@@ -4770,122 +4871,5 @@ BEGIN
 END
 
 
-GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 07/02/2018 10:04:20 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROC [dbo].[BUILD_ST_ERROR_LOG]
-@Brand varchar(50),
-@LifeCycleStage varchar(50),
-@ClientCode varchar(50),
-@VID int,
-@Email nvarchar(200),
-@IsNew bit,
-@Status varchar(10),
-@Error_Msg nvarchar(4000)
-AS
-BEGIN 
-	INSERT INTO [dbo].[ST_ERROR_LOG]
-			   ([Brand]
-			   ,[LifeCycleStage]
-			   ,[ClientCode]
-			   ,[VID]
-			   ,[Email]
-			   ,[IsNew]
-			   ,[Status]
-			   ,[Error_Msg])
-     VALUES
-           (@Brand
-           ,@LifeCycleStage
-           ,@ClientCode
-           ,@VID
-           ,@Email
-           ,@IsNew
-           ,@Status
-           ,@Error_Msg)
-	
-END
-GO
-/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 07/02/2018 10:04:20 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROC [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]
-@BrandName varchar(50)
-AS
-BEGIN
-	IF @BrandName='SUNSAIL' 
-	BEGIN
-		Select 
-			QueryFieldName,
-			Sunsail AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] WITH (NOLOCK)
-		WHERE
-			Sunsail<>''
-	END
-	IF @BrandName='MOORINGS'
-	BEGIN
-		Select 
-			QueryFieldName,
-			Moorings AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
-		WHERE
-			Moorings<>''
-	END
-	IF @BrandName='LEBOAT'
-	BEGIN 
-		Select 
-			QueryFieldName,
-			LeBoat AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
-		WHERE
-			LeBoat<>''
-	END
-	IF @BrandName='FOOTLOOSE'
-	BEGIN 
-		Select 
-			QueryFieldName,
-			FootLoose AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
-		WHERE
-			FootLoose<>''
-	END
-	IF @BrandName='DEV'
-	BEGIN 
-		Select 
-			QueryFieldName,
-			Moorings AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
-		WHERE
-			Moorings<>''
-	END
-	IF @BrandName='ZZTEST'
-	BEGIN 
-		Select 
-			QueryFieldName,
-			Moorings AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
-		WHERE
-			Moorings<>''
-	END
-	IF @BrandName='ZLBTEST'
-	BEGIN 
-		Select 
-			QueryFieldName,
-			LeBoat AS HubSpotFieldName 
-		FROM 
-			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
-		WHERE
-			LeBoat<>''
-	END
-END
+
 GO

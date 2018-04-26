@@ -50,7 +50,7 @@ G:\
       |  |--Archive
       |  |
       |  |--FullLoad
-      |
+      |  
       |--Batch_files
 
 
