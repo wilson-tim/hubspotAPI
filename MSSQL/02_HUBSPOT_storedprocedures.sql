@@ -1,6 +1,6 @@
 USE [HUBSPOT]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -387,7 +387,7 @@ BEGIN
 		AND CLI.Lead='Yes'
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [ST_MARINE_BOOKINGS].BookingSourcePrimary NOT IN ('STHOL','OPS','STAFF','OWNER','OWNS')
@@ -401,7 +401,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -544,7 +544,7 @@ BEGIN
 		WHERE
 			[ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
@@ -555,7 +555,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -700,7 +700,7 @@ BEGIN
 			)
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
@@ -711,7 +711,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -731,6 +731,7 @@ GO
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 23-Apr-2018      1.4         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
+-- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]
@@ -766,7 +767,7 @@ BEGIN
 		,Phone1
 		,Phone2
 		,BusinessPhone
-		,QuoteDuration
+--		,QuoteDuration
 		,QuoteBookRef
 		,[Status]
 		,CancelFromTelephone
@@ -791,7 +792,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
 		,BookingTotalPax
-		,Duration
+--		,Duration
 		,QuoteSalesAgent
 	FROM
 	(
@@ -1058,7 +1059,7 @@ BEGIN
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '%''%'
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '% %'
 		AND [ST_MARINE_REMBOOK].CompanyNo='5'
-		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-111) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
@@ -1072,7 +1073,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1525,7 +1526,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -1538,7 +1539,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1559,6 +1560,7 @@ GO
 -- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]
@@ -1626,8 +1628,8 @@ BEGIN
         ,BookingTotalPax
 		,QuoteSalesAgent
 		,BookingStatus
-		,QuoteDuration
-		,Duration
+--		  ,QuoteDuration
+--		  ,Duration
 --        ,RankResultMostRecentQuote
 --        ,RankResultFirstCharter
     FROM 
@@ -2112,7 +2114,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -2125,7 +2127,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 30/04/2018 10:31:41 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2579,7 +2581,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -2592,7 +2594,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2740,7 +2742,7 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
 			ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=[CELERITY_ST_CLIENT].BookingOffice
 		WHERE
-		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
@@ -2755,7 +2757,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2890,7 +2892,7 @@ BEGIN
 		    TRT_SUNSAIL_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%(%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%)%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%''%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '% %'
 		AND TRT_SUNSAIL_ST_EFMST.EFETDT != 0
-		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-109,112)) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-1,112))
+		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-90,112)) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-1,112))
 --		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
 --		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	)Result
@@ -2900,7 +2902,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2921,6 +2923,7 @@ GO
 -- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]
@@ -2961,7 +2964,7 @@ BEGIN
         ,DateOfBirth
         ,QuoteExecutiveReportingRegion
 --        ,NumberOfCharters  -- Ignore for now
-        ,QuoteDuration
+--        ,QuoteDuration
 --		  ,CleanBaseName
 --		  ,CleanBoatName
         ,QuoteBoat
@@ -2993,7 +2996,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
-		,Duration
+--		  ,Duration
 		,QuoteSalesAgent
 		,BookingStatus
 --        ,RankResultMostRecentQuote
@@ -3480,7 +3483,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -3492,7 +3495,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3954,7 +3957,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -3967,7 +3970,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4115,7 +4118,7 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
 			ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=[CELERITY_ST_CLIENT].BookingOffice
 		WHERE
-		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
@@ -4129,7 +4132,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4264,7 +4267,7 @@ BEGIN
 		    TRT_TRITON_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_TRITON_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%(%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%)%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%''%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '% %'
 		AND TRT_TRITON_ST_EFMST.EFETDT != 0
-		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-109,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-90,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
 --		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
 --		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	) Result
@@ -4274,7 +4277,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 25/04/2018 15:50:21 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 30/04/2018 10:31:42 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4295,6 +4298,7 @@ GO
 -- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]
@@ -4335,7 +4339,7 @@ BEGIN
         ,DateOfBirth
         ,QuoteExecutiveReportingRegion
 --        ,NumberOfCharters  -- Ignore for now
-        ,QuoteDuration
+--        ,QuoteDuration
 --		  ,CleanBaseName
 --		  ,CleanBoatName
         ,QuoteBoat
@@ -4367,7 +4371,7 @@ BEGIN
         ,CleanClientID
         ,BookingCleanBookRef
         ,BookingTotalPax
-		,Duration
+--		  ,Duration
 		,QuoteSalesAgent
 		,BookingStatus
 --        ,RankResultMostRecentQuote
@@ -4860,7 +4864,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-109) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -4871,5 +4875,125 @@ BEGIN
 END
 
 
+
+GO
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 30/04/2018 10:31:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROC [dbo].[BUILD_ST_ERROR_LOG]
+@Brand varchar(50),
+@LifeCycleStage varchar(50),
+@ClientCode varchar(50),
+@VID int,
+@Email nvarchar(200),
+@IsNew bit,
+@Status varchar(10),
+@Error_Msg nvarchar(4000)
+AS
+BEGIN 
+	INSERT INTO [dbo].[ST_ERROR_LOG]
+			   ([Brand]
+			   ,[LifeCycleStage]
+			   ,[ClientCode]
+			   ,[VID]
+			   ,[Email]
+			   ,[IsNew]
+			   ,[Status]
+			   ,[Error_Msg])
+     VALUES
+           (@Brand
+           ,@LifeCycleStage
+           ,@ClientCode
+           ,@VID
+           ,@Email
+           ,@IsNew
+           ,@Status
+           ,@Error_Msg)
+	
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 30/04/2018 10:31:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROC [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]
+@BrandName varchar(50)
+AS
+BEGIN
+	IF @BrandName='SUNSAIL' 
+	BEGIN
+		Select 
+			QueryFieldName,
+			Sunsail AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] WITH (NOLOCK)
+		WHERE
+			Sunsail<>''
+	END
+	IF @BrandName='MOORINGS'
+	BEGIN
+		Select 
+			QueryFieldName,
+			Moorings AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
+		WHERE
+			Moorings<>''
+	END
+	IF @BrandName='LEBOAT'
+	BEGIN 
+		Select 
+			QueryFieldName,
+			LeBoat AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
+		WHERE
+			LeBoat<>''
+	END
+	IF @BrandName='FOOTLOOSE'
+	BEGIN 
+		Select 
+			QueryFieldName,
+			FootLoose AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
+		WHERE
+			FootLoose<>''
+	END
+	IF @BrandName='DEV'
+	BEGIN 
+		Select 
+			QueryFieldName,
+			Moorings AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
+		WHERE
+			Moorings<>''
+	END
+	IF @BrandName='ZZTEST'
+	BEGIN 
+		Select 
+			QueryFieldName,
+			Moorings AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
+		WHERE
+			Moorings<>''
+	END
+	IF @BrandName='ZLBTEST'
+	BEGIN 
+		Select 
+			QueryFieldName,
+			LeBoat AS HubSpotFieldName 
+		FROM 
+			[HUBSPOT].[dbo].[SL_HUBSPOT_FIELD_NAMES] (NOLOCK)
+		WHERE
+			LeBoat<>''
+	END
+END
 
 GO

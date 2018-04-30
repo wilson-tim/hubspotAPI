@@ -4168,6 +4168,7 @@ INSERT [dbo].[SL_Simplified_SalesOffice] ([BrandName], [SalesOfficeFromRawData],
 INSERT [dbo].[SL_Simplified_SalesOffice] ([BrandName], [SalesOfficeFromRawData], [SalesOfficeSimplified]) VALUES (N'LBT', N'Holland Office', N'Holland')
 INSERT [dbo].[SL_Simplified_SalesOffice] ([BrandName], [SalesOfficeFromRawData], [SalesOfficeSimplified]) VALUES (N'LBT', N'Sweden/EUR', N'Sweden')
 INSERT [dbo].[SL_Simplified_SalesOffice] ([BrandName], [SalesOfficeFromRawData], [SalesOfficeSimplified]) VALUES (N'MRG', N'Surbiton', N'UK')
+INSERT [dbo].[SL_Simplified_SalesOffice] ([BrandName], [SalesOfficeFromRawData], [SalesOfficeSimplified]) VALUES (N'LBT', N'Canada Office', N'Canada')
 INSERT [dbo].[SL_Simplified_Title] ([TitleActual], [TitleSimplified]) VALUES (N';mr', N'Mr')
 INSERT [dbo].[SL_Simplified_Title] ([TitleActual], [TitleSimplified]) VALUES (N'<mrs', N'Mrs')
 INSERT [dbo].[SL_Simplified_Title] ([TitleActual], [TitleSimplified]) VALUES (N'Capt', N'Captain')
