@@ -387,7 +387,7 @@ BEGIN
 		AND CLI.Lead='Yes'
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [ST_MARINE_BOOKINGS].BookingSourcePrimary NOT IN ('STHOL','OPS','STAFF','OWNER','OWNS')
@@ -421,18 +421,52 @@ GO
 --                                                 This is covered by the INNER JOIN to SL_Simplified_BrochureName
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 25-Apr-2018      1.4         Tim Wilson         Revised client link using URN
+-- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]
+ALTER PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]
 AS
 BEGIN
-	SELECT DISTINCT * FROM
+	SELECT DISTINCT
+		 LifecycleStage
+		,BrandName
+		,Charter
+        ,BookingOfficeLocation
+		,BookingLanguage
+		,ClientCode
+		,Title
+		,FirstName
+		,LastName
+		,City
+		,County
+		,Postcode
+		,Country
+		,Email
+		,Deceased
+		,Blacklisted
+		,CancelFromMailing
+		,CancelFromEmail
+		,CancelFromBrochure
+		,BrochureProductRequested
+		,BrochureDateRequested
+		,Address1
+		,Address2
+		,Address3
+		,Phone1
+		,Phone2
+		,BusinessPhone
+		,DateOfBirth
+		,[Status]
+		,CancelFromTelephone
+		,LastContactDate
+		,NeptuneCreateDate
+		,CleanClientId
+	FROM
 	(
 		SELECT 
 			'lead' AS LifecycleStage,
 			'Le Boat Charter' AS BrandName,
 			'Le Boat Charter' AS Charter,
-			--CASE WHEN [ST_MARINE_BROCHURE_REQUEST].DateRequested IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BROCHURE_REQUEST].DateRequested))*60*60*1000) END AS ConfirmDate,
 			COALESCE(SO.[SourceOffice],'') AS BookingOfficeLocation,
 			COALESCE([ST_MARINE_BROCHURE_REQUEST].Language,'') AS BookingLanguage,
 			[ST_MARINE_BROCHURE_REQUEST].ClientCode,
@@ -490,11 +524,6 @@ BEGIN
 			CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
 			'' AS LastContactDate,
 			CASE WHEN (ISNULL([NEPTUNE_MAIL_CONTACT].F_added_date,'') = '' OR [NEPTUNE_MAIL_CONTACT].F_added_date NOT LIKE '__/__/____' OR [NEPTUNE_MAIL_CONTACT].F_added_date = '01/01/0000' OR [NEPTUNE_MAIL_CONTACT].F_added_date = '01/01/0001') THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(DATETIME, [NEPTUNE_MAIL_CONTACT].F_added_date, 103)))*60*60*1000) END AS NeptuneCreateDate,
-			COALESCE(BKGS.BookingSourcePrimary, '') AS BookingSourcePrimary,
-			'' AS BookingSourceSecondary,
-			'' AS BookingSourceTertiary,
-            COALESCE(BKGS.AgentContact,'') AS BookingSalesAgent,
-            COALESCE(REPLACE(REPLACE(REPLACE(BKGS.BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
             COALESCE(REPLACE(REPLACE(REPLACE([ST_MARINE_CLIENTS].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID
 
 		FROM	
@@ -506,31 +535,6 @@ BEGIN
 			ON [SL_Simplified_BrochureName].[BrochureNameActual]=[ST_MARINE_BROCHURE_REQUEST].[Type] AND [SL_Simplified_BrochureName].[BrandName]='LBT'
 		INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_MAIL_CONTACT] WITH (NOLOCK) 
 			ON [NEPTUNE_MAIL_CONTACT].F_mail_no = [ST_MARINE_CLIENTS].MailNo
-		--INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
-        --    ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
-        --    AND [NEPTUNE_FAMILY].F_leader = 'true'
-		-- Most recent booking
-		LEFT JOIN
-		(
-			SELECT
-				 [ST_MARINE_BOOKINGS].[BookingSourcePrimary]
-				,[ST_MARINE_FBKG].[AgentContact]
-				,[ST_MARINE_BOOKINGS].[BookRef]
-				,[ST_MARINE_FBKG].[PaxNo]
-				,[ST_MARINE_FBKG].[Email]
-				,ROW_NUMBER() OVER(PARTITION BY REPLACE([ST_MARINE_FBKG].Email,'\@','@')
-				ORDER BY [ST_MARINE_BOOKINGS].BookingDate DESC, [ST_MARINE_BOOKINGS].BookRef DESC
-				) AS MostRecentRank
-			FROM [NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
-			INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_FBKG] WITH (NOLOCK)
-				ON [ST_MARINE_FBKG].BkgRef=[ST_MARINE_BOOKINGS].BookRef
-			WHERE 
-				[ST_MARINE_BOOKINGS].BrandCode='LBT'
-			AND [ST_MARINE_BOOKINGS].Status IN ('Confirmed','Cancelled')
-			AND [ST_MARINE_BOOKINGS].BookingType='Direct'
-		) BKGS
-		ON REPLACE([ST_MARINE_CLIENTS].Email1,'\@','@') = REPLACE(BKGS.Email,'\@','@')
-		AND BKGS.MostRecentRank = 1
 		LEFT JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_CLIENT_PREFERENCE] WITH (NOLOCK)
 			ON [ST_MARINE_CLIENT_PREFERENCE].ClientCode=[ST_MARINE_CLIENTS].ClientCode
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Country] WITH (NOLOCK)
@@ -544,15 +548,13 @@ BEGIN
 		WHERE
 			[ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	Where RankResult=1
 	ORDER BY BrochureDateRequested 
 END
-
-
 
 GO
 /****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 30/04/2018 10:31:41 ******/
@@ -574,18 +576,51 @@ GO
 -- 19-Feb-2018      1.2         Tim Wilson         Improved brochure type/name filtering
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 25-Apr-2018      1.4         Tim Wilson         Revised client link using URN
+-- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]
+ALTER PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]
 AS
 BEGIN
-	SELECT DISTINCT * FROM
+	SELECT DISTINCT
+		 LifecycleStage
+		,BrandName
+		,Charter
+        ,BookingOfficeLocation
+		,BookingLanguage
+		,ClientCode
+		,Title
+		,FirstName
+		,LastName
+		,City
+		,County
+		,Postcode
+		,Country
+		,Email
+		,Deceased
+		,Blacklisted
+		,CancelFromMailing
+		,CancelFromEmail
+		,CancelFromBrochure
+		,EnewsDateRequested
+		,Address1
+		,Address2
+		,Address3
+		,Phone1
+		,Phone2
+		,BusinessPhone
+		,DateOfBirth
+		,[Status]
+		,CancelFromTelephone
+		,LastContactDate
+		,NeptuneCreateDate
+		,CleanClientId
+	FROM
 	(
 		SELECT 
 			'subscriber' AS LifecycleStage,
 			'Le Boat Charter' AS BrandName,
 			'Le Boat Charter' AS Charter,
-			--CASE WHEN [ST_MARINE_BROCHURE_REQUEST].DateRequested IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BROCHURE_REQUEST].DateRequested))*60*60*1000) END AS ConfirmDate,
 			COALESCE(SO.[SourceOffice],'') AS BookingOfficeLocation,
 			COALESCE([ST_MARINE_BROCHURE_REQUEST].Language,'') AS BookingLanguage,
 			[ST_MARINE_BROCHURE_REQUEST].ClientCode,
@@ -643,11 +678,6 @@ BEGIN
 			CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
 			'' AS LastContactDate,
 			CASE WHEN (ISNULL([NEPTUNE_MAIL_CONTACT].F_added_date,'') = '' OR [NEPTUNE_MAIL_CONTACT].F_added_date NOT LIKE '__/__/____' OR [NEPTUNE_MAIL_CONTACT].F_added_date = '01/01/0000' OR [NEPTUNE_MAIL_CONTACT].F_added_date = '01/01/0001') THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(DATETIME, [NEPTUNE_MAIL_CONTACT].F_added_date, 103)))*60*60*1000) END AS NeptuneCreateDate,
-			COALESCE(BKGS.BookingSourcePrimary,'') AS BookingSourcePrimary,
-			'' AS BookingSourceSecondary,
-			'' AS BookingSourceTertiary,
-            COALESCE(BKGS.AgentContact,'') AS BookingSalesAgent,
-            COALESCE(REPLACE(REPLACE(REPLACE(BKGS.BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
             COALESCE(REPLACE(REPLACE(REPLACE([ST_MARINE_CLIENTS].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID
 
 		FROM	
@@ -657,31 +687,6 @@ BEGIN
 			AND [ST_MARINE_BROCHURE_REQUEST].F_CONTACT_URN = [ST_MARINE_CLIENTS].F_URN
 		INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_MAIL_CONTACT] WITH (NOLOCK) 
 			ON [NEPTUNE_MAIL_CONTACT].F_mail_no = [ST_MARINE_CLIENTS].MailNo
-		--INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
-        --    ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
-        --    AND [NEPTUNE_FAMILY].F_leader = 'true'
-		-- Most recent booking
-		LEFT JOIN
-		(
-			SELECT
-				 [ST_MARINE_BOOKINGS].[BookingSourcePrimary]
-				,[ST_MARINE_FBKG].[AgentContact]
-				,[ST_MARINE_BOOKINGS].[BookRef]
-				,[ST_MARINE_FBKG].[PaxNo]
-				,[ST_MARINE_FBKG].[Email]
-				,ROW_NUMBER() OVER(PARTITION BY REPLACE([ST_MARINE_FBKG].Email,'\@','@')
-				ORDER BY [ST_MARINE_BOOKINGS].BookingDate DESC, [ST_MARINE_BOOKINGS].BookRef DESC
-				) AS MostRecentRank
-			FROM [NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
-			INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_FBKG] WITH (NOLOCK)
-				ON [ST_MARINE_FBKG].BkgRef=[ST_MARINE_BOOKINGS].BookRef
-			WHERE 
-				[ST_MARINE_BOOKINGS].BrandCode='LBT'
-			AND [ST_MARINE_BOOKINGS].Status IN ('Confirmed','Cancelled')
-			AND [ST_MARINE_BOOKINGS].BookingType='Direct'
-		) BKGS
-		ON REPLACE([ST_MARINE_CLIENTS].Email1,'\@','@') = REPLACE(BKGS.Email,'\@','@')
-		AND BKGS.MostRecentRank = 1
 		LEFT JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_CLIENT_PREFERENCE] WITH (NOLOCK)
 			ON [ST_MARINE_CLIENT_PREFERENCE].ClientCode=[ST_MARINE_CLIENTS].ClientCode
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Country] WITH (NOLOCK)
@@ -700,15 +705,13 @@ BEGIN
 			)
 		AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
-		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
 	Where RankResult=1
 	ORDER BY EnewsDateRequested
 END
-
-
 
 GO
 /****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 30/04/2018 10:31:41 ******/
@@ -731,17 +734,17 @@ GO
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 23-Apr-2018      1.4         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
--- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]
+ALTER PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]
 AS
 BEGIN
 	SELECT DISTINCT
 		 LifecycleStage
 		,BrandName
 		,Charter
---		,ConfirmDate
 		,BookingOfficeLocation
 		,BookingLanguage
 		,ClientCode
@@ -773,26 +776,8 @@ BEGIN
 		,CancelFromTelephone
 		,Notes
 		,LastContactDate
-		,BookingBookRef
-		,BookingCancellationDate
-		,CancellationBookRef
-		,CancellationCancellationDate
-		,FirstCharterBookRef
-		,FirstCharterDepartureDate
-		,FirstCharterDestination
-		,FirstCharterDateBooked
-		,FirstCharterProduct
-		,FirstCharterHullType
-		,FirstCharterBoat
-		,NumberOfBookings
 		,NeptuneCreateDate
-		,BookingSourceSecondary
-		,BookingSourceTertiary
-        ,BookingSalesAgent
         ,CleanClientID
-        ,BookingCleanBookRef
-		,BookingTotalPax
---		,Duration
 		,QuoteSalesAgent
 	FROM
 	(
@@ -800,7 +785,6 @@ BEGIN
 			'opportunity' AS LifecycleStage,
 			'Le Boat Charter' AS BrandName,
 			'Le Boat Charter' AS Charter,
-			--CASE WHEN [ST_MARINE_REMBOOK].RemovedDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_REMBOOK].RemovedDate))*60*60*1000) END AS ConfirmDate,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_REMBOOK].[Location],'') AS BookingOfficeLocation, 
 			COALESCE([ST_MARINE_REMBOOK].Language,'') AS BookingLanguage,
 			[ST_MARINE_REMBOOK].MailNo AS ClientCode,
@@ -855,48 +839,15 @@ BEGIN
 					[ST_MARINE_REMBOOK].Add3,
 					[ST_MARINE_REMBOOK].Phone1,
 					[ST_MARINE_REMBOOK].Phone2,
-					[ST_MARINE_REMBOOK].Phone3,
-					[ST_MARINE_REMBOOK].Duration
+					[ST_MARINE_REMBOOK].Phone3
 			) AS RankResult,
 			
             -- DWYT-16 New HubSpot API fields
 			CASE Client.CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
 			'' AS Notes,
 			COALESCE(Client.LastContactDate,'') AS LastContactDate,
-			COALESCE(BKGS.BookRef,'') AS BookingBookRef,
-			COALESCE(BKGS.CancellationDate,'') AS BookingCancellationDate,
-			COALESCE(CANX.BookRef,'') AS CancellationBookRef,
-			COALESCE(CANX.CancellationDate,'') AS CancellationCancellationDate,
-			COALESCE(FirstCharter.BookRef,'') AS FirstCharterBookRef,
-			COALESCE(FirstCharter.DepartureDate,'') AS FirstCharterDepartureDate,
-			COALESCE(FirstCharter.Destination,'') AS FirstCharterDestination,
-			COALESCE(FirstCharter.DateBooked,'') AS FirstCharterDateBooked,
-			COALESCE(FirstCharter.Product,'') AS FirstCharterProduct,
-			COALESCE(FirstCharter.HullType,'') AS FirstCharterHullType,
-			COALESCE(FirstCharter.Boat,'') AS FirstCharterBoat,
-            (SELECT COUNT(*)
-				FROM [NEPTUNE_Stage].[dbo].[ST_MARINE_FBKG] WITH (NOLOCK)
-				INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
-				ON [ST_MARINE_BOOKINGS].BookRef = [ST_MARINE_FBKG].BkgRef
-					AND [ST_MARINE_BOOKINGS].BrandCode='LBT'
-					AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
-				WHERE REPLACE([ST_MARINE_FBKG].Email,'\@','@') = REPLACE(Client.Email1,'\@','@')
-					AND [ST_MARINE_FBKG].Email LIKE '%_@%_.__%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%[[]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%(%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%)%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%''%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '% %'
-            ) AS NumberOfBookings,
 			COALESCE(Client.CreateDate,'') AS NeptuneCreateDate,
-			'' AS BookingSourceSecondary,
-			'' AS BookingSourceTertiary,
-            COALESCE(BKGS.AgentContact,'') AS BookingSalesAgent,
             [ST_MARINE_REMBOOK].MailNo AS CleanClientID,
-            COALESCE(BKGS.BookRef,'') AS BookingCleanBookRef,
-			COALESCE(BKGS.TotalPax,0) AS BookingTotalPax,
-     		COALESCE(BKGS.Duration,'') AS Duration,
 			COALESCE([ST_MARINE_REMBOOK].AgencyKeyContactName,'') AS QuoteSalesAgent
 
 		FROM
@@ -948,108 +899,6 @@ BEGIN
 			) Client
 			ON REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@') = REPLACE(Client.Email1,'\@','@')
 			AND [ST_MARINE_REMBOOK].MailNo = Client.MailNo
-		-- Most recent booking
-		LEFT JOIN
-			(
-				SELECT
-				 CASE WHEN [ST_MARINE_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate
-				,[ST_MARINE_FBKG].AgentContact
-				,[ST_MARINE_BOOKINGS].BookRef
-				,[ST_MARINE_BOOKINGS].TotalPax
-				--,[ST_MARINE_BOOKINGS].ConfirmDate
-				,[ST_MARINE_FBKG].Email
-     			,[ST_MARINE_BOOKINGS].[Duration] AS Duration
-				,ROW_NUMBER() OVER(PARTITION BY REPLACE([ST_MARINE_FBKG].Email,'\@','@')
-				ORDER BY [ST_MARINE_BOOKINGS].ConfirmDate DESC,
-					[ST_MARINE_BOOKINGS].BookRef DESC
-				) AS RecentRank
-				FROM [NEPTUNE_Stage].[dbo].[ST_MARINE_FBKG] WITH (NOLOCK)
-				INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
-				ON [ST_MARINE_BOOKINGS].BookRef = [ST_MARINE_FBKG].BkgRef
-					AND [ST_MARINE_BOOKINGS].BrandCode='LBT'
-					AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
-				WHERE
-					    [ST_MARINE_FBKG].Email LIKE '%_@%_.__%'
---					AND REPLACE([ST_MARINE_FBKG].Email,'\@','@') = REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@')
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%[[]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%(%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%)%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%''%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '% %'
-			) BKGS
-			ON REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@') = REPLACE(BKGS.Email,'\@','@')
-			AND BKGS.RecentRank = 1
-		-- Most recent cancellation
-		LEFT JOIN
-			(
-				SELECT
-				 CASE WHEN [ST_MARINE_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate
-				,[ST_MARINE_BOOKINGS].BookRef
-				,[ST_MARINE_FBKG].Email
-				,ROW_NUMBER() OVER(PARTITION BY REPLACE([ST_MARINE_FBKG].Email,'\@','@')
-				ORDER BY [ST_MARINE_BOOKINGS].ConfirmDate DESC,
-					[ST_MARINE_BOOKINGS].BookRef DESC
-				) AS CancellationRank
-				FROM [NEPTUNE_Stage].[dbo].[ST_MARINE_FBKG] WITH (NOLOCK)
-				INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
-				ON [ST_MARINE_BOOKINGS].BookRef = [ST_MARINE_FBKG].BkgRef
-					AND [ST_MARINE_BOOKINGS].BrandCode='LBT'
-					AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
-					AND [ST_MARINE_BOOKINGS].[CancelledDate] IS NOT NULL
-				WHERE
-					    [ST_MARINE_FBKG].Email LIKE '%_@%_.__%'
---					AND REPLACE([ST_MARINE_FBKG].Email,'\@','@') = REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@')
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%[[]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%(%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%)%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%''%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '% %'
-			) CANX
-			ON REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@') = REPLACE(CANX.Email,'\@','@')
-			AND CANX.CancellationRank = 1
-		-- First charter
-		LEFT JOIN
-			(
-				SELECT
-                [ST_MARINE_BOOKINGS].BookRef AS BookRef,
-				 CASE WHEN [ST_MARINE_BOOKINGS].DepartureDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BOOKINGS].DepartureDate))*60*60*1000) END AS DepartureDate
-				,COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation,'') AS Destination
-				,CASE WHEN [ST_MARINE_BOOKINGS].BookingDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BOOKINGS].BookingDate))*60*60*1000) END AS DateBooked
-				,COALESCE([SL_Simplified_ProductName].ProductNameSimplified,[ST_MARINE_BOOKINGS].ProductCode,'') AS Product
-				,COALESCE([NEPTUNE_ACC_TYPE].KEEL_TYPE, '') AS HullType
-				,COALESCE([ST_MARINE_FBKG].BoatType, '') AS Boat
-				--,[ST_MARINE_BOOKINGS].ConfirmDate
-				,[ST_MARINE_FBKG].Email
-				,ROW_NUMBER() OVER(PARTITION BY REPLACE([ST_MARINE_FBKG].Email,'\@','@')
-				ORDER BY [ST_MARINE_BOOKINGS].ConfirmDate ASC,
-					[ST_MARINE_BOOKINGS].BookRef ASC
-				) AS FirstCharterRank
-				FROM [NEPTUNE_Stage].[dbo].[ST_MARINE_FBKG] WITH (NOLOCK)
-				INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
-				ON [ST_MARINE_BOOKINGS].BookRef = [ST_MARINE_FBKG].BkgRef
-					AND [ST_MARINE_BOOKINGS].BrandCode='LBT'
-					AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
-				LEFT JOIN [HUBSPOT].[dbo].[SL_BaseNameFull] WITH (NOLOCK)
-					ON [SL_BaseNameFull].[BaseCode]=[ST_MARINE_FBKG].BaseLocation
-					AND [SL_BaseNameFull].Brand = 'LBT'
-				LEFT JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_ACC_TYPE] WITH (NOLOCK)
-					ON [NEPTUNE_ACC_TYPE].ACC_TYPE_DESC = [ST_MARINE_FBKG].BoatType
-		        LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-				    ON [SL_Simplified_ProductName].[ProductNameActual]=[ST_MARINE_BOOKINGS].ProductCode
-				WHERE
-					    [ST_MARINE_FBKG].Email LIKE '%_@%_.__%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%[[]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%]%' 
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%(%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%)%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '%''%'
-					AND [ST_MARINE_FBKG].Email NOT LIKE '% %'
-					AND [ST_MARINE_BOOKINGS].BookingDate >= CONVERT(datetime, '2010-01-01 00:00:00.000')
-			) FirstCharter
-			ON REPLACE([ST_MARINE_REMBOOK].Email1,'\@','@') = REPLACE(FirstCharter.Email,'\@','@')
-			AND FirstCharter.FirstCharterRank = 1
 		WHERE
 			[ST_MARINE_REMBOOK].Email1 LIKE '%_@%_.__%'
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '%[[]%' 
@@ -1059,7 +908,7 @@ BEGIN
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '%''%'
 		AND [ST_MARINE_REMBOOK].Email1 NOT LIKE '% %'
 		AND [ST_MARINE_REMBOOK].CompanyNo='5'
-		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [ST_MARINE_REMBOOK].RemovedDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 	)Result
@@ -1068,9 +917,6 @@ BEGIN
 	ORDER BY 
 		QuoteDateRequested
 END
-
-
-
 
 GO
 /****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 30/04/2018 10:31:41 ******/
@@ -1159,8 +1005,6 @@ BEGIN
         ,BookingCleanBookRef
         ,BookingTotalPax
 		,BookingStatus
---        ,RankResultMostRecentBooking
---        ,RankResultFirstCharter
     FROM 
     (
         SELECT
@@ -1526,7 +1370,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --		AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -1560,10 +1404,11 @@ GO
 -- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
--- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]
 AS
 BEGIN
     SELECT DISTINCT 
@@ -1598,6 +1443,7 @@ BEGIN
         ,Phone2
         ,BusinessPhone
         ,DateOfBirth
+        ,QuoteExecutiveReportingRegion
         ,QuoteBoat
         ,QuoteBookRef
         ,CustomerLinkCode
@@ -1609,29 +1455,9 @@ BEGIN
         ,CancelFromTelephone
         ,Notes
         ,LastContactDate
-        ,BookingCancellationDate
-        ,CancellationCancellationDate
-        ,CancellationBookRef
-        ,FirstCharterDepartureDate
-        ,FirstCharterDestination
-        ,FirstCharterDateBooked
-        ,FirstCharterProduct
-        ,FirstCharterHullType
-        ,FirstCharterBoat
-        ,NumberOfBookings
         ,TritonCreateDate
-        ,BookingSourceSecondary
-        ,BookingSourceTertiary
-        ,BookingSalesAgent
         ,CleanClientID
-        ,BookingCleanBookRef
-        ,BookingTotalPax
 		,QuoteSalesAgent
-		,BookingStatus
---		  ,QuoteDuration
---		  ,Duration
---        ,RankResultMostRecentQuote
---        ,RankResultFirstCharter
     FROM 
     (
         SELECT
@@ -1666,6 +1492,7 @@ BEGIN
 			COALESCE(CLI.[Phone2],'') AS Phone2,
 			COALESCE(CLI.[BusinessPhone],'') AS BusinessPhone,
 			CASE WHEN CLI.DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateOfBirth))*60*60*1000) END AS DateOfBirth,
+			COALESCE([CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,'') AS QuoteExecutiveReportingRegion,
 			COALESCE([CELERITY_ST_BOOKINGS].UserDefinable1,'') AS QuoteBoat,
 			COALESCE([CELERITY_ST_BOOKINGS].BookRef,'') AS QuoteBookRef,
 			COALESCE(CLI.CustomerLinkCode,'') AS CustomerLinkCode,
@@ -1706,47 +1533,21 @@ BEGIN
 					CLI.[Phone2],
 					CLI.[BusinessPhone],
 					CLI.DateOfBirth,
+					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
 					[CELERITY_ST_BOOKINGS].UserDefinable1,
 					CLI.CustomerLinkCode,
 					CLI.[CustomerClass],
 					CLI.ClientSourceCode,
 					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
             ) AS RankResultMostRecentQuote,
-            RankResultFirstCharter,
 
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             '' AS Notes,
             CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, CLI.[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
-            COALESCE(RecentBookings.BookingCancellationDate,'') AS BookingCancellationDate,
-            COALESCE(CancelledBookings.CancellationDate, '') AS CancellationCancellationDate,
-            COALESCE(CancelledBookings.CancellationBookRef, '') AS CancellationBookRef,
-            COALESCE(FirstCharter.FirstCharterDepartureDate, '') AS FirstCharterDepartureDate,
-            COALESCE(FirstCharter.FirstCharterDestination, '') AS FirstCharterDestination,
-            COALESCE(FirstCharter.FirstCharterDateBooked, '') AS FirstCharterDateBooked,
-            COALESCE(FirstCharter.FirstCharterProduct, '') AS FirstCharterProduct,
-            COALESCE(FirstCharter.FirstCharterHullType, '') AS FirstCharterHullType,
-            COALESCE(FirstCharter.FirstCharterBoat,'') AS FirstCharterBoat,
-            (SELECT COUNT(*) FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-                ON [CELERITY_ST_BOOKEDPASSENGERS].ClientCode = [CELERITY_ST_CLIENT].ClientCode
-                WHERE [CELERITY_ST_CLIENT].ClientCode = CLI.ClientCode
-				AND [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-                AND [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-            ) AS NumberOfBookings,
             CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateCreated))*60*60*1000) END AS TritonCreateDate,
-            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
-            COALESCE(RecentBookings.BookingSalesAgent,'') AS BookingSalesAgent,
-            COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
-            COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
-            COALESCE(RecentBookings.BookingTotalPax,'') AS BookingTotalPax,
-            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent,
-            COALESCE(RecentBookings.BookingStatus,'') AS BookingStatus,
-			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS QuoteDuration,
-            COALESCE(RecentBookings.BookingDuration,'') AS Duration
+            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
+            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -1774,335 +1575,6 @@ BEGIN
             ON [SL_Simplified_Title].[TitleActual]=CLI.Title
         LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
             ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-        LEFT JOIN
-        -- Most recent booking records
-        (
-            SELECT DISTINCT
-                BookRef AS BookingBookRef,
-                BookingConfirmDate AS BookingConfirmDate,
-                ClientCode AS BookingClientCode,
-				BookingCancellationDate,
-				BookingSourcePrimary,
-				BookingSourceSecondary,
-				BookingSourceTertiary,
-				BookingSalesAgent,
-				BookingCleanClientID,
-				BookingCleanBookRef,
-				BookingTotalPax,
-				BookingStatus,
-				BookingDuration,
-                RankResultBooking
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS BookingConfirmDate,
-                    CLI.ClientCode,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS BookingCancellationDate,
-		            COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS BookingSourcePrimary,
-		            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
-				    '' AS BookingSourceTertiary,
-					COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS BookingSalesAgent,
-		            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS BookingCleanClientID,
-				    COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-					COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
-					COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus,
-					COALESCE([CELERITY_ST_BOOKINGS].[Duration],'') AS BookingDuration,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-				ORDER BY 
-					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
-					[CELERITY_ST_BOOKINGS].DepartureDate DESC,
-					[CELERITY_ST_BOOKINGS].BookRef DESC, 
-					[CELERITY_ST_BOOKINGS].ConfirmDate DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
-					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
-					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
-					[CELERITY_ST_BOOKINGS].BookingLanguageFull,
-					[CELERITY_ST_BOOKINGS].ProductName,
-					[CELERITY_ST_BOOKINGS].AreaName,
-					CLI.ClientCode,
-					COALESCE([SL_Simplified_Title].[TitleSimplified],''),
-					CLI.FirstName,
-					CLI.LastName,
-					CLI.City,
-					CLI.County,
-					CLI.Postcode,
-					COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
-					(CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
-					CLI.[Add1],
-					CLI.[Add2],
-					CLI.[Add3],
-					CLI.[Phone1],
-					CLI.[Phone2],
-					CLI.[BusinessPhone],
-					CLI.DateOfBirth,
-					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
-					[CELERITY_ST_BOOKINGS].UserDefinable1,
-					CLI.CustomerLinkCode,
-					CLI.[CustomerClass],
-					CLI.ClientSourceCode,
-					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
-                    ) AS RankResultBooking
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'M'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].CancelledDate IS NOT NULL
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-                --Search all bookings for most recent cancellation records
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
-            ) RecentBookingsInnerSelect
-            WHERE RankResultBooking = 1
-        ) RecentBookings
-        ON RecentBookings.BookingClientCode = CLI.ClientCode
-
-        LEFT JOIN
-        -- First Charter records
-        (
-            SELECT DISTINCT
-                BookRef AS FirstCharterBookRef,
-                DepartureDate AS FirstCharterDepartureDate,
-                Destination AS FirstCharterDestination,
-                BookingDate AS FirstCharterDateBooked,
-                ProductName AS FirstCharterProduct,
-                HullType AS FirstCharterHullType,
-                UserDefinable1 AS FirstCharterBoat,
-                ClientCode AS FirstCharterClientCode,
-                RankResultFirstCharter
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].DepartureDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].DepartureDate))*60*60*1000) END AS DepartureDate,
-					COALESCE([SL_BaseNameFull].[BaseName],[CELERITY_ST_BOOKINGS].AreaName) AS Destination,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].BookingDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].BookingDate))*60*60*1000) END AS BookingDate,
-                    [SL_Simplified_ProductName].ProductNameSimplified AS ProductName,
-                    CASE
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'P' THEN 'Power'
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'X' THEN 'Catamaran'
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'L' THEN 'Catamaran'
-                        ELSE 'Monohull'
-                    END AS HullType,
-                    [CELERITY_ST_BOOKINGS].UserDefinable1,
-                    CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-                        ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
-                    ) AS RankResultFirstCharter
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'M'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName='MRG' AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-				LEFT JOIN [SL_BaseNameFull] WITH (NOLOCK)
-					ON [SL_BaseNameFull].BaseCode = [CELERITY_ST_BOOKINGS].AreaCode
-					AND [SL_BaseNameFull].Brand = 'MRG'
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-				AND [CELERITY_ST_BOOKINGS].BookingDate >= CONVERT(date, '2010-01-01 00:00:00.000')
-            ) FirstCharterInnerSelect
-            WHERE RankResultFirstCharter = 1
-        ) FirstCharter
-        ON FirstCharter.FirstCharterClientCode = CLI.ClientCode
-        LEFT JOIN
-        -- Most recent cancellation records
-        (
-            SELECT DISTINCT
-                BookRef AS CancellationBookRef,
-                CancellationDate AS CancellationDate,
-                ClientCode AS CancellationClientCode,
-                RankResultCancellation
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
-                    CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-                        ORDER BY 
-                            [CELERITY_ST_BOOKINGS].BookingDate DESC,
-                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
-                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
-                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
-                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
-                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
-                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary ASC,
-                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) ASC,
-                            [CELERITY_ST_BOOKINGS].BookingLanguageFull ASC,
-                            [CELERITY_ST_BOOKINGS].ProductName ASC,
-                            [CELERITY_ST_BOOKINGS].AreaName ASC,
-                            CLI.ClientCode ASC,
-                            COALESCE([SL_Simplified_Title].[TitleSimplified],'') ASC,
-                            CLI.FirstName ASC,
-                            CLI.LastName ASC,
-                            CLI.City ASC,
-                            CLI.County ASC,
-                            CLI.Postcode ASC,
-                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) ASC,
-                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) ASC,
-                            CLI.[Add1] ASC,
-                            CLI.[Add2] ASC,
-                            CLI.[Add3] ASC,
-                            CLI.[Phone1] ASC,
-                            CLI.[Phone2] ASC,
-                            CLI.[BusinessPhone] ASC,
-                            CLI.DateOfBirth ASC,
-							[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-							CLI.NumberOfCharters,
-							[CELERITY_ST_BOOKINGS].Duration,
-							[CELERITY_ST_BOOKINGS].UserDefinable1,
-							CLI.CustomerLinkCode,
-                            CLI.[CustomerClass] ASC,
-                            CLI.ClientSourceCode ASC,
-                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] ASC
-                    ) AS RankResultCancellation
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'M'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName='MRG' AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].CancelledDate IS NOT NULL
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-                --Search all bookings for most recent cancellation records
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
-            ) CancelledBookingsInnerSelect
-            WHERE RankResultCancellation = 1
-        ) CancelledBookings
-        ON CancelledBookings.CancellationClientCode = CLI.ClientCode
         WHERE 
             [CELERITY_ST_BOOKINGS].BrandName ='FTL'
         AND [CELERITY_ST_BOOKINGS].[Status] IN ('Quote', 'Hold', 'Option')
@@ -2114,7 +1586,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -2214,8 +1686,6 @@ BEGIN
         ,BookingCleanBookRef
         ,BookingTotalPax
 		,BookingStatus
---        ,RankResultMostRecentBooking
---        ,RankResultFirstCharter
     FROM 
     (
         SELECT
@@ -2581,7 +2051,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -2612,19 +2082,55 @@ GO
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]
 AS
 BEGIN
-	SELECT DISTINCT * FROM 
+	SELECT DISTINCT 
+		 LifecycleStage
+		,BrandName
+        ,BookingOfficeLocation
+		,ClientCode
+		,Title
+		,FirstName
+		,LastName
+		,City
+		,County
+		,Postcode
+		,Country
+		,Email
+		,CancelFromMailing
+		,CancelFromEmail
+		,CancelFromBrochure
+		,Deceased
+		,Blacklisted
+		,BrochureProductRequested
+		,BrochureDateRequested
+		,Address1
+		,Address2
+		,Address3
+		,Phone1
+		,Phone2
+		,BusinessPhone
+		,DateOfBirth
+		,CustomerLinkCode
+		,CustomerClass
+		,GoneAway
+		,ClientSourceCode
+		,[Status]
+		,ClientBookingOffice
+		,CancelFromTelephone
+		,LastContactDate
+		,TritonCreateDate
+		,CleanClientId
+	FROM
 	(
 		SELECT 
 			'lead' as LifecycleStage,
 			'Sunsail' AS BrandName,
-			--CASE WHEN [CELERITY_ST_BROCHUREREQUEST].[DateRequested] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BROCHUREREQUEST].[DateRequested]))*60*60*1000) END AS ConfirmDate,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]) AS BookingOfficeLocation,
-			--[CELERITY_ST_BROCHUREREQUEST].Language AS BookingLanguage, For now exclude this
 			[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 			COALESCE([SL_Simplified_Title].[TitleSimplified],'') AS Title,
 			[CELERITY_ST_CLIENT].[FirstName],
@@ -2648,7 +2154,6 @@ BEGIN
 			COALESCE([CELERITY_ST_CLIENT].[Phone2],'') AS Phone2,
 			COALESCE([CELERITY_ST_CLIENT].[BusinessPhone],'') AS BusinessPhone,
 			CASE WHEN [CELERITY_ST_CLIENT].DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateOfBirth))*60*60*1000) END AS DateOfBirth,
-			--COALESCE([CELERITY_ST_CLIENT].NumberOfCharters,'') AS NumberOfCharters, --Ignore for now
 			COALESCE([CELERITY_ST_CLIENT].CustomerLinkCode,'') AS CustomerLinkCode,
 			COALESCE([CELERITY_ST_CLIENT].[CustomerClass],'') AS CustomerClass,
 			CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END AS GoneAway,
@@ -2664,7 +2169,6 @@ BEGIN
 				(CASE [CELERITY_ST_CLIENT].Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]),
-				--[CELERITY_ST_BROCHUREREQUEST].Language,
 				[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				[CELERITY_ST_CLIENT].[FirstName],
@@ -2681,7 +2185,6 @@ BEGIN
 				[CELERITY_ST_CLIENT].[Phone2],
 				[CELERITY_ST_CLIENT].[BusinessPhone],
 				[CELERITY_ST_CLIENT].DateOfBirth,
-				--[CELERITY_ST_CLIENT].NumberOfCharters,
 				[CELERITY_ST_CLIENT].CustomerLinkCode,
 				[CELERITY_ST_CLIENT].[CustomerClass],
 				CELERITY_ST_CLIENT.ClientSourceCode,
@@ -2692,15 +2195,7 @@ BEGIN
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
             CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
-			COALESCE(BKGS.BookRef,'') AS BookRef,
-            COALESCE(BKGS.BookingSourcePrimary,'') AS BookingSourcePrimary,
-            COALESCE(BKGS.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
-            COALESCE(BKGS.AgentCode,'') AS BookingSalesAgent,
-            COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_CLIENT].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
-            COALESCE(REPLACE(REPLACE(REPLACE(BKGS.BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            CASE WHEN BKGS.[TotalPax] IS NULL THEN '' ELSE CAST(BKGS.[TotalPax] AS varchar(10)) END AS BookingTotalPax,
-            COALESCE(BKGS.[Status],'') AS BookingStatus
+            COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_CLIENT].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID
 
 		FROM
 			[CelerityMarine_Stage].[dbo].[CELERITY_ST_BROCHUREREQUEST] WITH (NOLOCK)
@@ -2709,28 +2204,6 @@ BEGIN
 			AND [CELERITY_ST_CLIENT].Brand = 'S'
 		INNER JOIN [HUBSPOT].[dbo].[SL_Simplified_BrochureName] WITH (NOLOCK)
 			ON [SL_Simplified_BrochureName].[BrochureNameActual]=[CELERITY_ST_BROCHUREREQUEST].[BrochureName] AND [SL_Simplified_BrochureName].[BrandName]='SUN'
-		LEFT JOIN
-		(
-			SELECT
-				 [CELERITY_ST_BOOKINGS].[BookRef]
-				,[CELERITY_ST_BOOKINGS].[BookingSourcePrimary]
-				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
-				,[CELERITY_ST_BOOKINGS].[AgentCode]
-				,[CELERITY_ST_BOOKINGS].[TotalPax]
-				,[CELERITY_ST_BOOKINGS].[Status]
-				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
-			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
-			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
-	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-			AND [CELERITY_ST_CLIENT].Brand = 'S'
-			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-		) BKGS
-		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
-		AND RecentRank = 1
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode=[CELERITY_ST_CLIENT].ClientCode
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -2742,9 +2215,9 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
 			ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=[CELERITY_ST_CLIENT].BookingOffice
 		WHERE
-		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
---        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
 		AND [CELERITY_ST_CLIENT].Email1 not like '%[[]%' AND [CELERITY_ST_CLIENT].Email1 not like '%]%' AND [CELERITY_ST_CLIENT].Email1 not like '%(%' AND [CELERITY_ST_CLIENT].Email1 not like '%)%' AND [CELERITY_ST_CLIENT].Email1 not like '%''%' AND [CELERITY_ST_CLIENT].Email1 not like '% %'
 	)Result
@@ -2775,12 +2248,45 @@ GO
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]
 AS
 BEGIN
-	SELECT DISTINCT * FROM 
+	SELECT DISTINCT
+		 LifecycleStage
+		,BrandName
+        ,BookingOfficeLocation
+		,BookingLanguage
+		,Title
+		,FirstName
+		,LastName
+		,Country
+		,Email
+		,EnewsProductName
+		,EnewsDateRequested
+		,Address1
+		,Address2
+		,Address3
+		,Phone1
+		,Phone2
+		,BusinessPhone
+		,DateOfBirth
+		,CustomerLinkCode
+		,CustomerClass
+		,GoneAway
+		,ClientSourceCode
+		,[Status]
+		,ClientBookingOffice
+		,CancelFromTelephone
+		,LastContactDate
+		,TritonCreateDate
+		,Deceased
+		,CancelFromEmail
+		,CancelFromBrochure
+		,ClientCode
+	FROM 
 	(
 		SELECT
 			'subscriber' as LifecycleStage, 
@@ -2837,47 +2343,19 @@ BEGIN
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
             CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
-			COALESCE(BKGS.BookRef,'') AS BookRef,
-            COALESCE(BKGS.BookingSourcePrimary,'') AS BookingSourcePrimary,
-            COALESCE(BKGS.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
-			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode,
-            COALESCE(BKGS.[Status],'') AS BookingStatus
+			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode
 			
 		FROM 
 			[CelerityMarine_Stage].[dbo].[TRT_SUNSAIL_ST_EFMST] WITH (NOLOCK)
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK) 
 			ON REPLACE([CELERITY_ST_CLIENT].Email1,'\@','@') = REPLACE(TRT_SUNSAIL_ST_EFMST.EFMAIL,'\@','@')
---			AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
 			AND [CELERITY_ST_CLIENT].Email1 != ''
 			AND [CELERITY_ST_CLIENT].Brand = 'S'
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode=[CELERITY_ST_CLIENT].ClientCode
-		LEFT JOIN
-		(
-			SELECT
-				 [CELERITY_ST_BOOKINGS].[BookRef]
-				,[CELERITY_ST_BOOKINGS].[BookingSourcePrimary]
-				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
-				,[CELERITY_ST_BOOKINGS].[AgentCode]
-				,[CELERITY_ST_BOOKINGS].[TotalPax]
-				,[CELERITY_ST_BOOKINGS].[Status]
-				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
-			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
-			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
-	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-			AND [CELERITY_ST_CLIENT].Brand = 'S'
-			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-		) BKGS
-		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
-		AND RecentRank = 1
 		LEFT JOIN [HUBSPOT].[dbo].[SL_ISO_SalesOffice] WITH (NOLOCK) 
 			ON [SL_ISO_SalesOffice].[ISO_Code]=TRT_SUNSAIL_ST_EFMST.EFCTCD
 		LEFT JOIN [HUBSPOT].[dbo].[SL_EFSITE_PRODUCT_INTEREST] WITH (NOLOCK)
@@ -2892,14 +2370,12 @@ BEGIN
 		    TRT_SUNSAIL_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%]%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%(%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%)%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '%''%' AND TRT_SUNSAIL_ST_EFMST.EFMAIL not like '% %'
 		AND TRT_SUNSAIL_ST_EFMST.EFETDT != 0
-		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-90,112)) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-1,112))
+		AND TRT_SUNSAIL_ST_EFMST.EFETDT >= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-117,112)) AND TRT_SUNSAIL_ST_EFMST.EFETDT <= CONVERT(INT, CONVERT(VARCHAR(8),GETDATE()-1,112))
 --		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
 --		AND TRT_SUNSAIL_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	)Result
 	Where RankResult=1
 END
-
-
 
 GO
 /****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 30/04/2018 10:31:42 ******/
@@ -2923,16 +2399,16 @@ GO
 -- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
--- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]
 AS
 BEGIN
     SELECT DISTINCT 
          LifecycleStage
         ,BrandName
---        ,ConfirmDate
 		,QuoteSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
@@ -2963,10 +2439,6 @@ BEGIN
         ,BusinessPhone
         ,DateOfBirth
         ,QuoteExecutiveReportingRegion
---        ,NumberOfCharters  -- Ignore for now
---        ,QuoteDuration
---		  ,CleanBaseName
---		  ,CleanBoatName
         ,QuoteBoat
         ,QuoteBookRef
         ,CustomerLinkCode
@@ -2975,38 +2447,17 @@ BEGIN
         ,ClientSourceCode
         ,[Status]
         ,ClientBookingOffice
-		
         ,CancelFromTelephone
         ,Notes
         ,LastContactDate
-        ,BookingCancellationDate
-        ,CancellationCancellationDate
-        ,CancellationBookRef
-        ,FirstCharterDepartureDate
-        ,FirstCharterDestination
-        ,FirstCharterDateBooked
-        ,FirstCharterProduct
-        ,FirstCharterHullType
-        ,FirstCharterBoat
-        ,NumberOfBookings
         ,TritonCreateDate
-        ,BookingSourceSecondary
-        ,BookingSourceTertiary
-        ,BookingSalesAgent
         ,CleanClientID
-        ,BookingCleanBookRef
-        ,BookingTotalPax
---		  ,Duration
 		,QuoteSalesAgent
-		,BookingStatus
---        ,RankResultMostRecentQuote
---        ,RankResultFirstCharter
     FROM 
     (
         SELECT
 			'opportunity' AS LifecycleStage,
 			'Sunsail' AS BrandName,
-			--CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS ConfirmDate,
 			COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS QuoteSourcePrimary,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation,'') AS BookingOfficeLocation,
 			COALESCE([SL_Simplified_Language].[LanguageSimplified],[CELERITY_ST_BOOKINGS].BookingLanguageFull,'') AS BookingLanguage,
@@ -3037,10 +2488,6 @@ BEGIN
 			COALESCE(CLI.[BusinessPhone],'') AS BusinessPhone,
 			CASE WHEN CLI.DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateOfBirth))*60*60*1000) END AS DateOfBirth,
 			COALESCE([CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,'') AS QuoteExecutiveReportingRegion,
-			--COALESCE(CLI.NumberOfCharters,'') AS NumberOfCharters, -- Ignore for now
-			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS QuoteDuration,
-			--COALESCE([CELERITY_ST_BOOKINGS].CleanBaseName,'') AS CleanBaseName,--Ignore for now
-			--COALESCE([CELERITY_ST_BOOKINGS].CleanBoatName,'') AS CleanBoatName,--Ignore for now
 			COALESCE([CELERITY_ST_BOOKINGS].UserDefinable1,'') AS QuoteBoat,
 			COALESCE([CELERITY_ST_BOOKINGS].BookRef,'') AS QuoteBookRef,
 			COALESCE(CLI.CustomerLinkCode,'') AS CustomerLinkCode,
@@ -3082,48 +2529,20 @@ BEGIN
 					CLI.[BusinessPhone],
 					CLI.DateOfBirth,
 					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
 					[CELERITY_ST_BOOKINGS].UserDefinable1,
 					CLI.CustomerLinkCode,
 					CLI.[CustomerClass],
 					CLI.ClientSourceCode,
 					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
             ) AS RankResultMostRecentQuote,
-            RankResultFirstCharter,
 
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             '' AS Notes,
             CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, CLI.[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
-            COALESCE(RecentBookings.BookingCancellationDate,'') AS BookingCancellationDate,
-            COALESCE(CancelledBookings.CancellationDate, '') AS CancellationCancellationDate,
-            COALESCE(CancelledBookings.CancellationBookRef, '') AS CancellationBookRef,
-            COALESCE(FirstCharter.FirstCharterDepartureDate, '') AS FirstCharterDepartureDate,
-            COALESCE(FirstCharter.FirstCharterDestination, '') AS FirstCharterDestination,
-            COALESCE(FirstCharter.FirstCharterDateBooked, '') AS FirstCharterDateBooked,
-            COALESCE(FirstCharter.FirstCharterProduct, '') AS FirstCharterProduct,
-            COALESCE(FirstCharter.FirstCharterHullType, '') AS FirstCharterHullType,
-            COALESCE(FirstCharter.FirstCharterBoat,'') AS FirstCharterBoat,
-            (SELECT COUNT(*) FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-                ON [CELERITY_ST_BOOKEDPASSENGERS].ClientCode = [CELERITY_ST_CLIENT].ClientCode
-                WHERE [CELERITY_ST_CLIENT].ClientCode = CLI.ClientCode
-				AND [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-                AND [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-            ) AS NumberOfBookings,
             CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateCreated))*60*60*1000) END AS TritonCreateDate,
-            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
-            COALESCE(RecentBookings.BookingSalesAgent,'') AS BookingSalesAgent,
-            COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
-            COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
-            COALESCE(RecentBookings.BookingTotalPax,'') AS BookingTotalPax,
-            COALESCE(RecentBookings.BookingDuration,'') AS Duration,
-            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent,
-            COALESCE(RecentBookings.BookingStatus,'') AS BookingStatus
+            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
+            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent
 
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -3149,329 +2568,6 @@ BEGIN
 		LEFT JOIN [SL_BaseNameFull] WITH (NOLOCK)
 			ON [SL_BaseNameFull].BaseCode = [CELERITY_ST_BOOKINGS].AreaCode
 			AND [SL_BaseNameFull].Brand = 'SUN'
-        LEFT JOIN
-        -- Most recent booking records
-        (
-            SELECT DISTINCT
-                BookRef AS BookingBookRef,
-                BookingConfirmDate AS BookingConfirmDate,
-                ClientCode AS BookingClientCode,
-				BookingCancellationDate,
-				BookingSourcePrimary,
-				BookingSourceSecondary,
-				BookingSourceTertiary,
-				BookingSalesAgent,
-				BookingCleanClientID,
-				BookingCleanBookRef,
-				BookingTotalPax,
-				BookingStatus,
-				BookingDuration,
-                RankResultBooking
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS BookingConfirmDate,
-                    CLI.ClientCode,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS BookingCancellationDate,
-		            COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS BookingSourcePrimary,
-		            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
-				    '' AS BookingSourceTertiary,
-					COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS BookingSalesAgent,
-		            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS BookingCleanClientID,
-				    COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-					COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
-					COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus,
-					COALESCE([CELERITY_ST_BOOKINGS].[Duration],'') AS BookingDuration,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-				ORDER BY 
-					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
-					[CELERITY_ST_BOOKINGS].DepartureDate DESC,
-					[CELERITY_ST_BOOKINGS].BookRef DESC, 
-					[CELERITY_ST_BOOKINGS].ConfirmDate DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
-					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
-					[CELERITY_ST_BOOKINGS].BookingLanguageFull,
-					[CELERITY_ST_BOOKINGS].ProductName,
-					[CELERITY_ST_BOOKINGS].AreaName,
-					CLI.ClientCode,
-					COALESCE([SL_Simplified_Title].[TitleSimplified],''),
-					CLI.FirstName,
-					CLI.LastName,
-					CLI.City,
-					CLI.County,
-					CLI.Postcode,
-					COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
-					(CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
-					CLI.[Add1],
-					CLI.[Add2],
-					CLI.[Add3],
-					CLI.[Phone1],
-					CLI.[Phone2],
-					CLI.[BusinessPhone],
-					CLI.DateOfBirth,
-					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
-					[CELERITY_ST_BOOKINGS].UserDefinable1,
-					CLI.CustomerLinkCode,
-					CLI.[CustomerClass],
-					CLI.ClientSourceCode,
-					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
-                    ) AS RankResultBooking
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'S'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].CancelledDate IS NOT NULL
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-                --Search all bookings for most recent cancellation records
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
-            ) RecentBookingsInnerSelect
-            WHERE RankResultBooking = 1
-        ) RecentBookings
-        ON RecentBookings.BookingClientCode = CLI.ClientCode
-        LEFT JOIN
-        -- First Charter records
-        (
-            SELECT DISTINCT
-                BookRef AS FirstCharterBookRef,
-                DepartureDate AS FirstCharterDepartureDate,
-                Destination AS FirstCharterDestination,
-                BookingDate AS FirstCharterDateBooked,
-                ProductName AS FirstCharterProduct,
-                HullType AS FirstCharterHullType,
-                UserDefinable1 AS FirstCharterBoat,
-                ClientCode AS FirstCharterClientCode,
-                RankResultFirstCharter
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].DepartureDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].DepartureDate))*60*60*1000) END AS DepartureDate,
-                    COALESCE([SL_BaseNameFull].[BaseName],[CELERITY_ST_BOOKINGS].AreaName) AS Destination,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].BookingDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].BookingDate))*60*60*1000) END AS BookingDate,
-                    [CELERITY_ST_BOOKINGS].ProductName,
-                    CASE
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'P' THEN 'Power'
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'X' THEN 'Catamaran'
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'L' THEN 'Catamaran'
-                        ELSE 'Monohull'
-                    END AS HullType,
-                    [CELERITY_ST_BOOKINGS].UserDefinable1,
-                    CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-                        ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
-                    ) AS RankResultFirstCharter
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'S'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-				LEFT JOIN [SL_BaseNameFull] WITH (NOLOCK)
-					ON [SL_BaseNameFull].BaseCode = [CELERITY_ST_BOOKINGS].AreaCode
-					AND [SL_BaseNameFull].Brand = 'SUN'
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-				AND [CELERITY_ST_BOOKINGS].BookingDate >= CONVERT(date,'2010-01-01 00:00:00.000')
-            ) FirstCharterInnerSelect
-            WHERE RankResultFirstCharter = 1
-        ) FirstCharter
-        ON FirstCharter.FirstCharterClientCode = CLI.ClientCode
-        LEFT JOIN
-        -- Most recent cancellation records
-        (
-            SELECT DISTINCT
-                BookRef AS CancellationBookRef,
-                CancellationDate AS CancellationDate,
-                ClientCode AS CancellationClientCode,
-                RankResultCancellation
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
-                    CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-				ORDER BY 
-					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
-					[CELERITY_ST_BOOKINGS].DepartureDate DESC,
-					[CELERITY_ST_BOOKINGS].BookRef DESC, 
-					[CELERITY_ST_BOOKINGS].ConfirmDate DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
-					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
-					[CELERITY_ST_BOOKINGS].BookingLanguageFull,
-					[CELERITY_ST_BOOKINGS].ProductName,
-					[CELERITY_ST_BOOKINGS].AreaName,
-					CLI.ClientCode,
-					COALESCE([SL_Simplified_Title].[TitleSimplified],''),
-					CLI.FirstName,
-					CLI.LastName,
-					CLI.City,
-					CLI.County,
-					CLI.Postcode,
-					COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
-					(CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
-					CLI.[Add1],
-					CLI.[Add2],
-					CLI.[Add3],
-					CLI.[Phone1],
-					CLI.[Phone2],
-					CLI.[BusinessPhone],
-					CLI.DateOfBirth,
-					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
-					[CELERITY_ST_BOOKINGS].UserDefinable1,
-					CLI.CustomerLinkCode,
-					CLI.[CustomerClass],
-					CLI.ClientSourceCode,
-					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
-                    ) AS RankResultCancellation
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'S'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].CancelledDate IS NOT NULL
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-                --Search all bookings for most recent cancellation records
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
-            ) CancelledBookingsInnerSelect
-            WHERE RankResultCancellation = 1
-        ) CancelledBookings
-        ON CancelledBookings.CancellationClientCode = CLI.ClientCode
         WHERE 
             [CELERITY_ST_BOOKINGS].BrandName ='SUN'
         AND [CELERITY_ST_BOOKINGS].[Status] IN ('Quote', 'Hold', 'Option')
@@ -3483,7 +2579,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -3584,8 +2680,6 @@ BEGIN
         ,BookingCleanBookRef
         ,BookingTotalPax
 		,BookingStatus
---        ,RankResultMostRecentBooking
---        ,RankResultFirstCharter
     FROM 
     (
         SELECT
@@ -3957,7 +3051,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
@@ -3988,19 +3082,55 @@ GO
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]
 AS
 BEGIN
-	SELECT DISTINCT * FROM 
+	SELECT DISTINCT 
+		 LifecycleStage
+		,BrandName
+        ,BookingOfficeLocation
+		,ClientCode
+		,Title
+		,FirstName
+		,LastName
+		,City
+		,County
+		,Postcode
+		,Country
+		,Email
+		,CancelFromMailing
+		,CancelFromEmail
+		,CancelFromBrochure
+		,Deceased
+		,Blacklisted
+		,BrochureProductRequested
+		,BrochureDateRequested
+		,Address1
+		,Address2
+		,Address3
+		,Phone1
+		,Phone2
+		,BusinessPhone
+		,DateOfBirth
+		,CustomerLinkCode
+		,CustomerClass
+		,GoneAway
+		,ClientSourceCode
+		,[Status]
+		,ClientBookingOffice
+		,CancelFromTelephone
+		,LastContactDate
+		,TritonCreateDate
+		,CleanClientId
+	FROM
 	(
 		SELECT 
 			'lead' as LifecycleStage,
 			'Moorings' AS BrandName,
-			--CASE WHEN [CELERITY_ST_BROCHUREREQUEST].[DateRequested] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BROCHUREREQUEST].[DateRequested]))*60*60*1000) END AS ConfirmDate,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]) AS BookingOfficeLocation,
-			--[CELERITY_ST_BROCHUREREQUEST].Language AS BookingLanguage, For now exclude this
 			[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 			COALESCE([SL_Simplified_Title].[TitleSimplified],'') AS Title,
 			[CELERITY_ST_CLIENT].[FirstName],
@@ -4024,7 +3154,6 @@ BEGIN
 			COALESCE([CELERITY_ST_CLIENT].[Phone2],'') AS Phone2,
 			COALESCE([CELERITY_ST_CLIENT].[BusinessPhone],'') AS BusinessPhone,
 			CASE WHEN [CELERITY_ST_CLIENT].DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateOfBirth))*60*60*1000) END AS DateOfBirth,
-			--COALESCE([CELERITY_ST_CLIENT].NumberOfCharters,'') AS NumberOfCharters, --Ignore for now
 			COALESCE([CELERITY_ST_CLIENT].CustomerLinkCode,'') AS CustomerLinkCode,
 			COALESCE([CELERITY_ST_CLIENT].[CustomerClass],'') AS CustomerClass,
 			CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END AS GoneAway,
@@ -4040,7 +3169,6 @@ BEGIN
 				(CASE [CELERITY_ST_CLIENT].Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]),
-				--[CELERITY_ST_BROCHUREREQUEST].Language,
 				[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				[CELERITY_ST_CLIENT].[FirstName],
@@ -4057,7 +3185,6 @@ BEGIN
 				[CELERITY_ST_CLIENT].[Phone2],
 				[CELERITY_ST_CLIENT].[BusinessPhone],
 				[CELERITY_ST_CLIENT].DateOfBirth,
-				--[CELERITY_ST_CLIENT].NumberOfCharters,
 				[CELERITY_ST_CLIENT].CustomerLinkCode,
 				[CELERITY_ST_CLIENT].[CustomerClass],
 				CELERITY_ST_CLIENT.ClientSourceCode,
@@ -4068,15 +3195,7 @@ BEGIN
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
             CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
-			COALESCE(BKGS.BookRef,'') AS BookRef,
-            COALESCE(BKGS.BookingSourcePrimary,'') AS BookingSourcePrimary,
-            COALESCE(BKGS.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
-            COALESCE(BKGS.AgentCode,'') AS BookingSalesAgent,
-            COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_CLIENT].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
-            COALESCE(REPLACE(REPLACE(REPLACE(BKGS.BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-            CASE WHEN BKGS.[TotalPax] IS NULL THEN '' ELSE CAST(BKGS.[TotalPax] AS varchar(10)) END AS BookingTotalPax,
-            COALESCE(BKGS.[Status],'') AS BookingStatus
+            COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_CLIENT].ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID
 
 		FROM
 			[CelerityMarine_Stage].[dbo].[CELERITY_ST_BROCHUREREQUEST] WITH (NOLOCK)
@@ -4085,28 +3204,6 @@ BEGIN
 			AND [CELERITY_ST_CLIENT].Brand = 'M'
 		INNER JOIN [HUBSPOT].[dbo].[SL_Simplified_BrochureName] WITH (NOLOCK)
 			ON [SL_Simplified_BrochureName].[BrochureNameActual]=[CELERITY_ST_BROCHUREREQUEST].[BrochureName] AND [SL_Simplified_BrochureName].[BrandName]='MRG'
-		LEFT JOIN
-		(
-			SELECT
-				 [CELERITY_ST_BOOKINGS].[BookRef]
-				,[CELERITY_ST_BOOKINGS].[BookingSourcePrimary]
-				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
-				,[CELERITY_ST_BOOKINGS].[AgentCode]
-				,[CELERITY_ST_BOOKINGS].[TotalPax]
-				,[CELERITY_ST_BOOKINGS].[Status]
-				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
-			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
-			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
-	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-			AND [CELERITY_ST_CLIENT].Brand = 'M'
-			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-		) BKGS
-		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
-		AND RecentRank = 1
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode=[CELERITY_ST_CLIENT].ClientCode
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
@@ -4118,9 +3215,9 @@ BEGIN
 		LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
 			ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=[CELERITY_ST_CLIENT].BookingOffice
 		WHERE
-		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+		    [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
---        AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
+--      AND [CELERITY_ST_BROCHUREREQUEST].[DateRequested] BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
 		AND [CELERITY_ST_CLIENT].Email1 LIKE '%_@%_.__%'
 		AND [CELERITY_ST_CLIENT].Email1 not like '%[[]%' AND [CELERITY_ST_CLIENT].Email1 not like '%]%' AND [CELERITY_ST_CLIENT].Email1 not like '%(%' AND [CELERITY_ST_CLIENT].Email1 not like '%)%' AND [CELERITY_ST_CLIENT].Email1 not like '%''%' AND [CELERITY_ST_CLIENT].Email1 not like '% %'
 	) Result
@@ -4150,12 +3247,45 @@ GO
 -- 05-Jan-2018      1.1         Tim Wilson         Debugged recent bookings join
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]
 AS
 BEGIN
-	SELECT DISTINCT * FROM 
+	SELECT DISTINCT
+		 LifecycleStage
+		,BrandName
+        ,BookingOfficeLocation
+		,BookingLanguage
+		,Title
+		,FirstName
+		,LastName
+		,Country
+		,Email
+		,EnewsProductName
+		,EnewsDateRequested
+		,Address1
+		,Address2
+		,Address3
+		,Phone1
+		,Phone2
+		,BusinessPhone
+		,DateOfBirth
+		,CustomerLinkCode
+		,CustomerClass
+		,GoneAway
+		,ClientSourceCode
+		,[Status]
+		,ClientBookingOffice
+		,CancelFromTelephone
+		,LastContactDate
+		,TritonCreateDate
+		,Deceased
+		,CancelFromEmail
+		,CancelFromBrochure
+		,ClientCode
+	FROM 
 	(
 		SELECT
 			'subscriber' as LifecycleStage, 
@@ -4212,47 +3342,19 @@ BEGIN
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
             CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
-			COALESCE(BKGS.BookRef,'') AS BookRef,
-            COALESCE(BKGS.BookingSourcePrimary,'') AS BookingSourcePrimary,
-            COALESCE(BKGS.BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
-			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode,
-            COALESCE(BKGS.[Status],'') AS BookingStatus
+			COALESCE([CELERITY_ST_CLIENT].ClientCode,'') AS ClientCode
 			
 		FROM 
 			[CelerityMarine_Stage].[dbo].[TRT_Triton_ST_EFMST] WITH (NOLOCK)
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK) 
 			ON REPLACE([CELERITY_ST_CLIENT].Email1,'\@','@') = REPLACE(TRT_TRITON_ST_EFMST.EFMAIL,'\@','@')
---			AND RIGHT([CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT].ClientCode,1) ='M'
 			AND [CELERITY_ST_CLIENT].Email1 != ''
 			AND [CELERITY_ST_CLIENT].Brand = 'M'
 		LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
 			ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode=[CELERITY_ST_CLIENT].ClientCode
-		LEFT JOIN
-		(
-			SELECT
-				 [CELERITY_ST_BOOKINGS].[BookRef]
-				,[CELERITY_ST_BOOKINGS].[BookingSourcePrimary]
-				,[CELERITY_ST_BOOKINGS].[BookingSourceSecondary]
-				,[CELERITY_ST_BOOKINGS].[AgentCode]
-				,[CELERITY_ST_BOOKINGS].[TotalPax]
-				,[CELERITY_ST_BOOKINGS].[Status]
-				,[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				,ROW_NUMBER() OVER(PARTITION BY [CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-				ORDER BY [CELERITY_ST_BOOKINGS].BookingDate DESC, [CELERITY_ST_BOOKINGS].BookRef DESC) AS RecentRank
-			FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-			INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS]
-			ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef = [CELERITY_ST_BOOKINGS].BookRef
-	        INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-            ON [CELERITY_ST_CLIENT].ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-			AND [CELERITY_ST_CLIENT].Brand = 'M'
-			WHERE [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-		) BKGS
-		ON BKGS.ClientCode = [CELERITY_ST_CLIENT].ClientCode
-		AND RecentRank = 1
 		LEFT JOIN [HUBSPOT].[dbo].[SL_ISO_SalesOffice] WITH (NOLOCK) 
 			ON [SL_ISO_SalesOffice].[ISO_Code]=TRT_TRITON_ST_EFMST.EFCTCD
 		LEFT JOIN [HUBSPOT].[dbo].[SL_EFSITE_PRODUCT_INTEREST] WITH (NOLOCK)
@@ -4267,14 +3369,12 @@ BEGIN
 		    TRT_TRITON_ST_EFMST.EFMAIL LIKE '%_@%_.__%'
 		AND TRT_TRITON_ST_EFMST.EFMAIL not like '%[[]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%]%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%(%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%)%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '%''%' AND TRT_TRITON_ST_EFMST.EFMAIL not like '% %'
 		AND TRT_TRITON_ST_EFMST.EFETDT != 0
-		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-90,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
+		AND TRT_TRITON_ST_EFMST.EFETDT >= CONVERT(VARCHAR(8),GETDATE()-117,112) AND TRT_TRITON_ST_EFMST.EFETDT <= CONVERT(VARCHAR(8),GETDATE()-1,112)
 --		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20130101 AND 20131231
 --		AND TRT_TRITON_ST_EFMST.EFETDT BETWEEN 20160101 AND 20161231
 	) Result
 	Where RankResult=1
 END
-
-
 
 GO
 /****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 30/04/2018 10:31:42 ******/
@@ -4298,16 +3398,16 @@ GO
 -- 23-Apr-2018      1.3         Tim Wilson         Resolve conflict between QuoteDuration and
 --                                                 Bookings Duration
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
--- 27-04-2018       1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
+-- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 --========================================================================================================================
 
-CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]
+ALTER PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]
 AS
 BEGIN
     SELECT DISTINCT 
          LifecycleStage
         ,BrandName
---        ,ConfirmDate
 		,QuoteSourcePrimary
         ,BookingOfficeLocation
         ,BookingLanguage
@@ -4338,10 +3438,6 @@ BEGIN
         ,BusinessPhone
         ,DateOfBirth
         ,QuoteExecutiveReportingRegion
---        ,NumberOfCharters  -- Ignore for now
---        ,QuoteDuration
---		  ,CleanBaseName
---		  ,CleanBoatName
         ,QuoteBoat
         ,QuoteBookRef
         ,CustomerLinkCode
@@ -4350,38 +3446,17 @@ BEGIN
         ,ClientSourceCode
         ,[Status]
         ,ClientBookingOffice
-		
         ,CancelFromTelephone
         ,Notes
         ,LastContactDate
-        ,BookingCancellationDate
-        ,CancellationCancellationDate
-        ,CancellationBookRef
-        ,FirstCharterDepartureDate
-        ,FirstCharterDestination
-        ,FirstCharterDateBooked
-        ,FirstCharterProduct
-        ,FirstCharterHullType
-        ,FirstCharterBoat
-        ,NumberOfBookings
         ,TritonCreateDate
-        ,BookingSourceSecondary
-        ,BookingSourceTertiary
-        ,BookingSalesAgent
         ,CleanClientID
-        ,BookingCleanBookRef
-        ,BookingTotalPax
---		  ,Duration
 		,QuoteSalesAgent
-		,BookingStatus
---        ,RankResultMostRecentQuote
---        ,RankResultFirstCharter
     FROM 
     (
         SELECT
 			'opportunity' AS LifecycleStage,
 			'Moorings' AS BrandName,
-			--CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS ConfirmDate,
 			COALESCE([CELERITY_ST_BOOKINGS].BookingSourcePrimary,'') AS QuoteSourcePrimary,
 			COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation,'') AS BookingOfficeLocation,
 			COALESCE([SL_Simplified_Language].[LanguageSimplified],[CELERITY_ST_BOOKINGS].BookingLanguageFull,'') AS BookingLanguage,
@@ -4412,10 +3487,6 @@ BEGIN
 			COALESCE(CLI.[BusinessPhone],'') AS BusinessPhone,
 			CASE WHEN CLI.DateOfBirth IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateOfBirth))*60*60*1000) END AS DateOfBirth,
 			COALESCE([CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,'') AS QuoteExecutiveReportingRegion,
-			--COALESCE(CLI.NumberOfCharters,'') AS NumberOfCharters, -- Ignore for now
-			COALESCE([CELERITY_ST_BOOKINGS].Duration,'') AS QuoteDuration,
-			--COALESCE([CELERITY_ST_BOOKINGS].CleanBaseName,'') AS CleanBaseName,--Ignore for now
-			--COALESCE([CELERITY_ST_BOOKINGS].CleanBoatName,'') AS CleanBoatName,--Ignore for now
 			COALESCE([CELERITY_ST_BOOKINGS].UserDefinable1,'') AS QuoteBoat,
 			COALESCE([CELERITY_ST_BOOKINGS].BookRef,'') AS QuoteBookRef,
 			COALESCE(CLI.CustomerLinkCode,'') AS CustomerLinkCode,
@@ -4457,48 +3528,20 @@ BEGIN
 					CLI.[BusinessPhone],
 					CLI.DateOfBirth,
 					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
 					[CELERITY_ST_BOOKINGS].UserDefinable1,
 					CLI.CustomerLinkCode,
 					CLI.[CustomerClass],
 					CLI.ClientSourceCode,
 					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
             ) AS RankResultMostRecentQuote,
-            RankResultFirstCharter,
 
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             '' AS Notes,
             CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, CLI.[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
-            COALESCE(RecentBookings.BookingCancellationDate,'') AS BookingCancellationDate,
-            COALESCE(CancelledBookings.CancellationDate, '') AS CancellationCancellationDate,
-            COALESCE(CancelledBookings.CancellationBookRef, '') AS CancellationBookRef,
-            COALESCE(FirstCharter.FirstCharterDepartureDate, '') AS FirstCharterDepartureDate,
-            COALESCE(FirstCharter.FirstCharterDestination, '') AS FirstCharterDestination,
-            COALESCE(FirstCharter.FirstCharterDateBooked, '') AS FirstCharterDateBooked,
-            COALESCE(FirstCharter.FirstCharterProduct, '') AS FirstCharterProduct,
-            COALESCE(FirstCharter.FirstCharterHullType, '') AS FirstCharterHullType,
-            COALESCE(FirstCharter.FirstCharterBoat,'') AS FirstCharterBoat,
-            (SELECT COUNT(*) FROM [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] WITH (NOLOCK)
-                ON [CELERITY_ST_BOOKEDPASSENGERS].ClientCode = [CELERITY_ST_CLIENT].ClientCode
-                WHERE [CELERITY_ST_CLIENT].ClientCode = CLI.ClientCode
-				AND [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-                AND [CELERITY_ST_BOOKINGS].[Status] = 'Booking'
-            ) AS NumberOfBookings,
             CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CLI.DateCreated))*60*60*1000) END AS TritonCreateDate,
-            COALESCE([CELERITY_ST_BOOKINGS].BookingSourceSecondary,'') AS BookingSourceSecondary,
-            '' AS BookingSourceTertiary,
-            COALESCE(RecentBookings.BookingSalesAgent,'') AS BookingSalesAgent,
-            COALESCE(RecentBookings.BookingCleanClientID,'') AS CleanClientID,
-            COALESCE(RecentBookings.BookingCleanBookRef,'') AS BookingCleanBookRef,
-            COALESCE(RecentBookings.BookingTotalPax,'') AS BookingTotalPax,
-            COALESCE(RecentBookings.BookingDuration,'') AS Duration,
-            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent,
-            COALESCE(RecentBookings.BookingStatus,'') AS BookingStatus
+            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS CleanClientID,
+            COALESCE([CELERITY_ST_BOOKINGS].AgentCode,'') AS QuoteSalesAgent
             
         FROM 
             [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -4526,333 +3569,6 @@ BEGIN
 		LEFT JOIN [SL_BaseNameFull] WITH (NOLOCK)
 			ON [SL_BaseNameFull].BaseCode = [CELERITY_ST_BOOKINGS].AreaCode
 			AND [SL_BaseNameFull].Brand = 'MRG'
-        LEFT JOIN
-        -- Most recent booking records
-        (
-            SELECT DISTINCT
-                BookRef AS BookingBookRef,
-                BookingConfirmDate AS BookingConfirmDate,
-                ClientCode AS BookingClientCode,
-				BookingCancellationDate,
-				BookingSourcePrimary,
-				BookingSourceSecondary,
-				BookingSourceTertiary,
-				BookingSalesAgent,
-				BookingCleanClientID,
-				BookingCleanBookRef,
-				BookingTotalPax,
-				BookingStatus,
-				BookingDuration,
-                RankResultBooking
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].ConfirmDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].ConfirmDate))*60*60*1000) END AS BookingConfirmDate,
-                    CLI.ClientCode,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS BookingCancellationDate,
-		            [CELERITY_ST_BOOKINGS].BookingSourcePrimary AS BookingSourcePrimary,
-		            [CELERITY_ST_BOOKINGS].BookingSourceSecondary AS BookingSourceSecondary,
-				    '' AS BookingSourceTertiary,
-					[CELERITY_ST_BOOKINGS].AgentCode AS BookingSalesAgent,
-		            COALESCE(REPLACE(REPLACE(REPLACE(CLI.ClientCode, 'TRT-M',''), 'TRT-S', ''), 'TRT-', ''), '') AS BookingCleanClientID,
-				    COALESCE(REPLACE(REPLACE(REPLACE([CELERITY_ST_BOOKINGS].BookRef, 'TRT-M', ''), 'TRT-S', ''), 'TRT-', ''),'') AS BookingCleanBookRef,
-					COALESCE([CELERITY_ST_BOOKINGS].[TotalPax],0) AS BookingTotalPax,
-					COALESCE([CELERITY_ST_BOOKINGS].[Status],'') AS BookingStatus,
-					COALESCE([CELERITY_ST_BOOKINGS].[Duration],'') AS BookingDuration,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-				ORDER BY 
-					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
-					[CELERITY_ST_BOOKINGS].DepartureDate DESC,
-					[CELERITY_ST_BOOKINGS].BookRef DESC, 
-					[CELERITY_ST_BOOKINGS].ConfirmDate DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
-					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
-					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
-					[CELERITY_ST_BOOKINGS].BookingLanguageFull,
-					[CELERITY_ST_BOOKINGS].ProductName,
-					[CELERITY_ST_BOOKINGS].AreaName,
-					CLI.ClientCode,
-					COALESCE([SL_Simplified_Title].[TitleSimplified],''),
-					CLI.FirstName,
-					CLI.LastName,
-					CLI.City,
-					CLI.County,
-					CLI.Postcode,
-					COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
-					(CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
-					CLI.[Add1],
-					CLI.[Add2],
-					CLI.[Add3],
-					CLI.[Phone1],
-					CLI.[Phone2],
-					CLI.[BusinessPhone],
-					CLI.DateOfBirth,
-					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
-					[CELERITY_ST_BOOKINGS].UserDefinable1,
-					CLI.CustomerLinkCode,
-					CLI.[CustomerClass],
-					CLI.ClientSourceCode,
-					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
-                    ) AS RankResultBooking
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'M'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].CancelledDate IS NOT NULL
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-                --Search all bookings for most recent booking records
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
-            ) RecentBookingsInnerSelect
-            WHERE RankResultBooking = 1
-        ) RecentBookings
-        ON RecentBookings.BookingClientCode = CLI.ClientCode
-        LEFT JOIN
-        -- First Charter records
-        (
-            SELECT DISTINCT
-                BookRef AS FirstCharterBookRef,
-                DepartureDate AS FirstCharterDepartureDate,
-                Destination AS FirstCharterDestination,
-                BookingDate AS FirstCharterDateBooked,
-                ProductName AS FirstCharterProduct,
-                HullType AS FirstCharterHullType,
-                UserDefinable1 AS FirstCharterBoat,
-                ClientCode AS FirstCharterClientCode,
-                RankResultFirstCharter
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].DepartureDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].DepartureDate))*60*60*1000) END AS DepartureDate,
-                    COALESCE([SL_BaseNameFull].[BaseName],[CELERITY_ST_BOOKINGS].AreaName) AS Destination,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].BookingDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].BookingDate))*60*60*1000) END AS BookingDate,
-                    [SL_Simplified_ProductName].ProductNameSimplified AS ProductName,
-                    CASE
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'P' THEN 'Power'
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'X' THEN 'Catamaran'
-                        WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1, 3, 1) = 'L' THEN 'Catamaran'
-                        ELSE 'Monohull'
-                    END AS HullType,
-                    [CELERITY_ST_BOOKINGS].UserDefinable1,
-                    CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-                        ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
-                    ) AS RankResultFirstCharter
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'M'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-				LEFT JOIN [SL_BaseNameFull] WITH (NOLOCK)
-					ON [SL_BaseNameFull].BaseCode = [CELERITY_ST_BOOKINGS].AreaCode
-					AND [SL_BaseNameFull].Brand = 'MRG'
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-				AND [CELERITY_ST_BOOKINGS].BookingDate >= CONVERT(date,'2010-01-01 00:00:00.000')
-            ) FirstCharterInnerSelect
-            WHERE RankResultFirstCharter = 1
-        ) FirstCharter
-        ON FirstCharter.FirstCharterClientCode = CLI.ClientCode
-        LEFT JOIN
-        -- Most recent cancellation records
-        (
-            SELECT DISTINCT
-                BookRef AS CancellationBookRef,
-                CancellationDate AS CancellationDate,
-                ClientCode AS CancellationClientCode,
-                RankResultCancellation
-            FROM
-            (
-                SELECT
-                    [CELERITY_ST_BOOKINGS].BookRef,
-                    CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
-                    CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
-				ORDER BY 
-					[CELERITY_ST_BOOKINGS].BookingDate DESC, 
-					[CELERITY_ST_BOOKINGS].DepartureDate DESC,
-					[CELERITY_ST_BOOKINGS].BookRef DESC, 
-					[CELERITY_ST_BOOKINGS].ConfirmDate DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
-					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
-					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
-					[CELERITY_ST_BOOKINGS].BookingLanguageFull,
-					[CELERITY_ST_BOOKINGS].ProductName,
-					[CELERITY_ST_BOOKINGS].AreaName,
-					CLI.ClientCode,
-					COALESCE([SL_Simplified_Title].[TitleSimplified],''),
-					CLI.FirstName,
-					CLI.LastName,
-					CLI.City,
-					CLI.County,
-					CLI.Postcode,
-					COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
-					(CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
-					CLI.[Add1],
-					CLI.[Add2],
-					CLI.[Add3],
-					CLI.[Phone1],
-					CLI.[Phone2],
-					CLI.[BusinessPhone],
-					CLI.DateOfBirth,
-					[CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
-					CLI.NumberOfCharters,
-					[CELERITY_ST_BOOKINGS].Duration,
-					[CELERITY_ST_BOOKINGS].UserDefinable1,
-					CLI.CustomerLinkCode,
-					CLI.[CustomerClass],
-					CLI.ClientSourceCode,
-					[SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
-                    ) AS RankResultCancellation
-                FROM 
-                    [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKEDPASSENGERS] WITH (NOLOCK)
-                    ON [CELERITY_ST_BOOKEDPASSENGERS].BookRef=[CELERITY_ST_BOOKINGS].BookRef
-                INNER JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENT] CLI WITH (NOLOCK)
-                    ON CLI.ClientCode=[CELERITY_ST_BOOKEDPASSENGERS].ClientCode
-					AND CLI.Brand = 'M'
-                LEFT JOIN [CelerityMarine_Stage].[dbo].[CELERITY_ST_CLIENTPREFERENCES] WITH (NOLOCK)
-                    ON [CELERITY_ST_CLIENTPREFERENCES].ClientCode = CLI.ClientCode
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_SalesOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_SalesOffice].BrandName=[CELERITY_ST_BOOKINGS].BrandName AND [SL_Simplified_SalesOffice].[SalesOfficeFromRawData]=[CELERITY_ST_BOOKINGS].BookingOfficeLocation
-                LEFT JOIN [AMI_Galaxy].[dbo].[CONF_DT_BRAND] WITH (NOLOCK)
-                    ON [CONF_DT_BRAND].a_BrandCd=[CELERITY_ST_BOOKINGS].BrandName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ProductName] WITH (NOLOCK)
-                    ON [SL_Simplified_ProductName].[ProductNameActual]=[CELERITY_ST_BOOKINGS].ProductName
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Language] WITH (NOLOCK)
-                    ON [SL_Simplified_Language].LanguageActual=[CELERITY_ST_BOOKINGS].BookingLanguageFull
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Triton_Client_Country] WITH (NOLOCK)
-                    ON [SL_Simplified_Triton_Client_Country].[CountryActual]=CLI.Country
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_Title] WITH (NOLOCK)
-                    ON [SL_Simplified_Title].[TitleActual]=CLI.Title
-                LEFT JOIN [HUBSPOT].[dbo].[SL_Simplified_ClientBookingOffice] WITH (NOLOCK)
-                    ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
-                WHERE 
-                    [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
-                AND [CELERITY_ST_BOOKINGS].CancelledDate IS NOT NULL
-                AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
-                AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
-                AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
-                AND [CELERITY_ST_BOOKINGS].BookingType ='DIRECT'
-                AND [CELERITY_ST_BOOKINGS].UserDefinable1 IS NOT NULL
-                AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
-				AND CLI.Email1 LIKE '%_@%_.__%'
-				AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-                --Search all bookings for most recent cancellation records
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
-                --AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN '2017-08-03' AND '2017-09-10'
-            ) CancelledBookingsInnerSelect
-            WHERE RankResultCancellation = 1
-        ) CancelledBookings
-        ON CancelledBookings.CancellationClientCode = CLI.ClientCode
         WHERE 
             [CELERITY_ST_BOOKINGS].BrandName ='MRG'
         AND [CELERITY_ST_BOOKINGS].[Status] IN ('Quote', 'Hold', 'Option')
@@ -4864,7 +3580,7 @@ BEGIN
         AND LTRIM(RTRIM([CELERITY_ST_BOOKINGS].UserDefinable1)) <> '' 
 		AND CLI.Email1 LIKE '%_@%_.__%'
 		AND CLI.Email1 not like '%[[]%' AND CLI.Email1 not like '%]%' AND CLI.Email1 not like '%(%' AND CLI.Email1 not like '%)%' AND CLI.Email1 not like '%''%' AND CLI.Email1 not like '% %'
-        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-90) AND CONVERT(DATE,GETDATE()-1)
+        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,GETDATE()-117) AND CONVERT(DATE,GETDATE()-1)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2013-01-01', 120) AND CONVERT(DATE, '2013-12-31', 120)
 --        AND [CELERITY_ST_BOOKINGS].BookingDate BETWEEN CONVERT(DATE,'2016-01-01', 120) AND CONVERT(DATE, '2016-12-31', 120)
     ) Result
