@@ -59,8 +59,8 @@ CREATE TABLE [dbo].[SL_HUBSPOT_FIELD_NAMES](
 	[QueryFieldName] [nvarchar](100) NULL,
 	[Moorings] [nvarchar](100) NULL,
 	[Sunsail] [nvarchar](100) NULL,
-	[LeBoat] [nvarchar](100) NULL,
-	[Footloose] [nvarchar](100) NULL
+	[Footloose] [nvarchar](100) NULL,
+	[LeBoat] [nvarchar](100) NULL
 ) ON [PRIMARY]
 
 GO
