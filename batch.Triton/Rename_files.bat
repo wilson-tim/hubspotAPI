@@ -1,6 +1,5 @@
 
 for /f %%a IN ('powershell get-date -format "{yyyyMMdd}"') do set today=%%a
-REM set today=%today%%
 
 G:
 CD G:\Marine\Triton\data\FullLoad\

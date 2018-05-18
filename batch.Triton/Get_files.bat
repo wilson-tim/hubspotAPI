@@ -1,6 +1,5 @@
 
 for /f %%a IN ('powershell get-date -format "{yyyyMMdd}"') do set today=%%a
-REM set today=%today%%
 
 @echo off
 REM pause
@@ -36,14 +35,14 @@ SET TritonExtract=Y
 goto end
 
 :time_delay
-REM timeout /t 600
-REM set /a ftp_loop=(%ftp_loop% + 1)
-REM goto loop_all
+timeout /t 600
+set /a ftp_loop=(%ftp_loop% + 1)
+goto loop_all
 
 :file_fail
 REM SET mailsubject=""
 if "%TritonExtract%"=="N" SET mailsubject="No Triton LIVE Extracts"
-REM blat empty.txt -from DoNotReply@SpecialistHolidays.com -to SHGDLMIDevelopmentTeam@SpecialistHolidays.com -subject "Missing Triton LIVE Files" -body "%mailsubject%" -server mail.specialistholidays.com -f "DoNotReply@SQL09.SpecialistHolidays.com"
+blat empty.txt -from DoNotReply@SpecialistHolidays.com -to SHGDLMIDevelopmentTeam@SpecialistHolidays.com -subject "Missing Triton LIVE Files" -body "%mailsubject%" -server mail.specialistholidays.com -f "DoNotReply@SQL09.SpecialistHolidays.com"
 goto end
 
 :end
