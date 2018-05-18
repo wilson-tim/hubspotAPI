@@ -4,7 +4,7 @@
     <DTSConfigurationFileInfo GeneratedBy="NEXUS\DHolmes" GeneratedFromPackageName="NeptuneCRM" GeneratedFromPackageID="{732593F8-F91C-44DC-ABF8-C2554327F8CB}" GeneratedDate="02/09/2016 11:12:25"/>
   </DTSConfigurationHeading>
   <Configuration ConfiguredType="Property" Path="\Package.Variables[User::AMIGalaxy_ConnString].Properties[Value]" ValueType="String">
-    <ConfiguredValue>Data Source=v-awd-sql-11;User ID=;Initial Catalog=AMI_Galaxy;Integrated Security=SSPI;Auto Translate=False;Provider=SQLNCLI11.1;</ConfiguredValue>
+    <ConfiguredValue>Data Source=V-AWD-SQL-09;User ID=;Initial Catalog=AMI_Galaxy;Integrated Security=SSPI;Auto Translate=False;Provider=SQLNCLI11.1;</ConfiguredValue>
   </Configuration>
   <Configuration ConfiguredType="Property" Path="\Package.Variables[User::FTPServerName].Properties[Value]" ValueType="String">
     <ConfiguredValue>10.84.244.10</ConfiguredValue>
@@ -22,12 +22,78 @@
     <ConfiguredValue>G:\Marine\NeptuneCRM\data\FullLoad\</ConfiguredValue>
   </Configuration>
   <Configuration ConfiguredType="Property" Path="\Package.Variables[User::NeptuneStage_ConnString].Properties[Value]" ValueType="String">
-    <ConfiguredValue>Data Source=V-AWD-SQL-11;User ID=;Initial Catalog=NEPTUNE_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
+    <ConfiguredValue>Data Source=V-AWD-SQL-09;User ID=;Initial Catalog=NEPTUNE_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
   </Configuration>
   <Configuration ConfiguredType="Property" Path="\Package.Variables[User::remotepath].Properties[Value]" ValueType="String">
     <ConfiguredValue>/data/reports/</ConfiguredValue>
   </Configuration>
   <Configuration ConfiguredType="Property" Path="\Package.Variables[User::UnzipExecutable].Properties[Value]" ValueType="String">
     <ConfiguredValue>C:\Program Files\7-Zip\7z.exe</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::datestampString].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::datestampString].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>(DT_WSTR,4)DATEPART("yyyy",GETDATE())+RIGHT("0" + (DT_WSTR,2)DATEPART("mm",GETDATE()),2)+RIGHT("0" + (DT_WSTR,2)DATEPART("dd",GETDATE()),2)</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_clientpreferences].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_clientpreferences].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::remotepath]+ "MAR_NPT_"+@[User::datestampString]+"_clientpreferences.csv"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_enquiries].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_enquiries].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::remotepath]+ "enquiries.csv"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_mlcont].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_mlcont].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::remotepath]+ "ml_cont.asc"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_mlfam].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_mlfam].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::remotepath]+ "ml_fam.asc"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_rembook].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::ftpfilename_rembook].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::remotepath]+ "rembook"+@[User::datestampString]+".asc.gz"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_clientpreferences].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_clientpreferences].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::localpath] + "MAR_NPT_" + @[User::datestampString] + "_ClientPreferences.csv"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_enquiries].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_enquiries].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::localpath] + "enquiries.csv"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_mlcont].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_mlcont].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::localpath] + "ml_cont.asc"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_mlfam].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_mlfam].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::localpath] + "ml_fam.asc"</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_rembook].Properties[EvaluateAsExpression]" ValueType="Boolean">
+    <ConfiguredValue>-1</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package.Variables[User::local_rembook].Properties[Expression]" ValueType="String">
+    <ConfiguredValue>@[User::localpath]+ "rembook"+ @[User::datestampString]+".asc"</ConfiguredValue>
   </Configuration>
 </DTSConfiguration>

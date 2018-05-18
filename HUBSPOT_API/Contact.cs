@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml.Linq;
@@ -177,7 +178,7 @@ namespace HUBSPOT_API
                     int timeLeft = (int)(startTime.AddSeconds(1.0 / 10.0) - DateTime.UtcNow).TotalMilliseconds;   // 1 second divided by 10 (the maximum number of uploads per second)
                     if (timeLeft > 0)
                     {
-                        await Task.Delay(timeLeft);
+                        Thread.Sleep(timeLeft);
                     }
                 }
                 return "Process Completed";

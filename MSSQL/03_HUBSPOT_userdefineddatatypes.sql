@@ -10,6 +10,6 @@
 */
 USE [HUBSPOT]
 GO
-/****** Object:  UserDefinedDataType [dbo].[HugeMoney]    Script Date: 10/01/2018 10:56:52 ******/
+/****** Object:  UserDefinedDataType [dbo].[HugeMoney]    Script Date: 18/05/2018 09:50:37 ******/
 CREATE TYPE [dbo].[HugeMoney] FROM [decimal](28, 4) NULL
 GO

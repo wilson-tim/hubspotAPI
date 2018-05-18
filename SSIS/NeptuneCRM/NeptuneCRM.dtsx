@@ -13,8 +13,8 @@
   DTS:ObjectName="NeptuneCRM"
   DTS:PackageType="5"
   DTS:ProtectionLevel="0"
-  DTS:VersionBuild="293"
-  DTS:VersionGUID="{E9DDA9D2-FCD6-4811-92CF-6060ED239368}">
+  DTS:VersionBuild="307"
+  DTS:VersionGUID="{966397CD-6A2E-4C70-9379-5A5921468D29}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -36,15 +36,7 @@
       DTS:DTSID="{50082582-1137-42B0-84DC-9D7CD0E6DF02}"
       DTS:ObjectName="clientpreferences">
       <DTS:PropertyExpression
-        DTS:Name="ConnectionString">@[User::localpath]+ "CRMIII_MAR_NPT_" 
-+
-(DT_WSTR,4)DATEPART("yyyy",GETDATE())
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("mm",GETDATE()),2)
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("dd",GETDATE()),2)
-+
-"_ClientPreferences.csv"</DTS:PropertyExpression>
+        DTS:Name="ConnectionString">@[User::local_clientpreferences]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
           DTS:Format="Delimited"
@@ -54,7 +46,7 @@
           DTS:RowDelimiter=""
           DTS:TextQualifier="_x0022_"
           DTS:CodePage="1252"
-          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\CRMIII_MAR_NPT_20180425_ClientPreferences.csv">
+          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\MAR_NPT_20180514_ClientPreferences.csv">
           <DTS:FlatFileColumns>
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -63,7 +55,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="Source_Key"
-              DTS:DTSID="{B4A3D7D0-4B8B-4D22-AEBB-ED5969533639}"
+              DTS:DTSID="{1E9D1B90-D2B7-4FFA-A90F-1C44202AA337}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -72,7 +64,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="ClientCode"
-              DTS:DTSID="{DE3A04F3-6CEC-42A1-91D6-EECDD3021F5E}"
+              DTS:DTSID="{D5AD7C39-6002-4DB6-BEB7-21C1266DA314}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -81,7 +73,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="Brand"
-              DTS:DTSID="{A3CD34E3-FDF1-4AAC-9CA0-9893FB58601F}"
+              DTS:DTSID="{08BDDDBC-81BE-4357-8F2B-16F4A777BF7D}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -90,7 +82,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="CancelFromBrochure"
-              DTS:DTSID="{0A977588-FB5E-46CA-B85F-10DAC02FA1BB}"
+              DTS:DTSID="{B9D7D35B-15B2-4D68-8AE0-1CF2C7359293}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -99,7 +91,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="CancelFromMailing"
-              DTS:DTSID="{E09AFDEA-05CB-4733-9E02-6CC56FCA660F}"
+              DTS:DTSID="{2A279731-26EA-4F37-99AF-D93D2DA99B45}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -108,7 +100,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="CancelFromEmail"
-              DTS:DTSID="{AA52C381-4808-4E5A-B36B-4FE764C1D865}"
+              DTS:DTSID="{8815BC0F-74B4-46A9-96A1-6A06EFFA9725}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -117,7 +109,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="CancelFromTelephone"
-              DTS:DTSID="{D4CAABE3-DDCC-402A-97C7-1C9524575521}"
+              DTS:DTSID="{7BE7794E-AE4B-4D45-BA53-397F33B987BB}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -126,7 +118,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="CancelFromEnews"
-              DTS:DTSID="{622DCC91-9C1B-495D-9764-15EB82B0348C}"
+              DTS:DTSID="{5C28214B-3BDC-44B3-8941-9C6FF7041397}"
               DTS:CreationName="" />
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -135,7 +127,7 @@
               DTS:DataType="129"
               DTS:TextQualified="True"
               DTS:ObjectName="CancelFromSMS"
-              DTS:DTSID="{E6D63651-3971-48C5-9196-DFC9EB1705CD}"
+              DTS:DTSID="{2E2EB8F2-9761-40F7-8437-F7B5FB2A8E24}"
               DTS:CreationName="" />
           </DTS:FlatFileColumns>
         </DTS:ConnectionManager>
@@ -147,7 +139,7 @@
       DTS:DTSID="{9801B004-40EF-4048-88F0-D7A229A27ACA}"
       DTS:ObjectName="enquiries">
       <DTS:PropertyExpression
-        DTS:Name="ConnectionString">@[User::localpath]+ "CRMIII_enquiries.csv"</DTS:PropertyExpression>
+        DTS:Name="ConnectionString">@[User::local_enquiries]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
           DTS:Format="Delimited"
@@ -156,7 +148,7 @@
           DTS:RowDelimiter=""
           DTS:TextQualifier="_x003C_none_x003E_"
           DTS:CodePage="1252"
-          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\CRMIII_enquiries.csv">
+          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\enquiries.csv">
           <DTS:FlatFileColumns>
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -421,7 +413,7 @@
       DTS:DTSID="{852EE198-8C57-4AD6-92A7-017F52F1A393}"
       DTS:ObjectName="ml_cont">
       <DTS:PropertyExpression
-        DTS:Name="ConnectionString">@[User::localpath] + "CRMIII_ml_cont.asc"</DTS:PropertyExpression>
+        DTS:Name="ConnectionString">@[User::local_mlcont]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
           DTS:Format="Delimited"
@@ -430,7 +422,7 @@
           DTS:RowDelimiter=""
           DTS:TextQualifier="_x003C_none_x003E_"
           DTS:CodePage="1252"
-          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\CRMIII_ml_cont.asc">
+          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\ml_cont.asc">
           <DTS:FlatFileColumns>
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -883,7 +875,7 @@
       DTS:DTSID="{43323f55-53fc-4568-ad9c-69c1f6a79364}"
       DTS:ObjectName="ml_fam">
       <DTS:PropertyExpression
-        DTS:Name="ConnectionString">@[User::localpath] + "CRMIII_ml_fam.asc"</DTS:PropertyExpression>
+        DTS:Name="ConnectionString">@[User::local_mlfam]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
           DTS:Format="Delimited"
@@ -892,7 +884,7 @@
           DTS:RowDelimiter=""
           DTS:TextQualifier="_x003C_none_x003E_"
           DTS:CodePage="1252"
-          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\CRMIII_ml_fam.asc">
+          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\ml_fam.asc">
           <DTS:FlatFileColumns>
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -2227,16 +2219,7 @@
       DTS:DTSID="{29522CF8-620C-450E-ACEA-D9ECC569EE48}"
       DTS:ObjectName="rembook">
       <DTS:PropertyExpression
-        DTS:Name="ConnectionString">@[User::localpath]+ "rembook"
-
-+
-(DT_WSTR,4)DATEPART("yyyy",GETDATE())
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("mm",GETDATE()),2)
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("dd",GETDATE()),2)
-+
-".asc"</DTS:PropertyExpression>
+        DTS:Name="ConnectionString">@[User::local_rembook]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
           DTS:Format="Delimited"
@@ -2245,7 +2228,7 @@
           DTS:RowDelimiter=""
           DTS:TextQualifier="_x003C_none_x003E_"
           DTS:CodePage="1252"
-          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\rembook20180425.asc">
+          DTS:ConnectionString="G:\Marine\NeptuneCRM\data\FullLoad\rembook20180514.asc">
           <DTS:FlatFileColumns>
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -2641,6 +2624,72 @@
     </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
+      DTS:DTSID="{70123BAF-F2FB-468B-B35D-5873D215EE99}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="(DT_WSTR,4)DATEPART(&quot;yyyy&quot;,GETDATE())+RIGHT(&quot;0&quot; + (DT_WSTR,2)DATEPART(&quot;mm&quot;,GETDATE()),2)+RIGHT(&quot;0&quot; + (DT_WSTR,2)DATEPART(&quot;dd&quot;,GETDATE()),2)"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="datestampString">
+      <DTS:VariableValue
+        DTS:DataType="8">20180514</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{01D36C1C-DCF2-4252-BD48-AACD7751F7B1}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::remotepath]+ &quot;MAR_NPT_&quot;+@[User::datestampString]+&quot;_clientpreferences.csv&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="ftpfilename_clientpreferences">
+      <DTS:VariableValue
+        DTS:DataType="8">/data/reports/MAR_NPT_20180514_clientpreferences.csv</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{A0B65562-B094-4535-881C-81D2230438F6}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::remotepath]+ &quot;enquiries.csv&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="ftpfilename_enquiries">
+      <DTS:VariableValue
+        DTS:DataType="8">/data/reports/enquiries.csv</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{CE0A23E8-E0F4-496F-BF3E-EDBB40D19C84}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::remotepath]+ &quot;ml_cont.asc&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="ftpfilename_mlcont">
+      <DTS:VariableValue
+        DTS:DataType="8">/data/reports/ml_cont.asc</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{48167515-C22C-4F2D-BA79-9241FA61A119}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::remotepath]+ &quot;ml_fam.asc&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="ftpfilename_mlfam">
+      <DTS:VariableValue
+        DTS:DataType="8">/data/reports/ml_fam.asc</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{D71E3CC4-35C4-4740-8012-4F9D55E1981D}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::remotepath]+ &quot;rembook&quot;+@[User::datestampString]+&quot;.asc.gz&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="ftpfilename_rembook">
+      <DTS:VariableValue
+        DTS:DataType="8">/data/reports/rembook20180514.asc.gz</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
       DTS:DTSID="{7AEA3A97-5105-456A-B0CB-01AF9133704C}"
       DTS:IncludeInDebugDump="2345"
       DTS:Namespace="User"
@@ -2683,6 +2732,61 @@
       DTS:ObjectName="localpath">
       <DTS:VariableValue
         DTS:DataType="8">G:\Marine\NeptuneCRM\data\FullLoad\</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{6D735095-FA54-4E6C-A09C-E18167030C33}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::localpath] + &quot;MAR_NPT_&quot; + @[User::datestampString] + &quot;_ClientPreferences.csv&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="local_clientpreferences">
+      <DTS:VariableValue
+        DTS:DataType="8">G:\Marine\NeptuneCRM\data\FullLoad\MAR_NPT_20180514_ClientPreferences.csv</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{F38E333C-BA3F-467E-9607-2140297A4AAA}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::localpath] + &quot;enquiries.csv&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="local_enquiries">
+      <DTS:VariableValue
+        DTS:DataType="8">G:\Marine\NeptuneCRM\data\FullLoad\enquiries.csv</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{C9164FF0-4910-4474-82B6-EF6608343DD3}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::localpath] + &quot;ml_cont.asc&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="local_mlcont">
+      <DTS:VariableValue
+        DTS:DataType="8">G:\Marine\NeptuneCRM\data\FullLoad\ml_cont.asc</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{2494ADC2-657E-4002-82C5-140071229AF7}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::localpath] + &quot;ml_fam.asc&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="local_mlfam">
+      <DTS:VariableValue
+        DTS:DataType="8">G:\Marine\NeptuneCRM\data\FullLoad\ml_fam.asc</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{20B72F79-FA82-4B16-9914-C258BE2A2A25}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::localpath]+ &quot;rembook&quot;+ @[User::datestampString]+&quot;.asc&quot;"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="local_rembook">
+      <DTS:VariableValue
+        DTS:DataType="8">G:\Marine\NeptuneCRM\data\FullLoad\rembook20180514.asc</DTS:VariableValue>
     </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
@@ -2819,21 +2923,13 @@
           DTS:ThreadHint="0">
           <DTS:Variables />
           <DTS:PropertyExpression
-            DTS:Name="RemotePath">@[User::remotepath]+ "CRMIII_MAR_NPT_"
-+
-(DT_WSTR,4)DATEPART("yyyy",GETDATE())
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("mm",GETDATE()),2)
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("dd",GETDATE()),2)
-+
-"_clientpreferences.csv"</DTS:PropertyExpression>
+            DTS:Name="RemotePath">@[User::ftpfilename_clientpreferences]</DTS:PropertyExpression>
           <DTS:ObjectData>
             <FtpData
               ConnectionName="{7F942746-A0B2-4094-92F4-6FD9A68865FE}"
               TaskOperationType="Receive"
               TaskLocalPath="FTP_Folder"
-              TaskRemotePath="/data/reports/CRMIII_MAR_NPT_20180425_clientpreferences.csv"
+              TaskRemotePath="/data/reports/MAR_NPT_20180514_clientpreferences.csv"
               TaskOverwriteDest="True" />
           </DTS:ObjectData>
         </DTS:Executable>
@@ -2867,12 +2963,14 @@
           DTS:TaskContact="FTP Task; Microsoft Corporation; Microsoft SQL Server 2008 R2; (c) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
           DTS:ThreadHint="0">
           <DTS:Variables />
+          <DTS:PropertyExpression
+            DTS:Name="RemotePath">@[User::ftpfilename_enquiries]</DTS:PropertyExpression>
           <DTS:ObjectData>
             <FtpData
               ConnectionName="{7F942746-A0B2-4094-92F4-6FD9A68865FE}"
               TaskOperationType="Receive"
               TaskLocalPath="FTP_Folder"
-              TaskRemotePath="/data/reports/CRMIII_enquiries.csv"
+              TaskRemotePath="/data/reports/enquiries.csv"
               TaskOverwriteDest="True" />
           </DTS:ObjectData>
         </DTS:Executable>
@@ -2888,12 +2986,14 @@
           DTS:TaskContact="FTP Task; Microsoft Corporation; Microsoft SQL Server 2008 R2; (c) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
           DTS:ThreadHint="0">
           <DTS:Variables />
+          <DTS:PropertyExpression
+            DTS:Name="RemotePath">@[User::ftpfilename_mlcont]</DTS:PropertyExpression>
           <DTS:ObjectData>
             <FtpData
               ConnectionName="{7F942746-A0B2-4094-92F4-6FD9A68865FE}"
               TaskOperationType="Receive"
               TaskLocalPath="FTP_Folder"
-              TaskRemotePath="/data/reports/CRMIII_ml_cont.asc"
+              TaskRemotePath="/data/reports/ml_cont.asc"
               TaskOverwriteDest="True" />
           </DTS:ObjectData>
         </DTS:Executable>
@@ -2909,12 +3009,14 @@
           DTS:TaskContact="FTP Task; Microsoft Corporation; Microsoft SQL Server 2008 R2; (c) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
           DTS:ThreadHint="0">
           <DTS:Variables />
+          <DTS:PropertyExpression
+            DTS:Name="RemotePath">@[User::ftpfilename_mlfam]</DTS:PropertyExpression>
           <DTS:ObjectData>
             <FtpData
               ConnectionName="{7F942746-A0B2-4094-92F4-6FD9A68865FE}"
               TaskOperationType="Receive"
               TaskLocalPath="FTP_Folder"
-              TaskRemotePath="/data/reports/CRMIII_ml_fam.asc"
+              TaskRemotePath="/data/reports/ml_fam.asc"
               TaskOverwriteDest="True" />
           </DTS:ObjectData>
         </DTS:Executable>
@@ -2947,33 +3049,15 @@
           DTS:ObjectName="rembook"
           DTS:TaskContact="FTP Task; Microsoft Corporation; Microsoft SQL Server 2008 R2; (c) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
           DTS:ThreadHint="0">
-          <DTS:Variables>
-            <DTS:Variable
-              DTS:CreationName=""
-              DTS:DTSID="{DA8A4D74-3A7D-4139-ADB4-A9B9CDD65C11}"
-              DTS:IncludeInDebugDump="2345"
-              DTS:Namespace="User"
-              DTS:ObjectName="rembook">
-              <DTS:VariableValue
-                DTS:DataType="8">rembook</DTS:VariableValue>
-            </DTS:Variable>
-          </DTS:Variables>
+          <DTS:Variables />
           <DTS:PropertyExpression
-            DTS:Name="RemotePath">@[User::remotepath]+ @[User::rembook]
-+
-(DT_WSTR,4)DATEPART("yyyy",GETDATE())
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("mm",GETDATE()),2)
-+RIGHT("0" + 
-(DT_WSTR,2)DATEPART("dd",GETDATE()),2)
-+
-".asc.gz"</DTS:PropertyExpression>
+            DTS:Name="RemotePath">@[User::ftpfilename_rembook]</DTS:PropertyExpression>
           <DTS:ObjectData>
             <FtpData
               ConnectionName="{7F942746-A0B2-4094-92F4-6FD9A68865FE}"
               TaskOperationType="Receive"
               TaskLocalPath="FTP_Folder"
-              TaskRemotePath="/data/reports/rembook20180425.asc.gz"
+              TaskRemotePath="/data/reports/rembook20180514.asc.gz"
               TaskOverwriteDest="True" />
           </DTS:ObjectData>
         </DTS:Executable>
@@ -16246,7 +16330,7 @@
           <DTS:ObjectData>
             <ExecuteProcessData
               Executable="C:\Program Files\7-Zip\7z.exe"
-              Arguments="e G:\Marine\NeptuneCRM\data\FullLoad\rembook20180425.asc.gz"
+              Arguments="e G:\Marine\NeptuneCRM\data\FullLoad\rembook20180514.asc.gz"
               WorkingDirectory="G:\Marine\NeptuneCRM\data\FullLoad\" />
           </DTS:ObjectData>
         </DTS:Executable>
@@ -17352,7 +17436,7 @@
     design-time-name="Package\Load Enquiries\load">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="218,42"
           Id="Package\Load Enquiries\load\OLE DB Destination-Enquiries"
@@ -17380,7 +17464,9 @@
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -17403,7 +17489,7 @@
     design-time-name="Package\Load Family\load">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="151,42"
           Id="Package\Load Family\load\Flat File Source"
@@ -17439,7 +17525,9 @@
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -17461,7 +17549,9 @@
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -17483,14 +17573,16 @@
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <AnnotationLayout
           Text="Flat File Source&#xA;Column 6, F_email2 Truncation error configured&#xA;to 'Ignore failure'"
           ParentId="Package\Load Family\load"
           FontInfo="{assembly:Null}"
-          Size="281,72"
+          Size="281,NaN"
           Id="cd6e0548-25a5-4a09-9eb4-14065158087c"
           TopLeft="310,42" />
       </GraphLayout>
@@ -17513,7 +17605,7 @@
     design-time-name="Package\Load Mail Contact\load">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="239,42"
           Id="Package\Load Mail Contact\load\OLE DB Destination - Mail Contact"
@@ -17553,7 +17645,9 @@
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>

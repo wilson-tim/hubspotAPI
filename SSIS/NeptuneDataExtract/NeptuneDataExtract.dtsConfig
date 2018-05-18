@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<DTSConfiguration>
+<DTSConfigurationHeading>
+<DTSConfigurationFileInfo GeneratedBy="NEXUS\SFrate" GeneratedFromPackageName="NeptuneDataExtract" GeneratedFromPackageID="{B5073B05-A671-4DF5-84D4-EC6FF16314A3}" GeneratedDate="19/05/2014 18:03:57"/> 
+</DTSConfigurationHeading>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[AMI_Galaxy].Properties[InitialCatalog]" ValueType="String">
+<ConfiguredValue>AMI_Galaxy</ConfiguredValue> 
+</Configuration>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[AMI_Galaxy].Properties[ServerName]" ValueType="String">
+<ConfiguredValue>V-AWD-SQL-09</ConfiguredValue> 
+</Configuration>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[FTP Folder].Properties[ConnectionString]" ValueType="String">
+<ConfiguredValue>G:\Marine\Neptune\data\FullLoad</ConfiguredValue> 
+</Configuration>
+<Configuration ConfiguredType="Property" Path="\Package.Connections[FTP Connection Manager].Properties[ServerPassword]" ValueType="String">
+<ConfiguredValue>dbc0ns</ConfiguredValue>
+</Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Passenger FTP\FTP_Passenger.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/pass.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Booking FTP\FTP_Bookings.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/book.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Accom Ref FTP\FTP_AccomRef.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/accomref.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Accom File FTP\FTP_Accom.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/accom.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Agent FTP\FTP_Agent.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/agent.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Aircraft FTP\FTP_Aircraft.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/aircraft.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Airlines FTP\FTP_Airline.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/airline.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Avail FTP\FTP_Avail.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/avail.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Avbk FTP\FTP_Avbk.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/avbk.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Base FTP\FTP_Base.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/base.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\BkPrice FTP\FTP_Bkprice.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/bkprice.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Chartype FTP\FTP_Chartype.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/chartype.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Ex_Rate FTP\FTP_ex_rate.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/ex_rate.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Extra FTP\FTP_Extra.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/extra.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Extref FTP\FTP_Extref.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/extref.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Fltalloc FTP\FTP_Fltalloc.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/fltalloc.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Fltref FTP\FTP_Fltref.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/fltref.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Priceopt FTP\FTP_Priceopt.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/priceopt.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Product FTP\FTP_Product.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/product.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Reg_Base FTP\FTP_Reg_Base.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/reg_base.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Source FTP\FTP_Source.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/source.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Prcdesc FTP\FTP_Prcdesc.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/prcdesc.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Origin FTP\FTP_Origin.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/origin.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Area FTP\FTP_Area.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/area.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\MyUser FTP\FTP_MyUser.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/myuser.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Acc_type FTP\FTP_Acc_type.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/acc_type.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Payment FTP\FTP_Payment.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/payment.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Route FTP\FTP_Route.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/route.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Passlink FTP\FTP_Passlink.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/passlink.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Flight FTP\FTP_Flight.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/flight.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Airport FTP\FTP_Airport.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/airport.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Inv_co FTP\FTP_Inv_co.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/inv_co.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Accnote FTP\FTP_Accnote.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/accnote.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Fltnote FTP\FTP_Fltnote.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/fltnote.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Instruct FTP\FTP_Instruct.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/instruct.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Routflight FTP\FTP_Routflight.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/routflight.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Routlink FTP\FTP_Routlink.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/routlink.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Empl_unav FTP\FTP_Empl_unav.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/empl_unav.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Empl_avail FTP\FTP_Empl_avail.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/empl_avail.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Emplref FTP\FTP_Emplref.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/emplref.txt</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Etra_avail FTP\FTP_Etra_avail.Properties[RemotePath]" ValueType="String">
+    <ConfiguredValue>/data/reports/shg_reports/xtra_avail.txt</ConfiguredValue>
+  </Configuration>
+</DTSConfiguration>

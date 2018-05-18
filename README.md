@@ -15,6 +15,7 @@ This repository has a separate subdirectory for each component of the solution a
   NeptuneCRM
   TritonCelerity
   TritonCelerity_ENews
+  HubSpotAPI
 
 
 The G: drive folder structure supporting the SSIS packages has been revised and simplified as follows:

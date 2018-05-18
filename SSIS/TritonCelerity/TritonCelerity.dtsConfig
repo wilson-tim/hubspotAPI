@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <DTSConfiguration>
-<DTSConfigurationHeading><DTSConfigurationFileInfo GeneratedBy="NEXUS\Milojkb1" GeneratedFromPackageName="TritonCelerity" GeneratedFromPackageID="{ACFBF847-8AF5-4E50-9DB3-9410D0D9AF55}" GeneratedDate="03/10/2017 10:12:51"/>
+<DTSConfigurationHeading><DTSConfigurationFileInfo GeneratedBy="NEXUS\Milojkb1" GeneratedFromPackageName="TritonCelerity" GeneratedFromPackageID="{27CB19D9-1D35-4F5F-8017-02F59BA8A6CF}" GeneratedDate="03/10/2017 10:12:51"/>
 </DTSConfigurationHeading>
 <Configuration ConfiguredType="Property" Path="\Package.Connections[AMI_Galaxy].Properties[ConnectionString]" ValueType="String">
-<ConfiguredValue>Data Source=V-AWD-SQL-11;Initial Catalog=AMI_Galaxy;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
+<ConfiguredValue>Data Source=V-AWD-SQL-09;Initial Catalog=AMI_Galaxy;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
 </Configuration>
 <Configuration ConfiguredType="Property" Path="\Package.Connections[CelerityMarine_Stage].Properties[ConnectionString]" ValueType="String">
-<ConfiguredValue>Data Source=V-AWD-SQL-11;Initial Catalog=CelerityMarine_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
+<ConfiguredValue>Data Source=V-AWD-SQL-09;Initial Catalog=CelerityMarine_Stage;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
 </Configuration>
 <Configuration ConfiguredType="Property" Path="\Package.Variables[User::BatchFileLocation].Properties[Value]" ValueType="String">
 <ConfiguredValue>G:\Marine\Triton\Batch_Files\</ConfiguredValue>

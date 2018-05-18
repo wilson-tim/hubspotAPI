@@ -12,7 +12,7 @@ REM set mydate=%today%_%HOUR%_%MINUTE%
 for /f %%a IN ('powershell get-date -format "{yyyy_MM_dd_HH_mm_ss}"') do set mydate=%%a
 
 set srcLocation=G:\Marine\MarineCRM\HUBSPOT\
-set destLocation="\\P-gs2-filecl-01\marine\Marketing\CRM\MI projects\HubSpot\"
+set destLocation="\\P-GS2-FILECL-01\marine\Marketing\CRM\MI projects\HUBSPOT\"
 
 powershell.exe %srcLocation%Export_TO_CSV.ps1 %mydate% %srcLocation%
 

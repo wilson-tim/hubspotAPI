@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<DTSConfiguration>
+  <DTSConfigurationHeading>
+    <DTSConfigurationFileInfo GeneratedBy="NEXUS\sys-twilson" GeneratedFromPackageName="HubSpotAPI" GeneratedFromPackageID="{C94AC24B-82F2-44C2-AD06-4058D9F25E08}" GeneratedDate="10/05/2018 13:49:33"/>
+  </DTSConfigurationHeading>
+  <Configuration ConfiguredType="Property" Path="\Package.Connections[HUBSPOT].Properties[ConnectionString]" ValueType="String">
+    <ConfiguredValue>Data Source=V-AWD-SQL-09;Initial Catalog=HUBSPOT;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Export records to CSV.Properties[Executable]" ValueType="String">
+    <ConfiguredValue>G:\Marine\MarineCRM\HUBSPOT\ExportRecordsToCSV.bat</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\HUBSPOT_API.Properties[Executable]" ValueType="String">
+    <ConfiguredValue>G:\Marine\MarineCRM\HUBSPOT\HUBSPOT_API.bat</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Truncate table ST_ERROR_LOG.Properties[Connection]" ValueType="String">
+    <ConfiguredValue>HUBSPOT</ConfiguredValue>
+  </Configuration>
+  <Configuration ConfiguredType="Property" Path="\Package\Truncate table ST_ERROR_LOG.Properties[SqlStatementSource]" ValueType="String">
+    <ConfiguredValue>TRUNCATE TABLE ST_ERROR_LOG</ConfiguredValue>
+  </Configuration>
+</DTSConfiguration>
