@@ -10,7 +10,7 @@
 */
 USE [HUBSPOT]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -28,6 +28,7 @@ GO
 -- 04-Jan-2018      1.1         Tim Wilson         First Charter selection now ge 01/01/2010
 -- 19-Feb-2018      1.2         Tim Wilson         New selection criterion for [ST_MARINE_BOOKINGS].BookingSourcePrimary
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
+-- 21-May-2018      1.4         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]
@@ -159,8 +160,7 @@ BEGIN
 					CLI.Phone2,
 					CLI.MobilePhone,
 					CLI.DateOfBirth,
-					[ST_MARINE_BOOKINGS].[Duration],
-					[ST_MARINE_BOOKINGS].BookRef
+					[ST_MARINE_BOOKINGS].[Duration]
 			) AS RankResult,
 			
             -- DWYT-16 New HubSpot API fields
@@ -242,38 +242,37 @@ BEGIN
                     COALESCE([NEPTUNE_ACC_TYPE].KEEL_TYPE, '') AS HullType,
                     COALESCE([ST_MARINE_FBKG].BoatType, '') AS BoatType,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
 							[ST_MARINE_BOOKINGS].BookingDate ASC,
-							[ST_MARINE_BOOKINGS].DepartureDate ASC,
-							[ST_MARINE_BOOKINGS].BookRef ASC,
-							[ST_MARINE_BOOKINGS].ConfirmDate ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-							[ST_MARINE_BOOKINGS].BookingSourcePrimary DESC,
-							COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_BOOKINGS].BookingOfficeLocation) DESC,
-							[ST_MARINE_BOOKINGS].BookingLanguage DESC,
-							CLI.ClientCode DESC,
-							COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-							CLI.FirstName DESC,
-							CLI.LastName DESC,
-							CLI.City DESC,
-							CLI.County DESC,
-							CLI.Postcode DESC,
-							COALESCE([SL_Simplified_Neptune_Client_Country].[CountrySimplified],CLI.Country) DESC,
-							COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation) DESC, 
-							CLI.Add1 DESC,
-							CLI.Add2 DESC,
-							CLI.Add3 DESC,
-							CLI.Phone1 DESC,
-							CLI.Phone2 DESC,
-							CLI.MobilePhone DESC,
-							CLI.DateOfBirth DESC,
-							[ST_MARINE_BOOKINGS].[Duration] DESC,
-							[ST_MARINE_BOOKINGS].BookRef DESC
+							[ST_MARINE_BOOKINGS].DepartureDate DESC,
+							[ST_MARINE_BOOKINGS].BookRef DESC,
+							[ST_MARINE_BOOKINGS].ConfirmDate DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+							[ST_MARINE_BOOKINGS].BookingSourcePrimary,
+							COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_BOOKINGS].BookingOfficeLocation),
+							[ST_MARINE_BOOKINGS].BookingLanguage,
+							CLI.ClientCode,
+							COALESCE([SL_Simplified_Title].[TitleSimplified],''),
+							CLI.FirstName,
+							CLI.LastName,
+							CLI.City,
+							CLI.County,
+							CLI.Postcode,
+							COALESCE([SL_Simplified_Neptune_Client_Country].[CountrySimplified],CLI.Country),
+							COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation), 
+							CLI.Add1,
+							CLI.Add2,
+							CLI.Add3,
+							CLI.Phone1,
+							CLI.Phone2,
+							CLI.MobilePhone,
+							CLI.DateOfBirth,
+							[ST_MARINE_BOOKINGS].[Duration]
 					) AS RankResultFirstCharter
                 FROM 
 					[NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
@@ -300,7 +299,7 @@ BEGIN
 				    ON [SL_Simplified_ProductName].[ProductNameActual]=[ST_MARINE_BOOKINGS].ProductCode
 				WHERE 
 					[ST_MARINE_BOOKINGS].BrandCode='LBT'
-				AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
+				AND [ST_MARINE_BOOKINGS].[Status] = 'Confirmed'
 				AND [ST_MARINE_BOOKINGS].BookingType='Direct'
 				AND CLI.Lead='Yes'
 				AND CLI.Email1 LIKE '%_@%_.__%'
@@ -325,7 +324,7 @@ BEGIN
                     CASE WHEN [ST_MARINE_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [ST_MARINE_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
                     CLI.ClientCode,
                     COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation,'') AS Destination,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
 							[ST_MARINE_BOOKINGS].BookingDate DESC,
 							[ST_MARINE_BOOKINGS].DepartureDate DESC,
@@ -355,8 +354,7 @@ BEGIN
 							CLI.Phone2,
 							CLI.MobilePhone,
 							CLI.DateOfBirth,
-							[ST_MARINE_BOOKINGS].[Duration],
-							[ST_MARINE_BOOKINGS].BookRef
+							[ST_MARINE_BOOKINGS].[Duration]
 					) AS RankResultCancellation
                 FROM 
 					[NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
@@ -412,7 +410,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -432,6 +430,7 @@ GO
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 17-May-2018      1.4         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.5         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS_8YR]
@@ -563,8 +562,7 @@ BEGIN
 					CLI.Phone2,
 					CLI.MobilePhone,
 					CLI.DateOfBirth,
-					[ST_MARINE_BOOKINGS].[Duration],
-					[ST_MARINE_BOOKINGS].BookRef
+					[ST_MARINE_BOOKINGS].[Duration]
 			) AS RankResult,
 			
             -- DWYT-16 New HubSpot API fields
@@ -646,38 +644,37 @@ BEGIN
                     COALESCE([NEPTUNE_ACC_TYPE].KEEL_TYPE, '') AS HullType,
                     COALESCE([ST_MARINE_FBKG].BoatType, '') AS BoatType,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
 							[ST_MARINE_BOOKINGS].BookingDate ASC,
-							[ST_MARINE_BOOKINGS].DepartureDate ASC,
-							[ST_MARINE_BOOKINGS].BookRef ASC,
-							[ST_MARINE_BOOKINGS].ConfirmDate ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) ASC,
-							(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-							[ST_MARINE_BOOKINGS].BookingSourcePrimary DESC,
-							COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_BOOKINGS].BookingOfficeLocation) DESC,
-							[ST_MARINE_BOOKINGS].BookingLanguage DESC,
-							CLI.ClientCode DESC,
-							COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-							CLI.FirstName DESC,
-							CLI.LastName DESC,
-							CLI.City DESC,
-							CLI.County DESC,
-							CLI.Postcode DESC,
-							COALESCE([SL_Simplified_Neptune_Client_Country].[CountrySimplified],CLI.Country) DESC,
-							COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation) DESC, 
-							CLI.Add1 DESC,
-							CLI.Add2 DESC,
-							CLI.Add3 DESC,
-							CLI.Phone1 DESC,
-							CLI.Phone2 DESC,
-							CLI.MobilePhone DESC,
-							CLI.DateOfBirth DESC,
-							[ST_MARINE_BOOKINGS].[Duration] DESC,
-							[ST_MARINE_BOOKINGS].BookRef DESC
+							[ST_MARINE_BOOKINGS].DepartureDate DESC,
+							[ST_MARINE_BOOKINGS].BookRef DESC,
+							[ST_MARINE_BOOKINGS].ConfirmDate DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+							(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+							[ST_MARINE_BOOKINGS].BookingSourcePrimary,
+							COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_BOOKINGS].BookingOfficeLocation),
+							[ST_MARINE_BOOKINGS].BookingLanguage,
+							CLI.ClientCode,
+							COALESCE([SL_Simplified_Title].[TitleSimplified],''),
+							CLI.FirstName,
+							CLI.LastName,
+							CLI.City,
+							CLI.County,
+							CLI.Postcode,
+							COALESCE([SL_Simplified_Neptune_Client_Country].[CountrySimplified],CLI.Country),
+							COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation), 
+							CLI.Add1,
+							CLI.Add2,
+							CLI.Add3,
+							CLI.Phone1,
+							CLI.Phone2,
+							CLI.MobilePhone,
+							CLI.DateOfBirth,
+							[ST_MARINE_BOOKINGS].[Duration]
 					) AS RankResultFirstCharter
                 FROM 
 					[NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
@@ -704,7 +701,7 @@ BEGIN
 				    ON [SL_Simplified_ProductName].[ProductNameActual]=[ST_MARINE_BOOKINGS].ProductCode
 				WHERE 
 					[ST_MARINE_BOOKINGS].BrandCode='LBT'
-				AND [ST_MARINE_BOOKINGS].[Status] IN ('Confirmed','Cancelled')
+				AND [ST_MARINE_BOOKINGS].[Status] = 'Confirmed'
 				AND [ST_MARINE_BOOKINGS].BookingType='Direct'
 				AND CLI.Lead='Yes'
 				AND CLI.Email1 LIKE '%_@%_.__%'
@@ -729,7 +726,7 @@ BEGIN
                     CASE WHEN [ST_MARINE_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[ST_MARINE_BOOKINGS].CancelledDate,120) END AS CancellationDate,
                     CLI.ClientCode,
                     COALESCE([SL_BaseNameFull].[BaseName],[ST_MARINE_FBKG].BaseLocation,'') AS Destination,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
 							[ST_MARINE_BOOKINGS].BookingDate DESC,
 							[ST_MARINE_BOOKINGS].DepartureDate DESC,
@@ -759,8 +756,7 @@ BEGIN
 							CLI.Phone2,
 							CLI.MobilePhone,
 							CLI.DateOfBirth,
-							[ST_MARINE_BOOKINGS].[Duration],
-							[ST_MARINE_BOOKINGS].BookRef
+							[ST_MARINE_BOOKINGS].[Duration]
 					) AS RankResultCancellation
                 FROM 
 					[NEPTUNE_Stage].[dbo].[ST_MARINE_BOOKINGS] WITH (NOLOCK)
@@ -815,7 +811,7 @@ BEGIN
 		ConfirmDate 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -836,6 +832,7 @@ GO
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 25-Apr-2018      1.4         Tim Wilson         Revised client link using URN
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]
@@ -913,6 +910,7 @@ BEGIN
 					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [ST_MARINE_CLIENTS].Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[ST_MARINE_BROCHURE_REQUEST].Language,
 					[ST_MARINE_BROCHURE_REQUEST].ClientCode,
@@ -972,7 +970,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -995,6 +993,7 @@ GO
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.6         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.7         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.8         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_8YR]
@@ -1072,6 +1071,7 @@ BEGIN
 					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [ST_MARINE_CLIENT_PREFERENCE].CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [ST_MARINE_CLIENTS].Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[ST_MARINE_BROCHURE_REQUEST].Language,
 					[ST_MARINE_BROCHURE_REQUEST].ClientCode,
@@ -1132,7 +1132,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1152,6 +1152,7 @@ GO
 -- 20-Mar-2018      1.3         Tim Wilson         Remove selection filter for Deceased flag
 -- 25-Apr-2018      1.4         Tim Wilson         Revised client link using URN
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]
@@ -1290,7 +1291,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1312,6 +1313,7 @@ GO
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.6         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.7         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.8         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS_8YR]
@@ -1451,7 +1453,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1473,6 +1475,7 @@ GO
 --                                                 Bookings Duration
 -- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]
@@ -1558,9 +1561,11 @@ BEGIN
 					(CASE Client.CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE Client.CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE Client.CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE Client.CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+					COALESCE(Client.LastContactDate,'') DESC,
+					COALESCE(Client.CreateDate,'') DESC,
 					(CASE Client.Deceased WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE Client.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE Client.CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_REMBOOK].[Location]),
 					[ST_MARINE_REMBOOK].Language,
 					[ST_MARINE_REMBOOK].MailNo,
@@ -1658,7 +1663,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1682,6 +1687,7 @@ GO
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.7         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.8         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.9         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES_8YR]
@@ -1767,9 +1773,11 @@ BEGIN
 					(CASE Client.CancelFromEmail WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE Client.CancelFromMailing WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE Client.CancelFromBrochure WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE Client.CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
+					COALESCE(Client.LastContactDate,'') DESC,
+					COALESCE(Client.CreateDate,'') DESC,
 					(CASE Client.Deceased WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE Client.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
-					(CASE Client.CancelFromTelephone WHEN 'TRUE' THEN 'Y' ELSE 'N' END) DESC,
 					COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[ST_MARINE_REMBOOK].[Location]),
 					[ST_MARINE_REMBOOK].Language,
 					[ST_MARINE_REMBOOK].MailNo,
@@ -1868,7 +1876,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1885,6 +1893,7 @@ GO
 -- 30-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 20-Mar-2018      1.1         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 21-May-2018      1.5         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]
@@ -2009,6 +2018,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+  		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -2128,46 +2139,48 @@ BEGIN
                     END AS HullType,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
+                            [CELERITY_ST_BOOKINGS].BookingDate ASC,
+                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
+                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
+                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+                            (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
+                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
+                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary ASC,
+                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) ASC,
+                            [CELERITY_ST_BOOKINGS].BookingLanguageFull ASC,
+                            [CELERITY_ST_BOOKINGS].ProductName ASC,
+                            [CELERITY_ST_BOOKINGS].AreaName ASC,
+                            CLI.ClientCode ASC,
+                            COALESCE([SL_Simplified_Title].[TitleSimplified],'') ASC,
+                            CLI.FirstName ASC,
+                            CLI.LastName ASC,
+                            CLI.City ASC,
+                            CLI.County ASC,
+                            CLI.Postcode ASC,
+                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) ASC,
+                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) ASC,
+                            CLI.[Add1] ASC,
+                            CLI.[Add2] ASC,
+                            CLI.[Add3] ASC,
+                            CLI.[Phone1] ASC,
+                            CLI.[Phone2] ASC,
+                            CLI.[BusinessPhone] ASC,
+                            CLI.DateOfBirth ASC,
+                            CLI.NumberOfCharters ASC,
+                            [CELERITY_ST_BOOKINGS].Duration ASC,
+                            [CELERITY_ST_BOOKINGS].UserDefinable1 ASC,
+                            CLI.CustomerLinkCode ASC,
+                            CLI.[CustomerClass] ASC,
+                            CLI.ClientSourceCode ASC,
+                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] ASC
                     ) AS RankResultFirstCharter
                 FROM 
                     [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -2197,7 +2210,7 @@ BEGIN
                     ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
                 WHERE 
                     [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
+                AND [CELERITY_ST_BOOKINGS].Status = 'Booking'
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
@@ -2225,7 +2238,7 @@ BEGIN
                     [CELERITY_ST_BOOKINGS].BookRef,
                     CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
                             [CELERITY_ST_BOOKINGS].BookingDate DESC,
                             [CELERITY_ST_BOOKINGS].DepartureDate DESC,
@@ -2235,6 +2248,8 @@ BEGIN
                             (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                             (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                             (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		  		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+						    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                             (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                             (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                             [CELERITY_ST_BOOKINGS].BookingSourcePrimary ASC,
@@ -2331,7 +2346,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2350,6 +2365,7 @@ GO
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 17-May-2018      1.5         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.6         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS_8YR]
@@ -2474,6 +2490,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -2593,46 +2611,48 @@ BEGIN
                     END AS HullType,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
+                            [CELERITY_ST_BOOKINGS].BookingDate ASC,
+                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
+                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
+                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+                            (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
+                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
+                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary ASC,
+                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) ASC,
+                            [CELERITY_ST_BOOKINGS].BookingLanguageFull ASC,
+                            [CELERITY_ST_BOOKINGS].ProductName ASC,
+                            [CELERITY_ST_BOOKINGS].AreaName ASC,
+                            CLI.ClientCode ASC,
+                            COALESCE([SL_Simplified_Title].[TitleSimplified],'') ASC,
+                            CLI.FirstName ASC,
+                            CLI.LastName ASC,
+                            CLI.City ASC,
+                            CLI.County ASC,
+                            CLI.Postcode ASC,
+                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) ASC,
+                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) ASC,
+                            CLI.[Add1] ASC,
+                            CLI.[Add2] ASC,
+                            CLI.[Add3] ASC,
+                            CLI.[Phone1] ASC,
+                            CLI.[Phone2] ASC,
+                            CLI.[BusinessPhone] ASC,
+                            CLI.DateOfBirth ASC,
+                            CLI.NumberOfCharters ASC,
+                            [CELERITY_ST_BOOKINGS].Duration ASC,
+                            [CELERITY_ST_BOOKINGS].UserDefinable1 ASC,
+                            CLI.CustomerLinkCode ASC,
+                            CLI.[CustomerClass] ASC,
+                            CLI.ClientSourceCode ASC,
+                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] ASC
                     ) AS RankResultFirstCharter
                 FROM 
                     [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -2662,7 +2682,7 @@ BEGIN
                     ON [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeActual]=CLI.BookingOffice
                 WHERE 
                     [CELERITY_ST_BOOKINGS].BrandName ='FTL'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
+                AND [CELERITY_ST_BOOKINGS].Status = 'Booking'
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
@@ -2690,7 +2710,7 @@ BEGIN
                     [CELERITY_ST_BOOKINGS].BookRef,
                     CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_BOOKINGS].CancelledDate,120) END AS CancellationDate,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
                             [CELERITY_ST_BOOKINGS].BookingDate DESC,
                             [CELERITY_ST_BOOKINGS].DepartureDate DESC,
@@ -2700,6 +2720,8 @@ BEGIN
                             (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                             (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                             (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		  		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+						    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                             (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                             (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                             [CELERITY_ST_BOOKINGS].BookingSourcePrimary ASC,
@@ -2797,7 +2819,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2820,6 +2842,7 @@ GO
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]
@@ -2924,6 +2947,9 @@ BEGIN
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
 					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -3012,7 +3038,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3037,6 +3063,7 @@ GO
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.7         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.8         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.9         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES_8YR]
@@ -3141,6 +3168,9 @@ BEGIN
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
 					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -3230,7 +3260,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3247,6 +3277,7 @@ GO
 -- 29-Nov-2017      1.0         Tim Wilson         Revised for CRM Phase III
 -- 20-Mar-2018      1.1         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 21-May-2018      1.5         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]
@@ -3375,6 +3406,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -3493,47 +3526,49 @@ BEGIN
                     END AS HullType,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
+                            [CELERITY_ST_BOOKINGS].BookingDate ASC,
+                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
+                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
+                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+                            (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
+                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
+                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
+                            [CELERITY_ST_BOOKINGS].BookingLanguageFull,
+                            [CELERITY_ST_BOOKINGS].ProductName,
+                            [CELERITY_ST_BOOKINGS].AreaName,
+                            CLI.ClientCode,
+                            COALESCE([SL_Simplified_Title].[TitleSimplified],''),
+                            CLI.FirstName,
+                            CLI.LastName,
+                            CLI.City,
+                            CLI.County,
+                            CLI.Postcode,
+                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
+                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
+                            CLI.[Add1],
+                            CLI.[Add2],
+                            CLI.[Add3],
+                            CLI.[Phone1],
+                            CLI.[Phone2],
+                            CLI.[BusinessPhone],
+                            CLI.DateOfBirth,
+                            [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
+                            CLI.NumberOfCharters,
+                            [CELERITY_ST_BOOKINGS].Duration,
+                            [CELERITY_ST_BOOKINGS].UserDefinable1,
+                            CLI.CustomerLinkCode,
+                            CLI.[CustomerClass],
+                            CLI.ClientSourceCode,
+                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
                     ) AS RankResultFirstCharter
                 FROM 
                     [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -3561,7 +3596,7 @@ BEGIN
 					AND [SL_BaseNameFull].Brand = 'SUN'
                 WHERE 
                     [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
+                AND [CELERITY_ST_BOOKINGS].Status = 'Booking'
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
@@ -3589,7 +3624,7 @@ BEGIN
                     [CELERITY_ST_BOOKINGS].BookRef,
                     CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                 ORDER BY 
                     [CELERITY_ST_BOOKINGS].BookingDate DESC,
                     [CELERITY_ST_BOOKINGS].DepartureDate DESC,
@@ -3599,6 +3634,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -3694,7 +3731,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3713,6 +3750,7 @@ GO
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 17-May-2018      1.5         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.6         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS_8YR]
@@ -3841,6 +3879,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -3959,47 +3999,49 @@ BEGIN
                     END AS HullType,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
+                            [CELERITY_ST_BOOKINGS].BookingDate ASC,
+                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
+                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
+                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+                            (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
+                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
+                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
+                            [CELERITY_ST_BOOKINGS].BookingLanguageFull,
+                            [CELERITY_ST_BOOKINGS].ProductName,
+                            [CELERITY_ST_BOOKINGS].AreaName,
+                            CLI.ClientCode,
+                            COALESCE([SL_Simplified_Title].[TitleSimplified],''),
+                            CLI.FirstName,
+                            CLI.LastName,
+                            CLI.City,
+                            CLI.County,
+                            CLI.Postcode,
+                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
+                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
+                            CLI.[Add1],
+                            CLI.[Add2],
+                            CLI.[Add3],
+                            CLI.[Phone1],
+                            CLI.[Phone2],
+                            CLI.[BusinessPhone],
+                            CLI.DateOfBirth,
+                            [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
+                            CLI.NumberOfCharters,
+                            [CELERITY_ST_BOOKINGS].Duration,
+                            [CELERITY_ST_BOOKINGS].UserDefinable1,
+                            CLI.CustomerLinkCode,
+                            CLI.[CustomerClass],
+                            CLI.ClientSourceCode,
+                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
                     ) AS RankResultFirstCharter
                 FROM 
                     [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -4027,7 +4069,7 @@ BEGIN
 					AND [SL_BaseNameFull].Brand = 'SUN'
                 WHERE 
                     [CELERITY_ST_BOOKINGS].BrandName ='SUN'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
+                AND [CELERITY_ST_BOOKINGS].Status = 'Booking'
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
@@ -4055,7 +4097,7 @@ BEGIN
                     [CELERITY_ST_BOOKINGS].BookRef,
                     CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_BOOKINGS].CancelledDate,120) END AS CancellationDate,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                 ORDER BY 
                     [CELERITY_ST_BOOKINGS].BookingDate DESC,
                     [CELERITY_ST_BOOKINGS].DepartureDate DESC,
@@ -4065,6 +4107,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -4161,7 +4205,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4180,6 +4224,7 @@ GO
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]
@@ -4263,10 +4308,13 @@ BEGIN
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+		        (CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) Desc,
 				(CASE [CELERITY_ST_CLIENT].Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]),
-				[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				[CELERITY_ST_CLIENT].[FirstName],
 				[CELERITY_ST_CLIENT].[LastName], 
@@ -4326,7 +4374,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4347,6 +4395,7 @@ GO
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.6         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.7         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.8         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS_8YR]
@@ -4430,10 +4479,13 @@ BEGIN
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+		        (CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) Desc,
 				(CASE [CELERITY_ST_CLIENT].Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]),
-				[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				[CELERITY_ST_CLIENT].[FirstName],
 				[CELERITY_ST_CLIENT].[LastName], 
@@ -4494,7 +4546,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4513,6 +4565,7 @@ GO
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]
@@ -4581,9 +4634,16 @@ BEGIN
 			DENSE_RANK() OVER(PARTITION BY TRT_SUNSAIL_ST_EFMST.EFMAIL 
 				ORDER BY 
 				CAST(CASE ISNULL(TRT_SUNSAIL_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_SUNSAIL_ST_EFMST.EFETDT), 112) END AS Datetime) DESC,
+	            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromEmail] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+			    (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				[SL_ISO_SalesOffice].[SalesOffice],
 				[SL_ISO_SalesOffice].[Language],
+				CELERITY_ST_CLIENT.ClientCode,
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				TRT_SUNSAIL_ST_EFMST.EFFNAM,
 				TRT_SUNSAIL_ST_EFMST.EFLNAM,
@@ -4606,7 +4666,7 @@ BEGIN
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
-            CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
+            CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
@@ -4643,7 +4703,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4664,6 +4724,7 @@ GO
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.6         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.7         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.8         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS_8YR]
@@ -4732,7 +4793,13 @@ BEGIN
 			DENSE_RANK() OVER(PARTITION BY TRT_SUNSAIL_ST_EFMST.EFMAIL 
 				ORDER BY 
 				CAST(CASE ISNULL(TRT_SUNSAIL_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_SUNSAIL_ST_EFMST.EFETDT), 112) END AS Datetime) DESC,
+	            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromEmail] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+			    (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				[SL_ISO_SalesOffice].[SalesOffice],
 				[SL_ISO_SalesOffice].[Language],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
@@ -4757,7 +4824,7 @@ BEGIN
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END AS LastContactDate,
-            CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END AS TritonCreateDate,
+            CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END AS TritonCreateDate,
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
@@ -4795,7 +4862,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4818,6 +4885,7 @@ GO
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]
@@ -4922,6 +4990,9 @@ BEGIN
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
 					(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -5007,7 +5078,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5032,6 +5103,7 @@ GO
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.7         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.8         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.9         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES_8YR]
@@ -5136,6 +5208,9 @@ BEGIN
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
 					(CASE CLI.Blacklisted WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -5222,7 +5297,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5241,6 +5316,7 @@ GO
 --                                                 New left joins to provide First Charter and Most Recent Cancellation data
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
+-- 21-May-2018      1.5         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]
@@ -5369,6 +5445,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -5489,47 +5567,49 @@ BEGIN
                     END AS HullType,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
+                            [CELERITY_ST_BOOKINGS].BookingDate ASC,
+                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
+                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
+                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+                            (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
+                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
+                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
+                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
+                            [CELERITY_ST_BOOKINGS].BookingLanguageFull,
+                            [CELERITY_ST_BOOKINGS].ProductName,
+                            [CELERITY_ST_BOOKINGS].AreaName,
+                            CLI.ClientCode,
+                            COALESCE([SL_Simplified_Title].[TitleSimplified],''),
+                            CLI.FirstName,
+                            CLI.LastName,
+                            CLI.City,
+                            CLI.County,
+                            CLI.Postcode,
+                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
+                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
+                            CLI.[Add1],
+                            CLI.[Add2],
+                            CLI.[Add3],
+                            CLI.[Phone1],
+                            CLI.[Phone2],
+                            CLI.[BusinessPhone],
+                            CLI.DateOfBirth,
+                            [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
+                            CLI.NumberOfCharters,
+                            [CELERITY_ST_BOOKINGS].Duration,
+                            [CELERITY_ST_BOOKINGS].UserDefinable1,
+                            CLI.CustomerLinkCode,
+                            CLI.[CustomerClass],
+                            CLI.ClientSourceCode,
+                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
                     ) AS RankResultFirstCharter
                 FROM 
                     [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -5559,7 +5639,7 @@ BEGIN
 					AND [SL_BaseNameFull].Brand = 'MRG'
                 WHERE 
                     [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
+                AND [CELERITY_ST_BOOKINGS].Status = 'Booking'
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
@@ -5587,7 +5667,7 @@ BEGIN
                     [CELERITY_ST_BOOKINGS].BookRef,
                     CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_BOOKINGS].CancelledDate))*60*60*1000) END AS CancellationDate,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                 ORDER BY 
                     [CELERITY_ST_BOOKINGS].BookingDate DESC,
                     [CELERITY_ST_BOOKINGS].DepartureDate DESC,
@@ -5597,6 +5677,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -5694,7 +5776,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5715,6 +5797,7 @@ GO
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 17-May-2018      1.5         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.6         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS_8YR]
@@ -5843,6 +5926,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -5963,47 +6048,49 @@ BEGIN
                     END AS HullType,
                     [CELERITY_ST_BOOKINGS].UserDefinable1,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                         ORDER BY 
-                        [CELERITY_ST_BOOKINGS].BookingDate ASC,
-                        [CELERITY_ST_BOOKINGS].DepartureDate ASC,
-                        [CELERITY_ST_BOOKINGS].BookRef ASC, 
-                        [CELERITY_ST_BOOKINGS].ConfirmDate ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,    
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) ASC,
-                        (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) ASC,
-                        [CELERITY_ST_BOOKINGS].BookingSourcePrimary DESC,
-                        COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation) DESC,
-                        [CELERITY_ST_BOOKINGS].BookingLanguageFull DESC,
-                        [CELERITY_ST_BOOKINGS].ProductName DESC,
-                        [CELERITY_ST_BOOKINGS].AreaName DESC,
-                        CLI.ClientCode DESC,
-                        COALESCE([SL_Simplified_Title].[TitleSimplified],'') DESC,
-                        CLI.FirstName DESC,
-                        CLI.LastName DESC,
-                        CLI.City DESC,
-                        CLI.County DESC,
-                        CLI.Postcode DESC,
-                        COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country) DESC,
-                        (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END) DESC,
-                        CLI.[Add1] DESC,
-                        CLI.[Add2] DESC,
-                        CLI.[Add3] DESC,
-                        CLI.[Phone1] DESC,
-                        CLI.[Phone2] DESC,
-                        CLI.[BusinessPhone] DESC,
-                        CLI.DateOfBirth DESC,
-                        [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion DESC,
-                        CLI.NumberOfCharters DESC,
-                        [CELERITY_ST_BOOKINGS].Duration DESC,
-                        [CELERITY_ST_BOOKINGS].UserDefinable1 DESC,
-                        CLI.CustomerLinkCode DESC,
-                        CLI.[CustomerClass] DESC,
-                        CLI.ClientSourceCode DESC,
-                        [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified] DESC
+                            [CELERITY_ST_BOOKINGS].BookingDate ASC,
+                            [CELERITY_ST_BOOKINGS].DepartureDate DESC,
+                            [CELERITY_ST_BOOKINGS].BookRef DESC, 
+                            [CELERITY_ST_BOOKINGS].ConfirmDate DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,    
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+                            (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
+                            (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
+                            (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+                            [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
+                            COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BOOKINGS].BookingOfficeLocation),
+                            [CELERITY_ST_BOOKINGS].BookingLanguageFull,
+                            [CELERITY_ST_BOOKINGS].ProductName,
+                            [CELERITY_ST_BOOKINGS].AreaName,
+                            CLI.ClientCode,
+                            COALESCE([SL_Simplified_Title].[TitleSimplified],''),
+                            CLI.FirstName,
+                            CLI.LastName,
+                            CLI.City,
+                            CLI.County,
+                            CLI.Postcode,
+                            COALESCE([SL_Simplified_Triton_Client_Country].[CountrySimplified],CLI.Country),
+                            (CASE WHEN SUBSTRING([CELERITY_ST_BOOKINGS].UserDefinable1,3,1) IN ('X','L','P') THEN 'Catamaran' ELSE 'Monohull' END),
+                            CLI.[Add1],
+                            CLI.[Add2],
+                            CLI.[Add3],
+                            CLI.[Phone1],
+                            CLI.[Phone2],
+                            CLI.[BusinessPhone],
+                            CLI.DateOfBirth,
+                            [CELERITY_ST_BOOKINGS].ExecutiveReportingRegion,
+                            CLI.NumberOfCharters,
+                            [CELERITY_ST_BOOKINGS].Duration,
+                            [CELERITY_ST_BOOKINGS].UserDefinable1,
+                            CLI.CustomerLinkCode,
+                            CLI.[CustomerClass],
+                            CLI.ClientSourceCode,
+                            [SL_Simplified_ClientBookingOffice].[ClientBookingOfficeSimplified]
                     ) AS RankResultFirstCharter
                 FROM 
                     [CelerityMarine_Stage].[dbo].[CELERITY_ST_BOOKINGS] WITH (NOLOCK)
@@ -6033,7 +6120,7 @@ BEGIN
 					AND [SL_BaseNameFull].Brand = 'MRG'
                 WHERE 
                     [CELERITY_ST_BOOKINGS].BrandName ='MRG'
-                AND [CELERITY_ST_BOOKINGS].Status IN ('Booking','Cancelled')
+                AND [CELERITY_ST_BOOKINGS].Status = 'Booking'
                 AND [CELERITY_ST_BOOKINGS].BookingSourcePrimary NOT IN ('PR-Pr free trip','TAAC-Ta on account','PR-Public relations-mor','PRESS-Bericht in der press','STAFF-Staff booking','OWNS-Owner with no paymen','OS-Wot-offshore sailing','OWNER-Owner','DAYCH-Day charter discount','LOCAL-Local booking','OS-Offshore sailing','OSS-Offshore sailing','OW-Owner use','OPS-Operations/maintenan','TA','STHOL-Staff holiday','TAGEN-Travel agent','OSSFF-Staff friends & fami','LOCA2-Local booking','TO-Tour operator')
                 AND [CELERITY_ST_BOOKINGS].AreaCode NOT IN ('UKD','UK1','CVO','SS1','UK2','SS2','UK3','FLT','UK4')
                 AND [CELERITY_ST_BOOKINGS].ProductName IN ('SAILING_SCHOOLS','CREWED','FLOTILLA','FRANCHISE','FOOTLOOSE','BAREBOAT','CORPORATE','POWER')
@@ -6061,7 +6148,7 @@ BEGIN
                     [CELERITY_ST_BOOKINGS].BookRef,
                     CASE WHEN [CELERITY_ST_BOOKINGS].CancelledDate IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_BOOKINGS].CancelledDate,120) END AS CancellationDate,
                     CLI.ClientCode,
-                    DENSE_RANK() OVER(PARTITION BY CLI.Email1 
+                    DENSE_RANK() OVER(PARTITION BY CLI.Email1,CLI.ClientCode
                 ORDER BY 
                     [CELERITY_ST_BOOKINGS].BookingDate DESC,
                     [CELERITY_ST_BOOKINGS].DepartureDate DESC,
@@ -6071,6 +6158,8 @@ BEGIN
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
                     (CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
                     (CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
                     [CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -6169,7 +6258,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6188,6 +6277,7 @@ GO
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]
@@ -6271,10 +6361,13 @@ BEGIN
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+		        (CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) Desc,
 				(CASE [CELERITY_ST_CLIENT].Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]),
-				[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				[CELERITY_ST_CLIENT].[FirstName],
 				[CELERITY_ST_CLIENT].[LastName], 
@@ -6333,7 +6426,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6354,6 +6447,7 @@ GO
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.6         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.7         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.8         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS_8YR]
@@ -6437,10 +6531,13 @@ BEGIN
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+		        (CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) Desc,
 				(CASE [CELERITY_ST_CLIENT].Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				COALESCE([SL_Simplified_SalesOffice].[SalesOfficeSimplified],[CELERITY_ST_BROCHUREREQUEST].[Location]),
-				[CELERITY_ST_BROCHUREREQUEST].[ClientCode],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
 				[CELERITY_ST_CLIENT].[FirstName],
 				[CELERITY_ST_CLIENT].[LastName], 
@@ -6500,7 +6597,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6519,6 +6616,7 @@ GO
 -- 20-Mar-2018      1.2         Tim Wilson         Remove selection filter for Deceased flag; Add BookingStatus column
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.6         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]
@@ -6587,7 +6685,13 @@ BEGIN
 			DENSE_RANK() OVER(PARTITION BY TRT_TRITON_ST_EFMST.EFMAIL 
 				ORDER BY 
 				CAST(CASE ISNULL(TRT_TRITON_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_TRITON_ST_EFMST.EFETDT), 112) END AS Datetime) DESC,
+	            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromEmail] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+			    (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				[SL_ISO_SalesOffice].[SalesOffice],
 				[SL_ISO_SalesOffice].[Language],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
@@ -6612,7 +6716,7 @@ BEGIN
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103)))*60*60*1000) END AS LastContactDate,
-            CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
+            CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(50),CONVERT(BIGINT,DATEDIFF(HOUR, '1970-01-01', [CELERITY_ST_CLIENT].DateCreated))*60*60*1000) END AS TritonCreateDate,
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
@@ -6649,7 +6753,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6670,6 +6774,7 @@ GO
 -- 01-May-2018      1.5         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.6         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.7         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.8         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS_8YR]
@@ -6738,7 +6843,13 @@ BEGIN
 			DENSE_RANK() OVER(PARTITION BY TRT_TRITON_ST_EFMST.EFMAIL 
 				ORDER BY 
 				CAST(CASE ISNULL(TRT_TRITON_ST_EFMST.EFETDT,0) WHEN 0 THEN NULL ELSE CONVERT(DATETIME, CONVERT(VARCHAR(8), TRT_TRITON_ST_EFMST.EFETDT), 112) END AS Datetime) DESC,
+	            (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromEmail] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		        (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+			    (CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				(CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END) DESC,
+	            (CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END) DESC,
 				(CASE [CELERITY_ST_CLIENT].GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+				CELERITY_ST_CLIENT.ClientCode DESC,
 				[SL_ISO_SalesOffice].[SalesOffice],
 				[SL_ISO_SalesOffice].[Language],
 				COALESCE([SL_Simplified_Title].[TitleSimplified],''),
@@ -6763,7 +6874,7 @@ BEGIN
             -- DWYT-16 New HubSpot API fields
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromTelephone,
             CASE WHEN [CELERITY_ST_CLIENT].[LastContactDate] = '0' OR [CELERITY_ST_CLIENT].[LastContactDate] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, [CELERITY_ST_CLIENT].[LastContactDate], 103),120) END AS LastContactDate,
-            CASE WHEN [CELERITY_ST_CLIENT].DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END AS TritonCreateDate,
+            CASE WHEN [CELERITY_ST_CLIENT].[DateCreated] IS NULL THEN '' ELSE CONVERT(VARCHAR(10),[CELERITY_ST_CLIENT].DateCreated,120) END AS TritonCreateDate,
 			COALESCE([CELERITY_ST_CLIENT].[Deceased],'') AS Deceased,
             CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromEmail,
             CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END AS CancelFromBrochure,
@@ -6801,7 +6912,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6824,6 +6935,7 @@ GO
 -- 25-Apr-2018      1.4         Tim Wilson         Resolve client code only unique within brand issue
 -- 27-Apr-2018      1.5         Tim Wilson         Drop duration columns altogether for quotes selections
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
+-- 21-May-2018      1.7         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]
@@ -6928,6 +7040,9 @@ BEGIN
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
 					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -7016,7 +7131,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES_8YR]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES_8YR]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -7041,6 +7156,7 @@ GO
 -- 01-May-2018      1.6         Tim Wilson         Remove booking data columns
 -- 17-May-2018      1.7         Tim Wilson         Select all data from 01-01-2010
 -- 17-May-2018      1.8         Tim Wilson         Output dates in yyyy-mm-dd format
+-- 21-May-2018      1.9         Tim Wilson         Corrections for dedupe logic
 --========================================================================================================================
 
 CREATE PROC [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES_8YR]
@@ -7145,6 +7261,9 @@ BEGIN
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromEmail WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,	
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].CancelFromMailing WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromBrochure] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+					(CASE [CELERITY_ST_CLIENTPREFERENCES].[CancelFromTelephone] WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
+		            (CASE WHEN CLI.[LastContactDate] = '0' THEN '' ELSE CONVERT(VARCHAR(10),CONVERT(datetime, CLI.[LastContactDate], 103),120) END) DESC,
+				    (CASE WHEN CLI.DateCreated IS NULL THEN '' ELSE CONVERT(VARCHAR(10),CLI.DateCreated,120) END) DESC,
 					(CASE CLI.Blacklisted WHEN 'Y' THEN 'true' ELSE 'false' END) DESC,
 					(CASE CLI.GoneAway WHEN 'Y' THEN 'Y' ELSE 'N' END) DESC,
 					[CELERITY_ST_BOOKINGS].BookingSourcePrimary,
@@ -7234,7 +7353,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -7271,7 +7390,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 18/05/2018 09:49:33 ******/
+/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 22/05/2018 15:31:47 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
