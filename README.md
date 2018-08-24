@@ -21,22 +21,26 @@ This repository has a separate subdirectory for each component of the solution a
 The G: drive folder structure supporting the SSIS packages has been revised and simplified as follows:
 
 G:\\
-+--Marine
-   +--Neptune
-   |  +--data
-   |     +--Archive
-   |     +--FullLoad
-   +--NeptuneCRM
-   |  +--data
-   |     +--Archive
-   |     +--FullLoad
-   +--MarineCRM 
-   |  +--HUBSPOT
-   +--Triton
-      +--data
-      |  +--Archive
-      |  +--FullLoad
-      +--Batch_files
+\+--Marine
+   \+--Neptune
+   |  \+--data
+   |     \+--Archive
+   |     \+--FullLoad
+   \+--NeptuneCRM
+   |  \+--data
+   |     \+--Archive
+   |     \+--FullLoad
+   \+--MarineCRM 
+   |  \+--HUBSPOT
+   \+--Triton
+      \+--data
+      |  \+--Archive
+      |  \+--FullLoad
+      \+--Batch_files
+
+
+
+\*
 
 
 
