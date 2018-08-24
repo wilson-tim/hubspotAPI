@@ -10,7 +10,7 @@
 */
 USE [master]
 GO
-/****** Object:  Database [CelerityMarine_Stage]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Database [CelerityMarine_Stage]    Script Date: 24/08/2018 12:11:06 ******/
 CREATE DATABASE [CelerityMarine_Stage]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -87,16 +87,16 @@ EXEC sys.sp_db_vardecimal_storage_format N'CelerityMarine_Stage', N'ON'
 GO
 USE [CelerityMarine_Stage]
 GO
-/****** Object:  User [NEXUS\IMitrovic]    Script Date: 18/05/2018 09:40:40 ******/
-CREATE USER [NEXUS\IMitrovic] FOR LOGIN [NEXUS\IMitrovic] WITH DEFAULT_SCHEMA=[dbo]
+/****** Object:  User [NEXUS\IMitrovic]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE USER [NEXUS\IMitrovic] WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [BOXIUser]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  User [BOXIUser]    Script Date: 24/08/2018 12:11:06 ******/
 CREATE USER [BOXIUser] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [BOXI_UAT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  User [BOXI_UAT]    Script Date: 24/08/2018 12:11:06 ******/
 CREATE USER [BOXI_UAT] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [boxi]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  User [boxi]    Script Date: 24/08/2018 12:11:06 ******/
 CREATE USER [boxi] FOR LOGIN [boxi] WITH DEFAULT_SCHEMA=[dbo]
 GO
 ALTER ROLE [db_datareader] ADD MEMBER [NEXUS\IMitrovic]
@@ -111,7 +111,7 @@ ALTER ROLE [db_owner] ADD MEMBER [boxi]
 GO
 ALTER ROLE [db_datareader] ADD MEMBER [boxi]
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_CheckDate]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_CheckDate]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER OFF
@@ -187,7 +187,7 @@ select
 
 
 GO
-/****** Object:  UserDefinedFunction [dbo].[fnProperCase2]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  UserDefinedFunction [dbo].[fnProperCase2]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -238,7 +238,7 @@ BEGIN
 END
 
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_ACCOMMODATION]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[CELERITY_ST_ACCOMMODATION]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -265,7 +265,7 @@ CREATE TABLE [dbo].[CELERITY_ST_ACCOMMODATION](
 	[Comment] [varchar](400) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_BOOKEDPASSENGERS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[CELERITY_ST_BOOKEDPASSENGERS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -280,7 +280,15 @@ CREATE TABLE [dbo].[CELERITY_ST_BOOKEDPASSENGERS](
 	[PassengerType] [varchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_BOOKINGS]    Script Date: 18/05/2018 09:40:40 ******/
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [CELERITY_ST_BOOKEDPASSENGERS_PK]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE CLUSTERED INDEX [CELERITY_ST_BOOKEDPASSENGERS_PK] ON [dbo].[CELERITY_ST_BOOKEDPASSENGERS]
+(
+	[BookRef] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CELERITY_ST_BOOKINGS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -359,7 +367,15 @@ CREATE TABLE [dbo].[CELERITY_ST_BOOKINGS](
 	[BoatType] [varchar](100) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_BROCHUREREQUEST]    Script Date: 18/05/2018 09:40:40 ******/
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [CELERITY_ST_BOOKINGS_PK]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE CLUSTERED INDEX [CELERITY_ST_BOOKINGS_PK] ON [dbo].[CELERITY_ST_BOOKINGS]
+(
+	[BookRef] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CELERITY_ST_BROCHUREREQUEST]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -383,7 +399,7 @@ CREATE TABLE [dbo].[CELERITY_ST_BROCHUREREQUEST](
 	[SecondarySourceCode] [varchar](20) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_CLIENT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[CELERITY_ST_CLIENT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -450,7 +466,15 @@ CREATE TABLE [dbo].[CELERITY_ST_CLIENT](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_CLIENTPREFERENCES]    Script Date: 18/05/2018 09:40:40 ******/
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [CELERITY_ST_CLIENT_PK]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE CLUSTERED INDEX [CELERITY_ST_CLIENT_PK] ON [dbo].[CELERITY_ST_CLIENT]
+(
+	[ClientCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CELERITY_ST_CLIENTPREFERENCES]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -467,7 +491,7 @@ CREATE TABLE [dbo].[CELERITY_ST_CLIENTPREFERENCES](
 	[CancelFromElectronicB] [varchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_EXTRAS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[CELERITY_ST_EXTRAS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -497,7 +521,7 @@ CREATE TABLE [dbo].[CELERITY_ST_EXTRAS](
 	[SalesCategory] [varchar](100) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_FLIGHTS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[CELERITY_ST_FLIGHTS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -518,7 +542,7 @@ CREATE TABLE [dbo].[CELERITY_ST_FLIGHTS](
 	[Type] [varchar](30) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CELERITY_ST_MAILINGHISTORY]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[CELERITY_ST_MAILINGHISTORY]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -533,7 +557,7 @@ CREATE TABLE [dbo].[CELERITY_ST_MAILINGHISTORY](
 	[MailingNameCode] [varchar](20) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_MAIL_CONTACT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NEPTUNE_MAIL_CONTACT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -590,7 +614,7 @@ CREATE TABLE [dbo].[NEPTUNE_MAIL_CONTACT](
 	[F_demog_code] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_BookedAccom]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_BookedAccom]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -616,7 +640,7 @@ CREATE TABLE [dbo].[NPT_BookedAccom](
 	[NoOfPassengers] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_BookedExtra]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_BookedExtra]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -646,7 +670,7 @@ CREATE TABLE [dbo].[NPT_BookedExtra](
 	[SalesCategory] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_BookedFlight]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_BookedFlight]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -667,7 +691,7 @@ CREATE TABLE [dbo].[NPT_BookedFlight](
 	[Type] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_BookingPax]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_BookingPax]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -682,7 +706,7 @@ CREATE TABLE [dbo].[NPT_BookingPax](
 	[PassengerType] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_Bookings]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_Bookings]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -747,7 +771,7 @@ CREATE TABLE [dbo].[NPT_Bookings](
 	[UserDefinable10] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_BrochureRequest]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_BrochureRequest]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -771,7 +795,7 @@ CREATE TABLE [dbo].[NPT_BrochureRequest](
 	[SecondarySourceCode] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_Client]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_Client]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -830,7 +854,7 @@ CREATE TABLE [dbo].[NPT_Client](
 	[UserDefinable10] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ClientPreference]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ClientPreference]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -845,7 +869,7 @@ CREATE TABLE [dbo].[NPT_ClientPreference](
 	[CancelFromTelephone] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_MailingHistory]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_MailingHistory]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -860,7 +884,7 @@ CREATE TABLE [dbo].[NPT_MailingHistory](
 	[MailingNameCode] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ml_book]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ml_book]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -902,7 +926,7 @@ CREATE TABLE [dbo].[NPT_ml_book](
 	[F_charter] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ml_cont]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ml_cont]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -959,7 +983,7 @@ CREATE TABLE [dbo].[NPT_ml_cont](
 	[F_demog_code] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ml_enq]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ml_enq]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -984,7 +1008,7 @@ CREATE TABLE [dbo].[NPT_ml_enq](
 	[F_orig_brochure] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ml_fam]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ml_fam]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1074,7 +1098,7 @@ CREATE TABLE [dbo].[NPT_ml_fam](
 	[F_dup_type] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ml_quest]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ml_quest]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1140,7 +1164,7 @@ CREATE TABLE [dbo].[NPT_ml_quest](
 	[F_hols_per_yr] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_ml_raf]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_ml_raf]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1164,7 +1188,7 @@ CREATE TABLE [dbo].[NPT_ml_raf](
 	[F_client_no] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_Quotes]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_Quotes]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1209,7 +1233,7 @@ CREATE TABLE [dbo].[NPT_Quotes](
 	[LANGUAGE] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NPT_rembook]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[NPT_rembook]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1244,7 +1268,7 @@ CREATE TABLE [dbo].[NPT_rembook](
 	[F_added_by] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SB_Currency]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[SB_Currency]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1254,7 +1278,7 @@ CREATE TABLE [dbo].[SB_Currency](
 	[CuurencyCodeUniform] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SB_NPT_Title]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[SB_NPT_Title]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1264,7 +1288,7 @@ CREATE TABLE [dbo].[SB_NPT_Title](
 	[MatchedTitle] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SB_TRT_Title]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[SB_TRT_Title]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1274,7 +1298,7 @@ CREATE TABLE [dbo].[SB_TRT_Title](
 	[MatchedTitle] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedAccom]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedAccom]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1302,7 +1326,7 @@ CREATE TABLE [dbo].[TRT_BookedAccom](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedAccom_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedAccom_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1330,7 +1354,7 @@ CREATE TABLE [dbo].[TRT_BookedAccom_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedExtra]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedExtra]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1361,7 +1385,7 @@ CREATE TABLE [dbo].[TRT_BookedExtra](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedExtra_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedExtra_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1392,7 +1416,7 @@ CREATE TABLE [dbo].[TRT_BookedExtra_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedExtraLookup]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedExtraLookup]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1403,7 +1427,7 @@ CREATE TABLE [dbo].[TRT_BookedExtraLookup](
 	[DerivedExtraName] [nvarchar](255) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedFlight]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedFlight]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1425,7 +1449,7 @@ CREATE TABLE [dbo].[TRT_BookedFlight](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookedFlight_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookedFlight_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1447,7 +1471,7 @@ CREATE TABLE [dbo].[TRT_BookedFlight_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookingOffice_Location]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookingOffice_Location]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1458,7 +1482,7 @@ CREATE TABLE [dbo].[TRT_BookingOffice_Location](
 	[BookingLanguage_Default_Full] [varchar](15) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookingPax]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookingPax]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1474,7 +1498,7 @@ CREATE TABLE [dbo].[TRT_BookingPax](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BookingPax_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BookingPax_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1490,7 +1514,7 @@ CREATE TABLE [dbo].[TRT_BookingPax_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Bookings]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Bookings]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1604,7 +1628,7 @@ CREATE TABLE [dbo].[TRT_Bookings](
 	[OptionFlag] [varchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Bookings_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Bookings_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1671,7 +1695,7 @@ CREATE TABLE [dbo].[TRT_Bookings_Incremental](
 	[Destination] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BrochureRequest]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BrochureRequest]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1696,7 +1720,7 @@ CREATE TABLE [dbo].[TRT_BrochureRequest](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_BrochureRequest_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_BrochureRequest_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1721,7 +1745,7 @@ CREATE TABLE [dbo].[TRT_BrochureRequest_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Client]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Client]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1795,7 +1819,7 @@ CREATE TABLE [dbo].[TRT_Client](
 	[RFVScore] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Client_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Client_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1855,7 +1879,7 @@ CREATE TABLE [dbo].[TRT_Client_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_ClientPreference]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_ClientPreference]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1878,7 +1902,7 @@ CREATE TABLE [dbo].[TRT_ClientPreference](
 	[UserDefinable5] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_ClientPreference_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_ClientPreference_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1894,7 +1918,7 @@ CREATE TABLE [dbo].[TRT_ClientPreference_Incremental](
 	[BrandSource] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_DateControl]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_DateControl]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1906,7 +1930,7 @@ CREATE TABLE [dbo].[TRT_DateControl](
 	[today+7] [date] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Efirst]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Efirst]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1919,7 +1943,7 @@ CREATE TABLE [dbo].[TRT_Efirst](
 	[CancelFromEmail] [char](100) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Email_Language]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Email_Language]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1933,7 +1957,7 @@ CREATE TABLE [dbo].[TRT_Email_Language](
 	[Email_Language] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_EmailPreference]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_EmailPreference]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1950,7 +1974,7 @@ CREATE TABLE [dbo].[TRT_EmailPreference](
 	[DoNotPhone] [varchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_File_Row_Counts]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_File_Row_Counts]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1962,7 +1986,7 @@ CREATE TABLE [dbo].[TRT_File_Row_Counts](
 	[i_SK_Rownumber] [int] IDENTITY(1,1) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_MailingHistory]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_MailingHistory]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1978,7 +2002,7 @@ CREATE TABLE [dbo].[TRT_MailingHistory](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_MailingHistory_Incremental]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_MailingHistory_Incremental]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1994,7 +2018,7 @@ CREATE TABLE [dbo].[TRT_MailingHistory_Incremental](
 	[Brand] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Merged_Row_Counts]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Merged_Row_Counts]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2010,7 +2034,7 @@ CREATE TABLE [dbo].[TRT_Merged_Row_Counts](
 	[i_SK_Rownumber] [int] IDENTITY(1,1) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Sunsail_ST_EFMST]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Sunsail_ST_EFMST]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2044,7 +2068,7 @@ CREATE TABLE [dbo].[TRT_Sunsail_ST_EFMST](
 	[EFFLG3] [nvarchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Table_Row_Counts]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Table_Row_Counts]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2058,7 +2082,7 @@ CREATE TABLE [dbo].[TRT_Table_Row_Counts](
 	[TableName] [varchar](25) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TRT_Triton_ST_EFMST]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Table [dbo].[TRT_Triton_ST_EFMST]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2094,7 +2118,21 @@ CREATE TABLE [dbo].[TRT_Triton_ST_EFMST](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [NonClusteredIndex-ClientCode]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  Index [CELERITY_ST_BOOKINGS_NCI]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE NONCLUSTERED INDEX [CELERITY_ST_BOOKINGS_NCI] ON [dbo].[CELERITY_ST_BOOKINGS]
+(
+	[BrandName] ASC,
+	[Status] ASC
+)
+INCLUDE ( 	[BookRef],
+	[BookingDate],
+	[CancelledDate],
+	[ConfirmDate],
+	[BookingSourcePrimary]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [NonClusteredIndex-ClientCode]    Script Date: 24/08/2018 12:11:06 ******/
 CREATE NONCLUSTERED INDEX [NonClusteredIndex-ClientCode] ON [dbo].[CELERITY_ST_BROCHUREREQUEST]
 (
 	[ClientCode] ASC
@@ -2102,21 +2140,23 @@ CREATE NONCLUSTERED INDEX [NonClusteredIndex-ClientCode] ON [dbo].[CELERITY_ST_B
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [NonClusteredIndex-ClientCode]    Script Date: 18/05/2018 09:40:40 ******/
-CREATE NONCLUSTERED INDEX [NonClusteredIndex-ClientCode] ON [dbo].[CELERITY_ST_CLIENT]
+/****** Object:  Index [CELERITY_ST_CLIENT_NCI]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE NONCLUSTERED INDEX [CELERITY_ST_CLIENT_NCI] ON [dbo].[CELERITY_ST_CLIENT]
 (
-	[ClientCode] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	[ClientCode] ASC,
+	[Brand] ASC
+)
+INCLUDE ( 	[Email1]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [NonClusteredIndex-ClientCode]    Script Date: 18/05/2018 09:40:40 ******/
-CREATE NONCLUSTERED INDEX [NonClusteredIndex-ClientCode] ON [dbo].[CELERITY_ST_CLIENTPREFERENCES]
+/****** Object:  Index [CELERITY_ST_CLIENTPREFERENCES_PK]    Script Date: 24/08/2018 12:11:06 ******/
+CREATE NONCLUSTERED INDEX [CELERITY_ST_CLIENTPREFERENCES_PK] ON [dbo].[CELERITY_ST_CLIENTPREFERENCES]
 (
 	[ClientCode] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_ACCOMMODATON]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_ACCOMMODATON]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2188,7 +2228,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_BOOKEDPAX]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_BOOKEDPAX]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2289,7 +2329,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_BOOKINGS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_BOOKINGS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2453,7 +2493,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_BROCHUREREQUEST]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_BROCHUREREQUEST]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2509,7 +2549,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_CLIENT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_CLIENT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2599,7 +2639,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_CLIENTPREFERENCE]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_CLIENTPREFERENCE]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2642,7 +2682,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_EXTRAS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_EXTRAS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2720,7 +2760,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_FLIGHTS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_FLIGHTS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2787,7 +2827,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_MAILINGHISTORY]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_MAILINGHISTORY]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2831,7 +2871,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_QUOTES]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_NEPTUNE_QUOTES]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2880,7 +2920,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_ACCOMMODATON]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_ACCOMMODATON]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2962,7 +3002,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_BOOKEDPAX]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_BOOKEDPAX]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3026,7 +3066,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_BOOKINGS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_BOOKINGS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3223,7 +3263,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_BROCHUREREQUEST]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_BROCHUREREQUEST]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3280,7 +3320,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_CLIENT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_CLIENT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3405,7 +3445,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_CLIENT_BOOKINGS_X]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_CLIENT_BOOKINGS_X]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3441,7 +3481,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_CLIENTPREFERENCE]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_CLIENTPREFERENCE]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3487,7 +3527,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_EXTRAS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_EXTRAS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3576,7 +3616,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_FLIGHTS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_FLIGHTS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3646,7 +3686,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_MAILINGHISTORY]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_ST_TRITON_MAILINGHISTORY]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3690,7 +3730,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_TABLES]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_CELERITY_TABLES]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3724,7 +3764,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKEDACCOM]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKEDACCOM]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3754,7 +3794,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKEDEXTRA]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKEDEXTRA]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3784,7 +3824,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKEDFLIGHT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKEDFLIGHT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3816,7 +3856,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKINGPAX]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKINGPAX]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3850,7 +3890,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKINGS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BOOKINGS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3878,7 +3918,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BROCHUREREQUEST]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_BROCHUREREQUEST]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3912,7 +3952,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_CLIENT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_CLIENT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3940,7 +3980,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_CLIENTPREFERENCE]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_CLIENTPREFERENCE]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3974,7 +4014,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[LOG_TRITON_TABLE_ROW_COUNTS]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[LOG_TRITON_TABLE_ROW_COUNTS]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4001,7 +4041,7 @@ BEGIN
 	INSERT INTO [dbo].[TRT_Table_Row_Counts] (a_name,iteration,loadtime,numberofrecords) VALUES(@a_name,@ITERATION,GETDATE(),@numberofrecords)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[TRITON_CELERITY_EMAIL_FORMAT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[TRITON_CELERITY_EMAIL_FORMAT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4071,7 +4111,7 @@ END
 --File_Row_Count_Adjusted
 --File_Row_Count_Adjusted
 GO
-/****** Object:  StoredProcedure [dbo].[TRITON_CELERITY_IMPORT_ROW_COUNT]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[TRITON_CELERITY_IMPORT_ROW_COUNT]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4131,7 +4171,7 @@ SET @i_Database_Row = (
 				END
 
 GO
-/****** Object:  StoredProcedure [dbo].[TRUNCATE_CELERITY_TABLES]    Script Date: 18/05/2018 09:40:40 ******/
+/****** Object:  StoredProcedure [dbo].[TRUNCATE_CELERITY_TABLES]    Script Date: 24/08/2018 12:11:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

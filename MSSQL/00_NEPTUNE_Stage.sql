@@ -10,7 +10,7 @@
 */
 USE [master]
 GO
-/****** Object:  Database [NEPTUNE_Stage]    Script Date: 18/05/2018 09:45:16 ******/
+/****** Object:  Database [NEPTUNE_Stage]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE DATABASE [NEPTUNE_Stage]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -87,25 +87,25 @@ EXEC sys.sp_db_vardecimal_storage_format N'NEPTUNE_Stage', N'ON'
 GO
 USE [NEPTUNE_Stage]
 GO
-/****** Object:  User [ServerLink]    Script Date: 18/05/2018 09:45:16 ******/
+/****** Object:  User [ServerLink]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE USER [ServerLink] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [NEXUS\KKumar]    Script Date: 18/05/2018 09:45:16 ******/
-CREATE USER [NEXUS\KKumar] FOR LOGIN [NEXUS\KKumar] WITH DEFAULT_SCHEMA=[dbo]
+/****** Object:  User [NEXUS\KKumar]    Script Date: 24/08/2018 12:14:24 ******/
+CREATE USER [NEXUS\KKumar] WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [NEXUS\IMitrovic]    Script Date: 18/05/2018 09:45:16 ******/
-CREATE USER [NEXUS\IMitrovic] FOR LOGIN [NEXUS\IMitrovic] WITH DEFAULT_SCHEMA=[dbo]
+/****** Object:  User [NEXUS\IMitrovic]    Script Date: 24/08/2018 12:14:24 ******/
+CREATE USER [NEXUS\IMitrovic] WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [NeptuneCRM]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  User [NeptuneCRM]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE USER [NeptuneCRM] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [BOXIUser]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  User [BOXIUser]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE USER [BOXIUser] FOR LOGIN [BOXIUser] WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [BOXI_DEV]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  User [BOXI_DEV]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE USER [BOXI_DEV] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [boxi]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  User [boxi]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE USER [boxi] FOR LOGIN [boxi] WITH DEFAULT_SCHEMA=[dbo]
 GO
 ALTER ROLE [db_datareader] ADD MEMBER [NEXUS\KKumar]
@@ -120,7 +120,7 @@ ALTER ROLE [db_owner] ADD MEMBER [boxi]
 GO
 ALTER ROLE [db_datareader] ADD MEMBER [boxi]
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_CheckDate]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_CheckDate]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER OFF
@@ -190,7 +190,7 @@ select
 
 
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_NeptuneDate]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_NeptuneDate]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER OFF
@@ -262,7 +262,7 @@ select
 
 
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ACC_TYPE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ACC_TYPE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -372,7 +372,7 @@ CREATE TABLE [dbo].[NEPTUNE_ACC_TYPE](
 	[I5_IMPORT] [nvarchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ACCNOTE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ACCNOTE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -383,7 +383,7 @@ CREATE TABLE [dbo].[NEPTUNE_ACCNOTE](
 	[TEXT] [nvarchar](1000) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ACCOMMODATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ACCOMMODATION]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -445,13 +445,13 @@ CREATE TABLE [dbo].[NEPTUNE_ACCOMMODATION](
 	[ZAPPED] [nvarchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_ACCOMMODATION_PK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_ACCOMMODATION_PK]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE UNIQUE CLUSTERED INDEX [IX_NEPTUNE_ACCOMMODATION_PK] ON [dbo].[NEPTUNE_ACCOMMODATION]
 (
 	[ACCOMMODATION_NO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ACCOMMODATION_REF]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ACCOMMODATION_REF]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -509,14 +509,14 @@ CREATE TABLE [dbo].[NEPTUNE_ACCOMMODATION_REF](
 	[PARENT_ACCOMREF_NO] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_ACCOMMODATION_REF_CL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_ACCOMMODATION_REF_CL]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE CLUSTERED INDEX [IX_NEPTUNE_ACCOMMODATION_REF_CL] ON [dbo].[NEPTUNE_ACCOMMODATION_REF]
 (
 	[CLIENT_NO] ASC,
 	[ACCOMRENO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AGENT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AGENT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -564,7 +564,7 @@ CREATE TABLE [dbo].[NEPTUNE_AGENT](
 	[ONLINE_TYPE] [nvarchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AIRCRAFT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AIRCRAFT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -575,7 +575,7 @@ CREATE TABLE [dbo].[NEPTUNE_AIRCRAFT](
 	[i5_managed] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AIRLINE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AIRLINE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -585,7 +585,7 @@ CREATE TABLE [dbo].[NEPTUNE_AIRLINE](
 	[DESCRIPTION] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AIRPORT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AIRPORT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -598,7 +598,7 @@ CREATE TABLE [dbo].[NEPTUNE_AIRPORT](
 	[DEST_ADDR_REQD] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_APEX_ACCOM_TYPE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_APEX_ACCOM_TYPE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -610,7 +610,7 @@ CREATE TABLE [dbo].[NEPTUNE_APEX_ACCOM_TYPE](
 	[DATE_CHANGED] [date] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_APEX_ACCOM_TYPE_GROUP]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_APEX_ACCOM_TYPE_GROUP]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -624,7 +624,7 @@ CREATE TABLE [dbo].[NEPTUNE_APEX_ACCOM_TYPE_GROUP](
 	[DATE_CREATED] [date] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_APEX_REVENUE_LINE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_APEX_REVENUE_LINE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -644,7 +644,7 @@ CREATE TABLE [dbo].[NEPTUNE_APEX_REVENUE_LINE](
 	[DATE_CHANGED] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_APEX_REVENUE_LINE_GROUP]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_APEX_REVENUE_LINE_GROUP]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -654,7 +654,7 @@ CREATE TABLE [dbo].[NEPTUNE_APEX_REVENUE_LINE_GROUP](
 	[REVENUE_GROUP_DESC] [nvarchar](40) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_APEX_YIELD_GROUP]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_APEX_YIELD_GROUP]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -674,7 +674,7 @@ CREATE TABLE [dbo].[NEPTUNE_APEX_YIELD_GROUP](
 	[DATE_CREATED] [date] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AREA]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AREA]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -686,7 +686,7 @@ CREATE TABLE [dbo].[NEPTUNE_AREA](
 	[AREA_DESCRIPTION_ID] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AVAIL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AVAIL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -710,7 +710,7 @@ CREATE TABLE [dbo].[NEPTUNE_AVAIL](
 	[ACCESS] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_AVBK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_AVBK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -732,7 +732,7 @@ CREATE TABLE [dbo].[NEPTUNE_AVBK](
 	[CLIENT_NO] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_BASE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_BASE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -782,7 +782,7 @@ CREATE TABLE [dbo].[NEPTUNE_BASE](
 	[OLD_BASE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_BKPRICE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_BKPRICE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -819,7 +819,7 @@ CREATE TABLE [dbo].[NEPTUNE_BKPRICE](
 	[CAPPED] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_BOOK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_BOOK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -954,13 +954,13 @@ CREATE TABLE [dbo].[NEPTUNE_BOOK](
 	[F_CONTACT_URN] [bigint] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_BOOK_PK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_BOOK_PK]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE UNIQUE CLUSTERED INDEX [IX_NEPTUNE_BOOK_PK] ON [dbo].[NEPTUNE_BOOK]
 (
 	[CLIENT_NO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_CHARTYPE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_CHARTYPE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -979,7 +979,7 @@ CREATE TABLE [dbo].[NEPTUNE_CHARTYPE](
 	[MAILLIST] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_CLIENT_PREFERENCE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_CLIENT_PREFERENCE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -996,7 +996,7 @@ CREATE TABLE [dbo].[NEPTUNE_CLIENT_PREFERENCE](
 	[CancelFromSMS] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_COMPANY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_COMPANY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1006,7 +1006,7 @@ CREATE TABLE [dbo].[NEPTUNE_COMPANY](
 	[COMPANY_DESCRIPTION] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EBROC_NEWLETTERS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EBROC_NEWLETTERS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1037,7 +1037,7 @@ CREATE TABLE [dbo].[NEPTUNE_EBROC_NEWLETTERS](
 	[F_CONTACT_URN] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EMPL_AVAIL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EMPL_AVAIL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1050,7 +1050,7 @@ CREATE TABLE [dbo].[NEPTUNE_EMPL_AVAIL](
 	[DAY_OFF] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EMPL_UNAVAIL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EMPL_UNAVAIL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1061,7 +1061,7 @@ CREATE TABLE [dbo].[NEPTUNE_EMPL_UNAVAIL](
 	[END_DATE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EMPLREF]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EMPLREF]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1076,7 +1076,7 @@ CREATE TABLE [dbo].[NEPTUNE_EMPLREF](
 	[END_DATE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EXRATE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EXRATE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1088,7 +1088,7 @@ CREATE TABLE [dbo].[NEPTUNE_EXRATE](
 	[EX_RATE] [numeric](10, 3) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EXTRA]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EXTRA]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1114,7 +1114,7 @@ CREATE TABLE [dbo].[NEPTUNE_EXTRA](
 	[END_DATE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EXTRA_AVAIL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EXTRA_AVAIL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1134,7 +1134,7 @@ CREATE TABLE [dbo].[NEPTUNE_EXTRA_AVAIL](
 	[SUN] [nvarchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_EXTRAREF]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_EXTRAREF]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1150,7 +1150,7 @@ CREATE TABLE [dbo].[NEPTUNE_EXTRAREF](
 	[ACCOMREF_NO] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_FAMILY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_FAMILY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1306,7 +1306,7 @@ CREATE TABLE [dbo].[NEPTUNE_FAMILY](
 	[F_why_consent_withdrawn] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_FLIGHT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_FLIGHT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1364,7 +1364,7 @@ CREATE TABLE [dbo].[NEPTUNE_FLIGHT](
 	[I5_MANAGED] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_FLIGHT_ALLOC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_FLIGHT_ALLOC]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1383,7 +1383,7 @@ CREATE TABLE [dbo].[NEPTUNE_FLIGHT_ALLOC](
 	[ALLOW_NEGATIVE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_FLIGHT_REF]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_FLIGHT_REF]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1406,7 +1406,7 @@ CREATE TABLE [dbo].[NEPTUNE_FLIGHT_REF](
 	[ROUTE_NO] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_FLTNOTE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_FLTNOTE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1417,7 +1417,7 @@ CREATE TABLE [dbo].[NEPTUNE_FLTNOTE](
 	[TYPE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_INSTRUCT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_INSTRUCT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1428,7 +1428,7 @@ CREATE TABLE [dbo].[NEPTUNE_INSTRUCT](
 	[ITYPE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_INVOICE_COMPANY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_INVOICE_COMPANY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1469,7 +1469,7 @@ CREATE TABLE [dbo].[NEPTUNE_INVOICE_COMPANY](
 	[DEPOSIT_CONF] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_MAIL_CONTACT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_MAIL_CONTACT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1528,13 +1528,13 @@ CREATE TABLE [dbo].[NEPTUNE_MAIL_CONTACT](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_NEPTUNE_MAIL_CONTACT_PK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_MAIL_CONTACT_PK]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE UNIQUE CLUSTERED INDEX [IX_NEPTUNE_MAIL_CONTACT_PK] ON [dbo].[NEPTUNE_MAIL_CONTACT]
 (
 	[F_mail_no] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_MYUSER]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_MYUSER]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1563,7 +1563,7 @@ CREATE TABLE [dbo].[NEPTUNE_MYUSER](
 	[NEW_SYS_USR] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ORIGIN]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ORIGIN]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1578,7 +1578,7 @@ CREATE TABLE [dbo].[NEPTUNE_ORIGIN](
 	[EFT_CODE] [nvarchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PACKAGE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PACKAGE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1589,7 +1589,7 @@ CREATE TABLE [dbo].[NEPTUNE_PACKAGE](
 	[PACKAGE_DESC] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PASS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PASS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1653,14 +1653,14 @@ CREATE TABLE [dbo].[NEPTUNE_PASS](
 	[REDRESS_NO] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_PASS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_PASS]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE CLUSTERED INDEX [IX_NEPTUNE_PASS] ON [dbo].[NEPTUNE_PASS]
 (
 	[CLIENT_NO] ASC,
 	[PASS_NO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PASSLINK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PASSLINK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1674,7 +1674,7 @@ CREATE TABLE [dbo].[NEPTUNE_PASSLINK](
 	[AGE_CAT] [nvarchar](5) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PAYMENT_DETAIL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PAYMENT_DETAIL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1701,7 +1701,7 @@ CREATE TABLE [dbo].[NEPTUNE_PAYMENT_DETAIL](
 	[AGENT_CODE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PAYMENT_METHOD]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PAYMENT_METHOD]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1716,7 +1716,7 @@ CREATE TABLE [dbo].[NEPTUNE_PAYMENT_METHOD](
 	[AUTH_NO_REQD] [nvarchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PAYMENT_TERMS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PAYMENT_TERMS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1733,7 +1733,7 @@ CREATE TABLE [dbo].[NEPTUNE_PAYMENT_TERMS](
 	[DEP_FINAL] [nvarchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PRICE_DESC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PRICE_DESC]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1750,7 +1750,7 @@ CREATE TABLE [dbo].[NEPTUNE_PRICE_DESC](
 	[PRICE_SUBTYPE_CODE] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PRICE_OPT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PRICE_OPT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1776,7 +1776,7 @@ CREATE TABLE [dbo].[NEPTUNE_PRICE_OPT](
 	[FROM_i5] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_PRODUCT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_PRODUCT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1789,7 +1789,7 @@ CREATE TABLE [dbo].[NEPTUNE_PRODUCT](
 	[AVAIL] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_REG_BASE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_REG_BASE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1803,7 +1803,7 @@ CREATE TABLE [dbo].[NEPTUNE_REG_BASE](
 	[END_DATE] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_REMBOOK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_REMBOOK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1852,7 +1852,7 @@ CREATE TABLE [dbo].[NEPTUNE_REMBOOK](
 	[F_agent_or_directbooking] [varchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ROUTE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ROUTE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1863,7 +1863,7 @@ CREATE TABLE [dbo].[NEPTUNE_ROUTE](
 	[i5_MANAGED] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ROUTE_FLIGHT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ROUTE_FLIGHT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1875,7 +1875,7 @@ CREATE TABLE [dbo].[NEPTUNE_ROUTE_FLIGHT](
 	[TIME] [numeric](10, 2) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_ROUTE_LINK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_ROUTE_LINK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1888,7 +1888,7 @@ CREATE TABLE [dbo].[NEPTUNE_ROUTE_LINK](
 	[DEP_NO] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_SALES_CATEGORY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_SALES_CATEGORY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1898,7 +1898,7 @@ CREATE TABLE [dbo].[NEPTUNE_SALES_CATEGORY](
 	[SALES_CATEGORY] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_SFT_ALLOCATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_SFT_ALLOCATION]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1929,7 +1929,7 @@ CREATE TABLE [dbo].[NEPTUNE_SFT_ALLOCATION](
 	[PickUpDay] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_SOURCE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_SOURCE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1943,7 +1943,7 @@ CREATE TABLE [dbo].[NEPTUNE_SOURCE](
 	[INTERNET] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[NEPTUNE_XREF]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[NEPTUNE_XREF]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1961,7 +1961,7 @@ CREATE TABLE [dbo].[NEPTUNE_XREF](
 	[BASE_CODE] [nvarchar](255) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SB_NEPTUNE_REVENUE_CATEGORY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[SB_NEPTUNE_REVENUE_CATEGORY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1983,7 +1983,7 @@ CREATE TABLE [dbo].[SB_NEPTUNE_REVENUE_CATEGORY](
 	[RevenueType] [nvarchar](255) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_BrochureName]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[SL_BrochureName]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1993,7 +1993,7 @@ CREATE TABLE [dbo].[SL_BrochureName](
 	[Source] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_ACCOMBOAT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_ACCOMBOAT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2009,14 +2009,14 @@ CREATE TABLE [dbo].[ST_MARINE_ACCOMBOAT](
 	[CharterEndTime] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [ST_MARINE_ACCOMBOAT_CL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [ST_MARINE_ACCOMBOAT_CL]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE CLUSTERED INDEX [ST_MARINE_ACCOMBOAT_CL] ON [dbo].[ST_MARINE_ACCOMBOAT]
 (
 	[CLIENT_NO] ASC,
 	[PASS_NO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_AVAILABLEPORTS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_AVAILABLEPORTS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2030,7 +2030,7 @@ CREATE TABLE [dbo].[ST_MARINE_AVAILABLEPORTS](
 	[BrandCode] [nvarchar](3) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_AVAILPERWEEK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_AVAILPERWEEK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2047,7 +2047,7 @@ CREATE TABLE [dbo].[ST_MARINE_AVAILPERWEEK](
 	[Available] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_BEDSTOSEATS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_BEDSTOSEATS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2065,7 +2065,7 @@ CREATE TABLE [dbo].[ST_MARINE_BEDSTOSEATS](
 	[Available] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_BOATAVAILABILITY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_BOATAVAILABILITY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2080,7 +2080,7 @@ CREATE TABLE [dbo].[ST_MARINE_BOATAVAILABILITY](
 	[BrandCode] [nvarchar](3) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_BOOKING_LEAD]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_BOOKING_LEAD]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2134,7 +2134,7 @@ CREATE TABLE [dbo].[ST_MARINE_BOOKING_LEAD](
 	[Lead] [nvarchar](3) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_BOOKINGITEMS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_BOOKINGITEMS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2152,7 +2152,7 @@ CREATE TABLE [dbo].[ST_MARINE_BOOKINGITEMS](
 	[TransferFlag] [nvarchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_BOOKINGS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_BOOKINGS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2185,13 +2185,13 @@ CREATE TABLE [dbo].[ST_MARINE_BOOKINGS](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_MARINE_BOOKINGS_PK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_BOOKINGS_PK]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE UNIQUE CLUSTERED INDEX [IX_MARINE_BOOKINGS_PK] ON [dbo].[ST_MARINE_BOOKINGS]
 (
 	[BookRef] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_BROCHURE_REQUEST]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_BROCHURE_REQUEST]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2210,7 +2210,7 @@ CREATE TABLE [dbo].[ST_MARINE_BROCHURE_REQUEST](
 	[F_CONTACT_URN] [bigint] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_CLIENT_PREFERENCE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_CLIENT_PREFERENCE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2228,7 +2228,7 @@ CREATE TABLE [dbo].[ST_MARINE_CLIENT_PREFERENCE](
 	[CancelFromSMS] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_CLIENTS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_CLIENTS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2264,13 +2264,13 @@ CREATE TABLE [dbo].[ST_MARINE_CLIENTS](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_MARINE_CLIENTS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_CLIENTS]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE CLUSTERED INDEX [IX_MARINE_CLIENTS] ON [dbo].[ST_MARINE_CLIENTS]
 (
 	[ClientCode] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_FBKG]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_FBKG]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2347,7 +2347,7 @@ CREATE TABLE [dbo].[ST_MARINE_FBKG](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 100) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_FITN]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_FITN]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2405,7 +2405,7 @@ CREATE TABLE [dbo].[ST_MARINE_FITN](
 	[ArrivalAirport] [nvarchar](9) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_FLIGHTINVENTORY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_FLIGHTINVENTORY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2498,7 +2498,7 @@ CREATE TABLE [dbo].[ST_MARINE_FLIGHTINVENTORY](
 	[NeptuneManaged] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_HOTEL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_HOTEL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2517,7 +2517,7 @@ CREATE TABLE [dbo].[ST_MARINE_HOTEL](
 	[HotelEndTime] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_INSURANCE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_INSURANCE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2550,7 +2550,7 @@ CREATE TABLE [dbo].[ST_MARINE_INSURANCE](
 	[BaseLocation] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_PAX]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_PAX]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2587,7 +2587,7 @@ CREATE TABLE [dbo].[ST_MARINE_PAX](
 	[Transfer] [nvarchar](20) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_PAXACC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_PAXACC]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2607,7 +2607,7 @@ CREATE TABLE [dbo].[ST_MARINE_PAXACC](
 	[HotelEndTime] [nvarchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_PAXBOAT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_PAXBOAT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2626,7 +2626,7 @@ CREATE TABLE [dbo].[ST_MARINE_PAXBOAT](
 	[BaseLocation] [nvarchar](25) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_PAXFLIGHT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_PAXFLIGHT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2646,7 +2646,7 @@ CREATE TABLE [dbo].[ST_MARINE_PAXFLIGHT](
 	[ArrivalDate] [int] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_PAXFLIGHTDURATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_PAXFLIGHTDURATION]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2660,7 +2660,7 @@ CREATE TABLE [dbo].[ST_MARINE_PAXFLIGHTDURATION](
 	[FlightNumber] [bigint] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_PAYMENT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_PAYMENT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2690,7 +2690,7 @@ CREATE TABLE [dbo].[ST_MARINE_PAYMENT](
 	[CompanyNo] [nvarchar](25) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_REMBOOK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_REMBOOK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2740,13 +2740,13 @@ CREATE TABLE [dbo].[ST_MARINE_REMBOOK](
 	[AgentOrDirectBooking] [varchar](1) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_MARINE_REMBOOK_PK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_REMBOOK_PK]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE UNIQUE CLUSTERED INDEX [IX_MARINE_REMBOOK_PK] ON [dbo].[ST_MARINE_REMBOOK]
 (
 	[BookRef] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_MARINE_SOLDPERWEEK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Table [dbo].[ST_MARINE_SOLDPERWEEK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2765,7 +2765,7 @@ CREATE TABLE [dbo].[ST_MARINE_SOLDPERWEEK](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_NEPTUNE_ACCOMMODATION_NC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_ACCOMMODATION_NC]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_ACCOMMODATION_NC] ON [dbo].[NEPTUNE_ACCOMMODATION]
 (
 	[ACCOMMODATION_NO] ASC,
@@ -2774,14 +2774,14 @@ CREATE NONCLUSTERED INDEX [IX_NEPTUNE_ACCOMMODATION_NC] ON [dbo].[NEPTUNE_ACCOMM
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_NEPTUNE_AVAIL_NC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_AVAIL_NC]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_AVAIL_NC] ON [dbo].[NEPTUNE_AVAIL]
 (
 	[COMPANY_NO] ASC,
 	[ACCOMMODATION_NO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 100) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_BOOK_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_BOOK_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_BOOK_2] ON [dbo].[NEPTUNE_BOOK]
 (
 	[MAIL_NO] ASC,
@@ -2790,28 +2790,38 @@ CREATE NONCLUSTERED INDEX [IX_NEPTUNE_BOOK_2] ON [dbo].[NEPTUNE_BOOK]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_NEPTUNE_FAMILY_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_FAMILY_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_FAMILY_2] ON [dbo].[NEPTUNE_FAMILY]
 (
 	[F_mail_no] ASC,
 	[F_leader] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_FLIGHT_REF_NC]    Script Date: 18/05/2018 09:45:17 ******/
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [NEPTUNE_FAMILY_NCI]    Script Date: 24/08/2018 12:14:24 ******/
+CREATE NONCLUSTERED INDEX [NEPTUNE_FAMILY_NCI] ON [dbo].[NEPTUNE_FAMILY]
+(
+	[F_leader] ASC
+)
+INCLUDE ( 	[F_mail_no],
+	[F_fam_no]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_NEPTUNE_FLIGHT_REF_NC]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_FLIGHT_REF_NC] ON [dbo].[NEPTUNE_FLIGHT_REF]
 (
 	[CLIENT_NO] ASC,
 	[FLIGHTRENO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 100) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_PASS_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_PASS_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_PASS_2] ON [dbo].[NEPTUNE_PASS]
 (
 	[MAIL_NO] ASC,
 	[FAM_NO] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 100) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_NEPTUNE_PASSLINK_NC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_NEPTUNE_PASSLINK_NC]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_NEPTUNE_PASSLINK_NC] ON [dbo].[NEPTUNE_PASSLINK]
 (
 	[CLIENT_NO] ASC,
@@ -2821,7 +2831,7 @@ CREATE NONCLUSTERED INDEX [IX_NEPTUNE_PASSLINK_NC] ON [dbo].[NEPTUNE_PASSLINK]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_BK_NEPTUNE_SFT_ALLOCATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_BK_NEPTUNE_SFT_ALLOCATION]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_BK_NEPTUNE_SFT_ALLOCATION] ON [dbo].[NEPTUNE_SFT_ALLOCATION]
 (
 	[i_SK_InventoryDate] ASC,
@@ -2833,20 +2843,21 @@ CREATE NONCLUSTERED INDEX [IX_BK_NEPTUNE_SFT_ALLOCATION] ON [dbo].[NEPTUNE_SFT_A
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_MARINE_BOOKINGS_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_BOOKINGS_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_MARINE_BOOKINGS_2] ON [dbo].[ST_MARINE_BOOKINGS]
 (
 	[BrandCode] ASC,
 	[Status] ASC
 )
 INCLUDE ( 	[BookRef],
+	[BookingDate],
 	[CancelledDate],
 	[ConfirmDate],
 	[TotalPax]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [NonClusteredIndex-ClientCode]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [NonClusteredIndex-ClientCode]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [NonClusteredIndex-ClientCode] ON [dbo].[ST_MARINE_CLIENT_PREFERENCE]
 (
 	[ClientCode] ASC
@@ -2857,17 +2868,18 @@ INCLUDE ( 	[CancelFromBrochure],
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_MARINE_CLIENTS_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_CLIENTS_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_MARINE_CLIENTS_2] ON [dbo].[ST_MARINE_CLIENTS]
 (
 	[MailNo] ASC,
-	[Deceased] ASC,
-	[Lead] ASC
+	[Lead] ASC,
+	[Email1] ASC,
+	[Deceased] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_MARINE_FBKG_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_FBKG_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_MARINE_FBKG_2] ON [dbo].[ST_MARINE_FBKG]
 (
 	[Email] ASC
@@ -2875,14 +2887,14 @@ CREATE NONCLUSTERED INDEX [IX_MARINE_FBKG_2] ON [dbo].[ST_MARINE_FBKG]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_ST_MARINE_PAX_NC_BKG_PAX]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_ST_MARINE_PAX_NC_BKG_PAX]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_ST_MARINE_PAX_NC_BKG_PAX] ON [dbo].[ST_MARINE_PAX]
 (
 	[BkgRef] ASC,
 	[PaxNo] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_ST_MARINE_PAXFLIGHT_CK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_ST_MARINE_PAXFLIGHT_CK]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_ST_MARINE_PAXFLIGHT_CK] ON [dbo].[ST_MARINE_PAXFLIGHT]
 (
 	[i_SK_Bkg] ASC,
@@ -2891,7 +2903,7 @@ CREATE NONCLUSTERED INDEX [IX_ST_MARINE_PAXFLIGHT_CK] ON [dbo].[ST_MARINE_PAXFLI
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_ST_MARINE_PAXFLIGHTDURATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_ST_MARINE_PAXFLIGHTDURATION]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_ST_MARINE_PAXFLIGHTDURATION] ON [dbo].[ST_MARINE_PAXFLIGHTDURATION]
 (
 	[BkgRef] ASC,
@@ -2901,7 +2913,7 @@ CREATE NONCLUSTERED INDEX [IX_ST_MARINE_PAXFLIGHTDURATION] ON [dbo].[ST_MARINE_P
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_MARINE_REMBOOK_2]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  Index [IX_MARINE_REMBOOK_2]    Script Date: 24/08/2018 12:14:24 ******/
 CREATE NONCLUSTERED INDEX [IX_MARINE_REMBOOK_2] ON [dbo].[ST_MARINE_REMBOOK]
 (
 	[Email1] ASC
@@ -2911,7 +2923,7 @@ INCLUDE ( 	[CompanyNo],
 GO
 ALTER TABLE [dbo].[NEPTUNE_APEX_REVENUE_LINE] ADD  DEFAULT (NULL) FOR [SORT_ORDER]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_NEPTUNE_SFT_ALLOCATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_NEPTUNE_SFT_ALLOCATION]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3142,7 +3154,7 @@ AS
 	
 EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','SFT_ALLOC'		
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_ACCOMBOAT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_ACCOMBOAT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3208,7 +3220,7 @@ AS
 			
 	
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_AVAILABLEPORTS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_AVAILABLEPORTS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3252,7 +3264,7 @@ AS
 	EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_AVPORTS'
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_AVAILPERWEEK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_AVAILPERWEEK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3309,7 +3321,7 @@ BEGIN
  END
   
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BEDSTOSEATS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BEDSTOSEATS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3360,7 +3372,7 @@ BEGIN
 END
 	
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOATAVAILABILITY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOATAVAILABILITY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3464,7 +3476,7 @@ AS
 		
 	EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_AVAIL'
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOOKING_LEAD]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOOKING_LEAD]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3636,7 +3648,7 @@ BEGIN
     EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_MAR_BKGLEAD'
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOOKINGITEMS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOOKINGITEMS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3818,7 +3830,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOOKINGS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BOOKINGS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3894,7 +3906,7 @@ BEGIN
     EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_MAR_BKG'
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BROCHURE_REQUEST]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_BROCHURE_REQUEST]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3970,7 +3982,7 @@ EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_MAR_BRO'
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_CLIENT_PREFERENCE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_CLIENT_PREFERENCE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4018,7 +4030,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_CLIENTS]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_CLIENTS]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4137,7 +4149,7 @@ BEGIN
 	EXEC AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_MAR_CLI'
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_FBKG]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_FBKG]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4650,7 +4662,7 @@ AS
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_FITN]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_FITN]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5190,7 +5202,7 @@ AS
 	
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_FLIGHTINVENTORY]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_FLIGHTINVENTORY]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5637,7 +5649,7 @@ AS
 	
  
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_HOTEL]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_HOTEL]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5700,7 +5712,7 @@ AS
 			
 	
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_INSURANCE]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_INSURANCE]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5759,7 +5771,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAX]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAX]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5829,7 +5841,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXACC]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXACC]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5895,7 +5907,7 @@ AS
 			
 	
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXBOAT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXBOAT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5957,7 +5969,7 @@ AS
 			
 	
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXFLIGHT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXFLIGHT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6012,7 +6024,7 @@ BEGIN
 END
 	
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXFLIGHTDURATION]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAXFLIGHTDURATION]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6090,7 +6102,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAYMENT]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_PAYMENT]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6160,7 +6172,7 @@ AS
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_REMBOOK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_REMBOOK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6276,7 +6288,7 @@ AS
   
   
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_SOLDPERWEEK]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_MARINE_SOLDPERWEEK]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6350,7 +6362,7 @@ BEGIN
 	EXEC  AMI_Galaxy.dbo.AMI_LOG_CLOSE 'NPTN','ST_SOLD'
 END
 GO
-/****** Object:  StoredProcedure [dbo].[UPDATE_ST_MARINE_FBKG_CAA]    Script Date: 18/05/2018 09:45:17 ******/
+/****** Object:  StoredProcedure [dbo].[UPDATE_ST_MARINE_FBKG_CAA]    Script Date: 24/08/2018 12:14:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
