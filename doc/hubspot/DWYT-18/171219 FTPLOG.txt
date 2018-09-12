@@ -1,0 +1,1472 @@
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 143,451,701,248 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Accomodations.csv
+229 Entering Extended Passive Mode (|||5027|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+77233263 bytes transferred in 74.151 seconds. Transfer rate 1041.562 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 143,352,291,328 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_QuotesAccomodations.csv
+229 Entering Extended Passive Mode (|||5026|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+64717439 bytes transferred in 61.096 seconds. Transfer rate 1059.280 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 143,267,934,208 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Brochures.csv
+229 Entering Extended Passive Mode (|||5029|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+54459087 bytes transferred in 54.033 seconds. Transfer rate 1007.882 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 143,205,302,272 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients01.csv
+229 Entering Extended Passive Mode (|||5028|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+79531895 bytes transferred in 74.630 seconds. Transfer rate 1065.684 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 143,099,224,064 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients02.csv
+229 Entering Extended Passive Mode (|||5031|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+79943944 bytes transferred in 75.950 seconds. Transfer rate 1052.584 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,993,543,168 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients03.csv
+229 Entering Extended Passive Mode (|||5038|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+78643994 bytes transferred in 90.637 seconds. Transfer rate 867.684 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,891,405,312 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients04.csv
+229 Entering Extended Passive Mode (|||5036|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+76012961 bytes transferred in 66.884 seconds. Transfer rate 1136.493 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,794,907,648 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients05.csv
+229 Entering Extended Passive Mode (|||5037|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+74548436 bytes transferred in 65.939 seconds. Transfer rate 1130.559 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,701,002,752 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients06.csv
+229 Entering Extended Passive Mode (|||5040|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+74924146 bytes transferred in 65.854 seconds. Transfer rate 1137.740 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,604,357,632 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients07.csv
+229 Entering Extended Passive Mode (|||5039|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+74337918 bytes transferred in 65.331 seconds. Transfer rate 1137.865 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,506,856,448 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients08.csv
+229 Entering Extended Passive Mode (|||5041|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+74917086 bytes transferred in 64.929 seconds. Transfer rate 1153.836 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,408,728,576 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients09.csv
+229 Entering Extended Passive Mode (|||5042|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+19019531 bytes transferred in 22.665 seconds. Transfer rate 839.157 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,943,680 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients10.csv
+229 Entering Extended Passive Mode (|||5044|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,939,584 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients11.csv
+229 Entering Extended Passive Mode (|||5043|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,935,488 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients12.csv
+229 Entering Extended Passive Mode (|||5047|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,927,296 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients13.csv
+229 Entering Extended Passive Mode (|||5045|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,923,200 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients14.csv
+229 Entering Extended Passive Mode (|||5048|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,919,104 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients15.csv
+229 Entering Extended Passive Mode (|||5046|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,915,008 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients16.csv
+229 Entering Extended Passive Mode (|||5050|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,910,912 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients17.csv
+229 Entering Extended Passive Mode (|||5049|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,906,816 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients18.csv
+229 Entering Extended Passive Mode (|||5001|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,902,720 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients19.csv
+229 Entering Extended Passive Mode (|||5005|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.002 seconds. Transfer rate 464.384 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,898,624 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clients20.csv
+229 Entering Extended Passive Mode (|||5002|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   907 bytes transferred in 0.001 seconds. Transfer rate 928.768 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 142,383,415,296 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Bookings.csv
+229 Entering Extended Passive Mode (|||5006|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+522529570 bytes transferred in 413.953 seconds. Transfer rate 1262.292 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 141,733,986,304 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_EmailPref.csv
+229 Entering Extended Passive Mode (|||5003|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+63990919 bytes transferred in 56.078 seconds. Transfer rate 1141.103 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 141,653,086,208 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Extras.csv
+229 Entering Extended Passive Mode (|||5004|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+280789580 bytes transferred in 236.482 seconds. Transfer rate 1187.359 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 141,282,504,704 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_QuotesExtras.csv
+229 Entering Extended Passive Mode (|||5007|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+319718439 bytes transferred in 273.662 seconds. Transfer rate 1168.296 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,869,980,160 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Flights.csv
+229 Entering Extended Passive Mode (|||5008|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+32288269 bytes transferred in 33.536 seconds. Transfer rate 962.790 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,829,741,056 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_QuotesFlights.csv
+229 Entering Extended Passive Mode (|||5009|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+1782384 bytes transferred in 5.827 seconds. Transfer rate 305.876 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,827,480,064 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Mailhst.csv
+229 Entering Extended Passive Mode (|||5011|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+21931619 bytes transferred in 29.754 seconds. Transfer rate 737.100 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,801,941,504 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Passengers.csv
+229 Entering Extended Passive Mode (|||5013|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+66868484 bytes transferred in 97.501 seconds. Transfer rate 685.824 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,717,998,080 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref01.csv
+229 Entering Extended Passive Mode (|||5010|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+92959190 bytes transferred in 107.980 seconds. Transfer rate 860.889 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,609,777,664 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref02.csv
+229 Entering Extended Passive Mode (|||5019|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+95714667 bytes transferred in 84.657 seconds. Transfer rate 1130.614 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,501,172,224 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref03.csv
+229 Entering Extended Passive Mode (|||5017|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+96987793 bytes transferred in 85.737 seconds. Transfer rate 1131.220 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,390,592,512 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref04.csv
+229 Entering Extended Passive Mode (|||5023|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+97000037 bytes transferred in 86.095 seconds. Transfer rate 1126.666 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,280,008,704 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref05.csv
+229 Entering Extended Passive Mode (|||5024|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+70093950 bytes transferred in 64.821 seconds. Transfer rate 1081.342 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,139,352,064 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref06.csv
+229 Entering Extended Passive Mode (|||5020|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.001 seconds. Transfer rate 248.832 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref07.csv
+229 Entering Extended Passive Mode (|||5021|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.001 seconds. Transfer rate 248.832 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref08.csv
+229 Entering Extended Passive Mode (|||5022|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.002 seconds. Transfer rate 124.416 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref09.csv
+229 Entering Extended Passive Mode (|||5025|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.002 seconds. Transfer rate 124.416 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref10.csv
+229 Entering Extended Passive Mode (|||5027|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.001 seconds. Transfer rate 248.832 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref11.csv
+229 Entering Extended Passive Mode (|||5026|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.001 seconds. Transfer rate 248.832 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Clientpref12.csv
+229 Entering Extended Passive Mode (|||5029|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   243 bytes transferred in 0.001 seconds. Transfer rate 248.832 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,199,096,320 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_QuotesPassengers.csv
+229 Entering Extended Passive Mode (|||5028|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+17293863 bytes transferred in 27.469 seconds. Transfer rate 629.583 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 140,176,723,968 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Quotes.csv
+229 Entering Extended Passive Mode (|||5032|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+277847829 bytes transferred in 219.341 seconds. Transfer rate 1266.740 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT
+Output redirected to a file.
+Input read from specified override file.
+Connecting to host FTP.SPECIALISTHOLIDAYS.COM at address 185.74.26.92 using port 990.
+Connection is secure.
+220-Microsoft FTP Service
+    ############################################################
+    THIS IS A PRIVATE SYSTEM AND SHOULD ONLY BE ACCESSED BY
+    AUTHORISED INDIVIDUALS OR CORPORATIONS
+220 ############################################################
+Enter login ID (rwerner):
+331 Password required
+"230-Directory has 139,620,470,784 bytes of disk space available."
+230 User logged in.
+Windows_NT
+Enter an FTP subcommand.
+> ASCII
+200 Type set to A.
+Enter an FTP subcommand.
+> CD /Triton/TritonCelerity
+250 CWD command successful.
+Enter an FTP subcommand.
+> PUT GBLDLIB/CELERITYFL TST_TRT_20171219_Priorities.csv
+229 Entering Extended Passive Mode (|||5030|)
+125 Data connection already open; Transfer starting.
+Connection is secure.
+226 Transfer complete.
+   210 bytes transferred in 0.001 seconds. Transfer rate 215.040 KB/sec.
+Enter an FTP subcommand.
+> CLOSE
+221 Goodbye.
+Enter an FTP subcommand.
+> QUIT

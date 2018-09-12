@@ -1,0 +1,26 @@
+/*
+    Neptune brochures
+*/
+
+SELECT DISTINCT
+...
+FROM	
+	[NEPTUNE_Stage].[dbo].[ST_MARINE_BROCHURE_REQUEST] WITH (NOLOCK)
+INNER JOIN [NEPTUNE_Stage].[dbo].[ST_MARINE_CLIENTS] WITH (NOLOCK)
+	ON [ST_MARINE_BROCHURE_REQUEST].ClientCode=[ST_MARINE_CLIENTS].ClientCode
+INNER JOIN [HUBSPOT].[dbo].[SL_Simplified_BrochureName] WITH (NOLOCK)
+	ON [SL_Simplified_BrochureName].[BrochureNameActual]=[ST_MARINE_BROCHURE_REQUEST].[Type] AND [SL_Simplified_BrochureName].[BrandName]='LBT'
+INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_MAIL_CONTACT] WITH (NOLOCK) 
+	ON [NEPTUNE_MAIL_CONTACT].F_mail_no = [ST_MARINE_CLIENTS].MailNo
+INNER JOIN [NEPTUNE_Stage].[dbo].[NEPTUNE_FAMILY] WITH (NOLOCK)
+	ON [NEPTUNE_FAMILY].F_mail_no = [NEPTUNE_MAIL_CONTACT].[F_mail_no]
+	AND [NEPTUNE_FAMILY].F_leader = 'true'
+...
+WHERE
+	[ST_MARINE_CLIENTS].Deceased='N'
+AND [ST_MARINE_CLIENTS].Lead='Yes'
+-- Filter valid email addresses
+AND [ST_MARINE_CLIENTS].Email1 LIKE '%_@%_.__%'
+AND [ST_MARINE_CLIENTS].Email1 not like '%[[]%' AND [ST_MARINE_CLIENTS].Email1 not like '%]%' AND [ST_MARINE_CLIENTS].Email1 not like '%(%' AND [ST_MARINE_CLIENTS].Email1 not like '%)%' AND [ST_MARINE_CLIENTS].Email1 not like '%''%' AND [ST_MARINE_CLIENTS].Email1 not like '% %'
+-- Filter date range
+AND [ST_MARINE_BROCHURE_REQUEST].DateRequested BETWEEN CONVERT(DATE,GETDATE()-8) AND CONVERT(DATE,GETDATE()-1)
