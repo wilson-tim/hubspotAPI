@@ -88,14 +88,6 @@ namespace HUBSPOT_API
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_QUOTES";
                         if (module == "BOOKINGS")
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_BOOKINGS";
-                        if (module == "ENEWS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_ENEWS_8YR";
-                        if (module == "BROCREQ_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_8YR";
-                        if (module == "QUOTES_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_QUOTES_8YR";
-                        if (module == "BOOKINGS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_BOOKINGS_8YR";
 
                         objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
                     }
@@ -109,14 +101,6 @@ namespace HUBSPOT_API
                             storedProcedureName = "BUILD_HUBSPOT_TRITON_SS_QUOTES";
                         if (module == "BOOKINGS")
                             storedProcedureName = "BUILD_HUBSPOT_TRITON_SS_BOOKINGS";
-                        if (module == "ENEWS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_SS_ENEWS_8YR";
-                        if (module == "BROCREQ_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS_8YR";
-                        if (module == "QUOTES_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_SS_QUOTES_8YR";
-                        if (module == "BOOKINGS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_SS_BOOKINGS_8YR";
 
                         objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
                     }
@@ -130,14 +114,6 @@ namespace HUBSPOT_API
                             storedProcedureName = "BUILD_HUBSPOT_TRITON_TM_QUOTES";
                         if (module == "BOOKINGS")
                             storedProcedureName = "BUILD_HUBSPOT_TRITON_TM_BOOKINGS";
-                        if (module == "ENEWS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_TM_ENEWS_8YR";
-                        if (module == "BROCREQ_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS_8YR";
-                        if (module == "QUOTES_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_TM_QUOTES_8YR";
-                        if (module == "BOOKINGS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_TM_BOOKINGS_8YR";
 
                         objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
                     }
@@ -151,14 +127,6 @@ namespace HUBSPOT_API
                             storedProcedureName = "BUILD_HUBSPOT_TRITON_FL_QUOTES";
                         if (module == "BOOKINGS")
                             storedProcedureName = "BUILD_HUBSPOT_TRITON_FL_BOOKINGS";
-                        if (module == "ENEWS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_FL_ENEWS_8YR";
-                        if (module == "BROCREQ_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_FL_BROCHURE_REQUESTS_8YR";
-                        if (module == "QUOTES_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_FL_QUOTES_8YR";
-                        if (module == "BOOKINGS_8YR")
-                            storedProcedureName = "BUILD_HUBSPOT_TRITON_FL_BOOKINGS_8YR";
 
                         objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
                     }
