@@ -71,3 +71,8 @@ echo ***********************************************************
 echo LEBOAT BOOKINGS Process Started At %TIME:~0,2%:%TIME:~3,2% >> logs\HUBSPOT_API_%TODAY%.log
 HUBSPOT_API.exe LEBOAT BOOKINGS >> logs\HUBSPOT_API_%TODAY%.log
 echo ***********************************************************
+
+echo ***********************************************************
+echo LEBOAT PREFS Process Started At %TIME:~0,2%:%TIME:~3,2% >> logs\HUBSPOT_API_%TODAY%.log
+HUBSPOT_API.exe LEBOAT PREFS >> logs\HUBSPOT_API_%TODAY%.log
+echo ***********************************************************

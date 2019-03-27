@@ -36,3 +36,4 @@ Move %srcLocation%HUBSPOT_NEPTUNE_BOOKINGS_%mydate%.csv %destLocation%HUBSPOT_NE
 Move %srcLocation%HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_%mydate%.csv %destLocation%HUBSPOT_NEPTUNE_BROCHURE_REQUESTS_%mydate%.csv"
 Move %srcLocation%HUBSPOT_NEPTUNE_ENEWS_%mydate%.csv %destLocation%HUBSPOT_NEPTUNE_ENEWS_%mydate%.csv"
 Move %srcLocation%HUBSPOT_NEPTUNE_QUOTES_%mydate%.csv %destLocation%HUBSPOT_NEPTUNE_QUOTES_%mydate%.csv"
+Move %srcLocation%HUBSPOT_NEPTUNE_PREFS_%mydate%.csv %destLocation%HUBSPOT_NEPTUNE_PREFS_%mydate%.csv"

@@ -88,6 +88,8 @@ namespace HUBSPOT_API
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_QUOTES";
                         if (module == "BOOKINGS")
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_BOOKINGS";
+                        if (module == "PREFS")
+                            storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_CONTACT_PREFERENCES";
 
                         objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
                     }
