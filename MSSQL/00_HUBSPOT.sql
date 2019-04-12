@@ -11,7 +11,7 @@
 
 USE [master]
 GO
-/****** Object:  Database [HUBSPOT]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Database [HUBSPOT]    Script Date: 12/04/2019 10:06:51 ******/
 CREATE DATABASE [HUBSPOT]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -88,10 +88,10 @@ EXEC sys.sp_db_vardecimal_storage_format N'HUBSPOT', N'ON'
 GO
 USE [HUBSPOT]
 GO
-/****** Object:  UserDefinedDataType [dbo].[HugeMoney]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  UserDefinedDataType [dbo].[HugeMoney]    Script Date: 12/04/2019 10:06:52 ******/
 CREATE TYPE [dbo].[HugeMoney] FROM [decimal](28, 4) NULL
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_convertDate]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_convertDate]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER OFF
@@ -141,7 +141,7 @@ BEGIN
 END	
 
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_convertDateFromInteger]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_convertDateFromInteger]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER OFF
@@ -191,7 +191,7 @@ BEGIN
 END	
 
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_convertDateFromText]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_convertDateFromText]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER OFF
@@ -241,7 +241,7 @@ BEGIN
 END	
 
 GO
-/****** Object:  UserDefinedFunction [dbo].[fn_GetField]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  UserDefinedFunction [dbo].[fn_GetField]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -308,22 +308,7 @@ BEGIN
 END
 
 GO
-/****** Object:  Table [dbo].[190326anomalies]    Script Date: 27/03/2019 11:25:59 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[190326anomalies](
-	[Email] [varchar](255) NULL,
-	[Brand] [varchar](10) NULL,
-	[CancelFromEnews] [varchar](10) NULL,
-	[Datestamp] [datetime] NULL,
-	[NeptuneData] [varchar](10) NULL,
-	[Correction] [varchar](10) NULL,
-	[Match] [varchar](10) NULL
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[SL_BaseNameFull]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_BaseNameFull]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -337,7 +322,7 @@ CREATE TABLE [dbo].[SL_BaseNameFull](
 	[Region] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_EFSITE_PRODUCT_INTEREST]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_EFSITE_PRODUCT_INTEREST]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -348,7 +333,7 @@ CREATE TABLE [dbo].[SL_EFSITE_PRODUCT_INTEREST](
 	[ProductInterest] [varchar](50) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_HUBSPOT_FIELD_NAMES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_HUBSPOT_FIELD_NAMES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -361,7 +346,7 @@ CREATE TABLE [dbo].[SL_HUBSPOT_FIELD_NAMES](
 	[LeBoat] [nvarchar](100) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_ISO_SalesOffice]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_ISO_SalesOffice]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -373,7 +358,7 @@ CREATE TABLE [dbo].[SL_ISO_SalesOffice](
 	[SalesOffice] [varchar](50) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_BrochureName]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_BrochureName]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -384,7 +369,7 @@ CREATE TABLE [dbo].[SL_Simplified_BrochureName](
 	[BrandName] [varchar](10) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_ClientBookingOffice]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_ClientBookingOffice]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -394,7 +379,7 @@ CREATE TABLE [dbo].[SL_Simplified_ClientBookingOffice](
 	[ClientBookingOfficeSimplified] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_Country]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_Country]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -404,7 +389,7 @@ CREATE TABLE [dbo].[SL_Simplified_Country](
 	[CountrySimplified] [nvarchar](50) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_Country_Language_SourceOffice]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_Country_Language_SourceOffice]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -414,7 +399,7 @@ CREATE TABLE [dbo].[SL_Simplified_Country_Language_SourceOffice](
 	[SourceOffice] [varchar](100) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_Language]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_Language]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -424,7 +409,7 @@ CREATE TABLE [dbo].[SL_Simplified_Language](
 	[LanguageSimplified] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_Neptune_Client_Country]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_Neptune_Client_Country]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -434,7 +419,7 @@ CREATE TABLE [dbo].[SL_Simplified_Neptune_Client_Country](
 	[CountrySimplified] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_ProductName]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_ProductName]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -444,7 +429,7 @@ CREATE TABLE [dbo].[SL_Simplified_ProductName](
 	[ProductNameSimplified] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_SalesOffice]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_SalesOffice]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -455,7 +440,7 @@ CREATE TABLE [dbo].[SL_Simplified_SalesOffice](
 	[SalesOfficeSimplified] [varchar](50) NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_Title]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_Title]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -465,7 +450,7 @@ CREATE TABLE [dbo].[SL_Simplified_Title](
 	[TitleSimplified] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[SL_Simplified_Triton_Client_Country]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[SL_Simplified_Triton_Client_Country]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -475,7 +460,7 @@ CREATE TABLE [dbo].[SL_Simplified_Triton_Client_Country](
 	[CountrySimplified] [varchar](50) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ST_ERROR_LOG]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  Table [dbo].[ST_ERROR_LOG]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -494,7 +479,7 @@ CREATE TABLE [dbo].[ST_ERROR_LOG](
 GO
 ALTER TABLE [dbo].[ST_ERROR_LOG] ADD  CONSTRAINT [DF_ST_ERROR_LOG_LogDate]  DEFAULT (getdate()) FOR [LogDate]
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BOOKINGS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -907,7 +892,7 @@ BEGIN
 
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1161,7 +1146,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_CONTACT_PREFERENCES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_CONTACT_PREFERENCES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1178,6 +1163,7 @@ GO
 -- 25-Feb-2019      1.0         Tim Wilson         Original Version    
 -- 15-Mar-2019      1.1         Tim Wilson         New filters for associated bookings/quotes/brochures/enews, lead contact
 -- 21-Mar-2019      1.2         Tim Wilson         Additional WHERE clause for P.Brand
+-- 11-Apr-2019      1.3         Tim Wilson         Deployment fixes
 --
 --========================================================================================================================
 
@@ -1213,16 +1199,17 @@ BEGIN
 	SET @dateFormat    = ISNULL(@pDateFormat, 'unix')
 
     SELECT
-             ClientEmail
-            ,Brand
+             Email
+            ,'Le Boat Charter' AS BrandName
+            ,PClientCode AS ClientCode
             ,CancelFromEnews
             ,Datestamp
         FROM
             (
             SELECT DISTINCT
             --			 [Source_Key_full]
-            --		    ,P.[ClientCode] AS PClientCode
-                         Brand
+                         P.[ClientCode] AS PClientCode
+            --          ,Brand AS BrandName
             --			,CASE [CancelFromBrochure] WHEN 'TRUE' THEN 'Y' ELSE 'N' END AS [CancelFromBrochure]
             --			,CASE [CancelFromMailing] WHEN 'TRUE' THEN 'Y' ELSE 'N' END AS [CancelFromMailing]
             --			,CASE [CancelFromEmail] WHEN 'TRUE' THEN 'Y' ELSE 'N' END AS [CancelFromEmail]
@@ -1236,7 +1223,7 @@ BEGIN
                         ,F.F_consent_withdrawn 
                         ,F.F_date_consent_withdrawn 
                         ,F.F_time_consent_withdrawn 
-                        ,REPLACE(F.F_email,'\@','@') AS ClientEmail
+                        ,REPLACE(F.F_email,'\@','@') AS Email
                         ,CASE
                             WHEN LEN(RTRIM(CASE
                                 WHEN CancelFromEnews = 'TRUE' THEN ISNULL(F.F_date_consent_withdrawn,'') + ' ' + ISNULL(F_time_consent_withdrawn,'')
@@ -1281,12 +1268,12 @@ BEGIN
                             )
             ) innerSelect
         WHERE datestamp BETWEEN @startDate AND @endDate  -- date range selection for regular upload
-        ORDER BY ClientEmail, Datestamp  -- ensure that CancelFromEnews settings are uploaded in chronological order
+        ORDER BY Email, Datestamp  -- ensure that CancelFromEnews settings are uploaded in chronological order
 
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_ENEWS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1540,7 +1527,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_NEPTUNE_QUOTES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1762,7 +1749,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_BOOKINGS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2178,7 +2165,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_FL_QUOTES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2492,7 +2479,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BOOKINGS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2903,7 +2890,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_BROCHURE_REQUESTS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3185,7 +3172,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_ENEWS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3457,7 +3444,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_SS_QUOTES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3769,7 +3756,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BOOKINGS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4186,7 +4173,7 @@ BEGIN
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_BROCHURE_REQUESTS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4468,7 +4455,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_ENEWS]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4740,7 +4727,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_HUBSPOT_TRITON_TM_QUOTES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5054,7 +5041,7 @@ AS
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[BUILD_ST_ERROR_LOG]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5091,7 +5078,7 @@ BEGIN
     
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 27/03/2019 11:25:59 ******/
+/****** Object:  StoredProcedure [dbo].[SELECT_SL_HUBSPOT_FIELD_NAMES]    Script Date: 12/04/2019 10:06:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
