@@ -20,7 +20,7 @@ This repository has a separate subdirectory for each component of the solution a
 
 The G: drive folder structure supporting the SSIS packages has been revised and simplified as follows:
 ```
-G:\\
+G:\
 +--Marine
    +--Neptune
    |  +--data
