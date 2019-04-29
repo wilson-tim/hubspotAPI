@@ -81,17 +81,30 @@ namespace HUBSPOT_API
                     if (brand == "LEBOAT")
                     {
                         if (module == "ENEWS")
+                        {
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_ENEWS";
+                            objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
+                        }
                         if (module == "BROCREQ")
+                        {
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_BROCHURE_REQUESTS";
+                            objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
+                        }
                         if (module == "QUOTES")
+                        {
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_QUOTES";
+                            objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
+                        }
                         if (module == "BOOKINGS")
+                        {
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_BOOKINGS";
+                            objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
+                        }
                         if (module == "PREFS")
+                        {
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_CONTACT_PREFERENCES";
-
-                        objContact.CreateOrUpdateContact(brand, storedProcedureName, debugFlag).Wait();
+                            objContact.UpdateContact(brand, storedProcedureName, debugFlag).Wait();
+                        }
                     }
                     if (brand == "SUNSAIL")
                     {

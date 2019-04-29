@@ -19,6 +19,11 @@ namespace HUBSPOT_API
             return await new HTTP().POST(requestURI, "application/json", content);
         }
 
+        public async Task<HttpResponseMessage> UpdateContact(string requestURI, StringContent content)
+        {
+            return await new HTTP().POST(requestURI, "application/json", content);
+        }
+
         public async Task<HttpResponseMessage> CreateContactProperty(string requestURI,StringContent content)
         {
             return await new HTTP().POST(requestURI, "application/json", content);

@@ -13,3 +13,10 @@ C:\Users\twilson\Documents\Visual Studio 2013\Projects\HUBSPOT_API\HUBSPOT_API\o
 C:\Users\twilson\Documents\Visual Studio 2013\Projects\HUBSPOT_API\HUBSPOT_API\bin\Debug\HUBSPOT_API.exe
 C:\Users\twilson\Documents\Visual Studio 2013\Projects\HUBSPOT_API\HUBSPOT_API\bin\Debug\HUBSPOT_API.pdb
 C:\Users\twilson\Documents\Visual Studio 2013\Projects\HUBSPOT_API\HUBSPOT_API\obj\Debug\HUBSPOT_API.csprojResolveAssemblyReference.cache
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\bin\Debug\HUBSPOT_API.exe.config
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\bin\Debug\HUBSPOT_API.exe
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\bin\Debug\HUBSPOT_API.pdb
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\obj\Debug\HUBSPOT_API.csproj.CoreCompileInputs.cache
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\obj\Debug\HUBSPOT_API.exe
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\obj\Debug\HUBSPOT_API.pdb
+C:\Users\twilson\source\repos\HUBSPOT_API.test2019\HUBSPOT_API\obj\Debug\HUBSPOT_API.csprojAssemblyReference.cache

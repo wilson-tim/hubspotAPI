@@ -190,6 +190,115 @@ namespace HUBSPOT_API
             }
         }
 
+        public async Task<string> UpdateContact(string brand, string storedProc, bool debugFlag)
+        {
+            try
+            {
+                var objDAL = new DAL();
+                var dt_ContactRecords = objDAL.GetDataTableFromSQLServerProc(storedProc, null);
+                var columnNames = dt_ContactRecords.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToArray();
+
+                SqlParameter[] sqlParameter = new SqlParameter[1];
+                sqlParameter[0] = new SqlParameter("@BrandName", brand);
+                var dt_HubSpotFieldNames = objDAL.GetDataTableFromSQLServerProc("SELECT_SL_HUBSPOT_FIELD_NAMES", sqlParameter);
+
+                var hapikey = sAll.Get(brand + "_HAPIKEY");
+
+                foreach (DataRow dataRow in dt_ContactRecords.Rows)
+                {
+                    // 09/01/2018  TW  Restrict processing to a maximum of 10 data rows per second
+                    // Save start time of data row processing
+                    DateTime startTime = DateTime.UtcNow;
+
+                    var requestURI = sAll.Get("UPDATE_CONTACT_POSTURL");
+                    var ObjProperties = new Properties();
+                    var objProperty = new List<Property>();
+                    foreach (var cName in columnNames)
+                    {
+                        foreach (DataRow hFieldNameDTrow in dt_HubSpotFieldNames.Rows)
+                        {
+                            var queryFieldName = hFieldNameDTrow["QueryFieldName"].ToString();
+                            var hubSpotFieldName = hFieldNameDTrow["HubSpotFieldName"].ToString();
+                            // 19/01/2018  TW  Use case insensitive search
+                            //if (cName == queryFieldName)
+                            if (String.Equals(cName, queryFieldName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                objProperty.Add(new Property(hubSpotFieldName, dataRow[cName].ToString()));
+                                break;
+                            }
+                        }
+                    }
+
+                    ObjProperties.properties = objProperty;
+                    var json = new JSON().Serialize(ObjProperties);
+                    if (debugFlag)
+                    {
+                        Console.WriteLine(json);
+                    }
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    requestURI = requestURI.Replace(":contact_email", dataRow["Email"].ToString()).Replace(":hapikey", hapikey);
+
+                    var response = await new HubSpot().UpdateContact(requestURI, content);
+                    var responseOutput = await response.Content.ReadAsStringAsync();
+                    if (debugFlag)
+                    {
+                        Console.WriteLine(responseOutput);
+                    }
+                    var ObjCustomer = new JSON().Deserialize<Contact>(responseOutput);
+
+                    var sqlParameters = new SqlParameter[8];
+                    sqlParameters[0] = new SqlParameter("@Brand", dataRow.Table.Columns.Contains("BrandName") ? dataRow["BrandName"].ToString() : "");
+                    sqlParameters[1] = new SqlParameter("@LifeCycleStage", dataRow.Table.Columns.Contains("LifecycleStage") ? dataRow["LifecycleStage"].ToString() : "");
+                    sqlParameters[2] = new SqlParameter("@ClientCode", dataRow.Table.Columns.Contains("ClientCode") ? dataRow["ClientCode"].ToString() : "");
+                    sqlParameters[3] = new SqlParameter("@VID", ObjCustomer != null ? ObjCustomer.vid.ToString() : "");
+                    sqlParameters[4] = new SqlParameter("@Email", dataRow["Email"].ToString());
+                    sqlParameters[5] = new SqlParameter("@IsNew", ObjCustomer != null ? ObjCustomer.isNew.ToString() : "");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        sqlParameters[6] = new SqlParameter("@Status", "Success");
+                        sqlParameters[7] = new SqlParameter("@Error_Msg", "");
+                    }
+                    else
+                    {
+                        sqlParameters[6] = new SqlParameter("@Status", "Fail");
+
+                        var errorMessage = ObjCustomer != null ? ObjCustomer.message : response.StatusCode.ToString();
+
+                        if (ObjCustomer != null)
+                        {
+                            if (ObjCustomer.validationResults != null)
+                            {
+                                errorMessage = "";
+                                foreach (var err in ObjCustomer.validationResults)
+                                {
+                                    errorMessage = errorMessage + "Field Name: " + err.name + " ";
+                                    errorMessage = errorMessage + "Error: " + err.error + " ";
+                                    errorMessage = errorMessage + "Message: " + err.message + " ";
+                                }
+                            }
+                        }
+                        sqlParameters[7] = new SqlParameter("@Error_Msg", errorMessage);
+                    }
+                    new DAL().LogRecordStatus("BUILD_ST_ERROR_LOG", sqlParameters);
+
+                    // 09/01/2018  TW  Restrict processing to a maximum of 10 data rows per second
+                    // Check whether to wait before processing the next data row
+                    int timeLeft = (int)(startTime.AddSeconds(1.0 / 10.0) - DateTime.UtcNow).TotalMilliseconds;   // 1 second divided by 10 (the maximum number of uploads per second)
+                    if (timeLeft > 0)
+                    {
+                        Thread.Sleep(timeLeft);
+                    }
+                }
+                return "Process Completed";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task<string> SyncContactProperties(string brand)
         {
             try
