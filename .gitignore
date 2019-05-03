@@ -1,3 +1,6 @@
+# Visual Studio files
+.vs/
+
 # Files created during testing
 HUBSPOT_API/bin/Debug/HUBSPOT_API.bat
 HUBSPOT_API/bin/Debug/*.log
