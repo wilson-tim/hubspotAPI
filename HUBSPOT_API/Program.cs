@@ -105,6 +105,10 @@ namespace HUBSPOT_API
                             storedProcedureName = "BUILD_HUBSPOT_NEPTUNE_CONTACT_PREFERENCES";
                             objContact.UpdateContact(brand, storedProcedureName, debugFlag).Wait();
                         }
+                        if (module == "GETALLCONTACTS")
+                        {
+                            objContact.GetAllContacts(brand, debugFlag).Wait();
+                        }
                     }
                     if (brand == "SUNSAIL")
                     {

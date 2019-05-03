@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContactRecordBatch.cs" />
     <Compile Include="ContactsProperties.cs" />
     <Compile Include="Contact.cs" />
     <Compile Include="DAL.cs" />

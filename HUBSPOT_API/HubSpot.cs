@@ -33,6 +33,11 @@ namespace HUBSPOT_API
         {
             return await new HTTP().DELETE(requestURI, "application/json");
         }
-       
+
+        public async Task<HttpResponseMessage> GetAllContacts(string requestURI)
+        {
+            return await new HTTP().GET(requestURI, "application/json");
+        }
+
     }
 }

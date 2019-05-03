@@ -304,7 +304,7 @@ namespace HUBSPOT_API
             try
             {
                 var devHapikey = sAll.Get("DEV_HAPIKEY");
-                var liveSunsailKey = sAll.Get(brand +"_HAPIKEY");
+                var liveSunsailKey = sAll.Get(brand + "_HAPIKEY");
 
                 var requestURI = sAll.Get("GET_ALL_CONTACTS_PROPERTIES_GETURL");
 
@@ -318,7 +318,7 @@ namespace HUBSPOT_API
                     var deletePropertyRequestURI = sAll.Get("DELETE_CONTACT_PROPERTY_DELETEURL");
                     deletePropertyRequestURI = deletePropertyRequestURI.Replace(":property_name", devProperty.name).Replace(":hapikey", devHapikey);
                     var response = await new HubSpot().DeleteContactProperty(deletePropertyRequestURI);
-                    if(!response.IsSuccessStatusCode)
+                    if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception("Issue with deleting property " + devProperty.name);
                     }
@@ -336,59 +336,172 @@ namespace HUBSPOT_API
 
                     //if (devProperty.Count() == 0)
                     //{
-                        if (liveProperty.type == "enumeration")
-                        {
-                            var objMultiSelectProperty = new AddContactPropertyMultiSelect();
-                            objMultiSelectProperty.name = liveProperty.name;
-                            objMultiSelectProperty.label = liveProperty.label;
-                            objMultiSelectProperty.description = liveProperty.description;
-                            objMultiSelectProperty.groupName = liveProperty.groupName;
-                            objMultiSelectProperty.type = liveProperty.type;
-                            objMultiSelectProperty.fieldType = liveProperty.fieldType;
-                            objMultiSelectProperty.hidden = liveProperty.hidden;
-                            objMultiSelectProperty.options = liveProperty.options;
-                            objMultiSelectProperty.formField = liveProperty.formField;
+                    if (liveProperty.type == "enumeration")
+                    {
+                        var objMultiSelectProperty = new AddContactPropertyMultiSelect();
+                        objMultiSelectProperty.name = liveProperty.name;
+                        objMultiSelectProperty.label = liveProperty.label;
+                        objMultiSelectProperty.description = liveProperty.description;
+                        objMultiSelectProperty.groupName = liveProperty.groupName;
+                        objMultiSelectProperty.type = liveProperty.type;
+                        objMultiSelectProperty.fieldType = liveProperty.fieldType;
+                        objMultiSelectProperty.hidden = liveProperty.hidden;
+                        objMultiSelectProperty.options = liveProperty.options;
+                        objMultiSelectProperty.formField = liveProperty.formField;
 
-                            var json = new JSON().Serialize(objMultiSelectProperty);
-                            var content = new StringContent(json, Encoding.UTF8, "application/json");
-                            var response = await new HubSpot().CreateContactProperty(devRequestURI, content);
-                            var responseOutput = await response.Content.ReadAsStringAsync();
-                            if(!response.IsSuccessStatusCode)
-                            {
-                                throw new Exception("Issue with property " + liveProperty.name + " Error Message:" + responseOutput.ToString());
-                            }
-                        }
-                        else
+                        var json = new JSON().Serialize(objMultiSelectProperty);
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
+                        var response = await new HubSpot().CreateContactProperty(devRequestURI, content);
+                        var responseOutput = await response.Content.ReadAsStringAsync();
+                        if (!response.IsSuccessStatusCode)
                         {
-                            var objSingleTextProperty = new AddContactPropertyString();
-                            objSingleTextProperty.name = liveProperty.name;
-                            objSingleTextProperty.label = liveProperty.label;
-                            objSingleTextProperty.description = liveProperty.description;
-                            objSingleTextProperty.groupName = liveProperty.groupName;
-                            objSingleTextProperty.type = liveProperty.type;
-                            objSingleTextProperty.fieldType = liveProperty.fieldType;
-                            objSingleTextProperty.formField = liveProperty.formField;
-                            objSingleTextProperty.displayOrder = liveProperty.displayOrder;
-                            objSingleTextProperty.options = liveProperty.options;
-
-                            var json = new JSON().Serialize(objSingleTextProperty);
-                            var content = new StringContent(json, Encoding.UTF8, "application/json");
-                            var response = await new HubSpot().CreateContactProperty(devRequestURI, content);
-                            var responseOutput = await response.Content.ReadAsStringAsync();
-                            if (!response.IsSuccessStatusCode)
-                            {
-                                throw new Exception("Issue with property " + liveProperty.name + " Error Message:" + responseOutput.ToString());
-                            }
+                            throw new Exception("Issue with property " + liveProperty.name + " Error Message:" + responseOutput.ToString());
                         }
+                    }
+                    else
+                    {
+                        var objSingleTextProperty = new AddContactPropertyString();
+                        objSingleTextProperty.name = liveProperty.name;
+                        objSingleTextProperty.label = liveProperty.label;
+                        objSingleTextProperty.description = liveProperty.description;
+                        objSingleTextProperty.groupName = liveProperty.groupName;
+                        objSingleTextProperty.type = liveProperty.type;
+                        objSingleTextProperty.fieldType = liveProperty.fieldType;
+                        objSingleTextProperty.formField = liveProperty.formField;
+                        objSingleTextProperty.displayOrder = liveProperty.displayOrder;
+                        objSingleTextProperty.options = liveProperty.options;
+
+                        var json = new JSON().Serialize(objSingleTextProperty);
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
+                        var response = await new HubSpot().CreateContactProperty(devRequestURI, content);
+                        var responseOutput = await response.Content.ReadAsStringAsync();
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new Exception("Issue with property " + liveProperty.name + " Error Message:" + responseOutput.ToString());
+                        }
+                    }
                 }
 
                 return "Process Completed";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw ex;
             }
+        }
+
+        public async Task<string> GetAllContacts(string brand, bool debugFlag)
+        {
+            try
+            {
+                SqlParameter[] sqlParameter = new SqlParameter[1];
+                sqlParameter[0] = new SqlParameter("@BrandName", brand);
+
+                var hapikey = sAll.Get(brand + "_HAPIKEY");
+
+                var requestURI = sAll.Get("GET_ALL_CONTACTS_GETURL");
+                var ObjProperties = new Properties();
+                var objProperty = new List<Property>();
+
+                requestURI = requestURI.Replace(":hapikey", hapikey);
+
+                bool hasMore = false;
+                long vidoffset = 0;
+
+                do
+                {
+                    string newrequestURI = "";
+
+                    if (hasMore)
+                    {
+                        newrequestURI = requestURI + "&vidOffset=" + vidoffset;
+                    }
+                    else
+                    {
+                        newrequestURI = requestURI;
+                    }
+                    if (debugFlag)
+                    {
+                        Console.WriteLine(newrequestURI);
+                    }
+
+                    var response = await new HubSpot().GetAllContacts(newrequestURI);
+                    var responseOutput = await response.Content.ReadAsStringAsync();
+                    if (debugFlag)
+                    {
+                        Console.WriteLine(responseOutput);
+                    }
+
+                    Console.WriteLine("ContactEmail" + "\t" + "AddedDate" + "\t" + "LastModifiedDate" + "\t" + "LifeCycleStage" + "\t" + "FirstName" + "\t" + "LastName");
+
+                    // Resolve hyphenated JSON
+                    responseOutput = responseOutput.Replace("has-more", "hasmore");
+                    responseOutput = responseOutput.Replace("vid-offset", "vidoffset");
+                    responseOutput = responseOutput.Replace("canonical-vid", "canonical-vid");
+                    responseOutput = responseOutput.Replace("merged-vids", "mergedvids");
+                    responseOutput = responseOutput.Replace("is-contact", "iscontact");
+                    responseOutput = responseOutput.Replace("profile-token", "profiletoken");
+                    responseOutput = responseOutput.Replace("profileurl", "profileurl");
+                    responseOutput = responseOutput.Replace("identity-profiles", "identityprofiles");
+                    responseOutput = responseOutput.Replace("saved-at-timestamp", "savedattimestamp");
+                    responseOutput = responseOutput.Replace("deleted-changed-timestamp", "deletedchangedtimestamp");
+                    responseOutput = responseOutput.Replace("merge-audits", "mergeaudits");
+
+                    var ObjContactRecordBatch = new JSON().Deserialize<ContactRecordBatch>(responseOutput);
+                    if (debugFlag)
+                    {
+                        Console.WriteLine(ObjContactRecordBatch.hasmore);
+                        Console.WriteLine(ObjContactRecordBatch.vidoffset);
+                    }
+
+                    var ObjContactRecords = ObjContactRecordBatch.contacts;
+
+                    foreach (var ContactRecord in ObjContactRecords)
+                    {
+                        string outputString = "";
+
+                        var ObjIdentityProfiles = ContactRecord.identityprofiles;
+
+                        foreach (var Identities in ObjIdentityProfiles)
+                        {
+                            var ObjIdentity = Identities.identities;
+
+                            foreach (var Identity in ObjIdentity)
+                            {
+                                if (Identity.type == "EMAIL")
+                                {
+                                    outputString = Identity.value  + "\t" + epoch2string(Identity.timestamp);
+                                }
+                            }
+                        }
+
+                        string var2 = ContactRecord.properties.lastmodifieddate.value != null ? epoch2string(Convert.ToInt64(ContactRecord.properties.lastmodifieddate.value)) : "";
+                        string var3 = ContactRecord.properties.lifecyclestage.value != null ? ContactRecord.properties.lifecyclestage.value : "";
+                        string var4 = ContactRecord.properties.firstname.value != null ? ContactRecord.properties.firstname.value : "";
+                        string var5 = ContactRecord.properties.lastname.value != null ? ContactRecord.properties.lastname.value : "";
+
+                        Console.WriteLine(outputString + "\t" + var2 + "\t" + var3 + "\t" + var4 + "\t" + var5);
+                    }
+
+                    hasMore = ObjContactRecordBatch.hasmore;
+                    vidoffset = ObjContactRecordBatch.vidoffset;
+
+                }
+                while (hasMore);
+
+                return "Process Completed";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw ex;
+            }
+        }
+
+        private string epoch2string(long epoch)
+        {
+            return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(epoch).ToShortDateString();
         }
     }
 }
